@@ -977,8 +977,9 @@ try{
 const latest=parseFeed(await getFeed(FEED_BASE+'ultimasnoticias/feed.xml'));
 if(!latest.length)throw new Error('Feed vazio');
 const nh=await nhP;
-const base=[{title:'Destaques',big:true,items:latest.slice(0,5)},{title:'Últimas notícias',items:latest.slice(5,5+MAX_PER_RAIL)}];
+const base=[{title:'Destaques',big:true,items:latest.slice(0,5)}];
 if(nh)base.push(nh);
+base.push({title:'Últimas notícias',items:latest.slice(5,5+MAX_PER_RAIL)});
 const previous=source==='live'||source==='cache'?RAILS.filter(R=>R.title!=='Destaques'&&R.title!=='Últimas notícias'&&R.title!==NH_TITLE):[];
 build(base.concat(previous));source='live';setLive(true,'Ao vivo: Agência Brasil');
 const res=await Promise.allSettled(EDITORIAS.map(([slug])=>getFeed(FEED_BASE+slug+'/feed.xml').then(parseFeed)));
