@@ -138,6 +138,27 @@ html,body{height:100%;margin:0;background:var(--letterbox);overflow:hidden}
 .p-body figure{margin:10px 0 44px}
 .p-body figure img{display:block;width:100%;height:auto;background:var(--thumb)}
 .p-body figcaption{margin-top:14px;font-size:24px;line-height:1.4;color:#9A9A9A}
+/* ===== Controle pelo celular: ícone azul quando há celular pareado; tela de pareamento com QR e código ===== */
+.top .hd-ico[aria-pressed="true"]:not(.on){color:var(--brand)}
+.rm{position:absolute;top:0;right:0;bottom:0;left:0;z-index:7;background:var(--bg);opacity:0;visibility:hidden;transition:opacity .2s,visibility 0s linear .2s}
+.rm.show{opacity:1;visibility:visible;transition:opacity .2s}
+.rm svg{display:block;flex:none;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.rm-top{position:absolute;left:var(--safe-x);right:var(--safe-x);top:var(--safe-y);height:118px;display:flex;align-items:center;border-bottom:3px solid #444}
+.rm-title{margin:0 0 0 48px;font-size:48px;font-weight:500;color:#fff;white-space:nowrap}
+.rm-btn{flex:none;height:87px;display:flex;align-items:center;gap:18px;padding:0 34px;border:0;background:#454545;color:#fff;font:900 34px/1 var(--font);cursor:pointer;outline:none;transition:background-color .12s,color .12s}
+.rm-btn svg{width:40px;height:40px}
+.rm-btn.on{background:var(--focus);color:var(--card)}
+.rm-body{position:absolute;left:var(--safe-x);right:var(--safe-x);top:290px;bottom:var(--safe-y);display:flex;align-items:center}
+.rm-qr{flex:none;width:520px;height:520px;box-sizing:border-box;padding:32px;background:#fff}
+.rm-qr svg{width:100%;height:100%;stroke:none}
+.rm-info{margin-left:96px;min-width:0}
+.rm-step{margin:0 0 28px;max-width:1000px;font-size:38px;line-height:1.4;color:#E0E0E0}
+.rm-step b{color:var(--brand);font-weight:700;overflow-wrap:anywhere}
+.rm-code{margin:0 0 44px;font:500 150px/1 "Roboto Mono",ui-monospace,monospace;letter-spacing:.15em;color:#fff;border-left:8px solid var(--focus);padding-left:32px}
+.rm-status{display:flex;align-items:center;margin:0;font-size:32px;font-weight:500;color:var(--sub)}
+.rm-status svg{width:42px;height:42px;margin-right:16px}
+.rm-status.ok{color:var(--brand)}
+.rm-new{margin-top:52px}
 /* ===== Abertura: despacho de agência — teletipo, faixas de manchetes, carimbo do logo na placa de manchete, voo até o cabeçalho ===== */
 .stage.intro-on .top .hd-logo{visibility:hidden}
 .intro{position:absolute;top:0;right:0;bottom:0;left:0;z-index:30;display:grid;place-items:center;cursor:default;user-select:none;-webkit-user-select:none;font-family:var(--font)}
@@ -167,7 +188,7 @@ html,body{height:100%;margin:0;background:var(--letterbox);overflow:hidden}
 .intro-gate kbd{font:inherit;font-weight:900;color:var(--card);background:var(--focus);padding:6px 22px;margin:0 6px}
 .intro-gate small{font-size:24px;color:#7A7A7A}
 .intro-gate .iw-cur{width:28px;height:44px;margin:0}
-@media (prefers-reduced-motion:reduce){.rails,.track,.ring,.toast,.post,.p-prog,.p-btn{transition:none}.sk .thumb,.skl,.iw-cur{animation:none}}
+@media (prefers-reduced-motion:reduce){.rails,.track,.ring,.toast,.post,.rm,.rm-btn,.p-prog,.p-btn{transition:none}.sk .thumb,.skl,.iw-cur{animation:none}}
 </style>
 </head>
 <body>
@@ -184,6 +205,7 @@ html,body{height:100%;margin:0;background:var(--letterbox);overflow:hidden}
 <button class="hd-ico" type="button" tabindex="-1" data-hd="add" data-soon aria-label="Adicionar tema" title="Adicionar tema"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M3 12h18"/></svg></button>
 </nav>
 <div class="hd-end">
+<button class="hd-ico" id="rmBtn" type="button" tabindex="-1" data-hd="remote" aria-label="Controle pelo celular" title="Controle pelo celular" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M10.5 18h3"/></svg></button>
 <button class="hd-ico" id="fsBtn" type="button" tabindex="-1" data-hd="fs" aria-label="Tela cheia" title="Tela cheia"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3h7v7M10 21H3v-7M21 3l-7.5 7.5M3 21l7.5-7.5"/></svg></button>
 <button class="hd-ico" type="button" tabindex="-1" data-hd="user" data-soon aria-label="Perfil" title="Perfil"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7.5" r="4"/><path d="M4 21v-.5a6.5 6.5 0 0 1 6.5-6.5h3a6.5 6.5 0 0 1 6.5 6.5v.5"/></svg></button>
 </div>
@@ -228,6 +250,22 @@ html,body{height:100%;margin:0;background:var(--letterbox);overflow:hidden}
 <div class="p-track" aria-hidden="true"><div class="p-prog" id="pProg"></div></div>
 </div>
 
+</section>
+
+<section class="rm" id="rm" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="rmTitle">
+<div class="rm-top">
+<button class="rm-btn" id="rmBack" type="button" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23 12H1.5M11.5 1.5 1.5 12l10 10.5"/></svg>Voltar</button>
+<h2 class="rm-title" id="rmTitle">Controle pelo celular</h2>
+</div>
+<div class="rm-body">
+<div class="rm-qr" id="rmQr" aria-hidden="true"></div>
+<div class="rm-info">
+<p class="rm-step">Aponte a câmera do celular para o QR code ou abra <b id="rmUrl">—</b> e digite o código:</p>
+<div class="rm-code" id="rmCode">—</div>
+<p class="rm-status" id="rmStatus" role="status" aria-live="polite"><svg viewBox="0 0 24 24" aria-hidden="true" id="rmStatusIco"></svg><span id="rmStatusText">Conectando…</span></p>
+<button class="rm-btn rm-new" id="rmNew" type="button" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 15 15 9M10.5 6.5l1.8-1.8a4.6 4.6 0 0 1 6.5 6.5l-1.8 1.8M13.5 17.5l-1.8 1.8a4.6 4.6 0 0 1-6.5-6.5l1.8-1.8M3 3l3 3M21 21l-3-3"/></svg><span id="rmNewText">Gerar novo código</span></button>
+</div>
+</div>
 </section>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -507,10 +545,11 @@ pf=hasNext?NB.next:NB.back;setNav(false);
 idx[k]=i;r=k;inHeader=false;render();updateProg();requestAnimationFrame(updateProg);
 focusEl(pScroll);}
 /* fechar passa pelo histórico: o Voltar do Fire TV/Android TV (popstate) também fecha a matéria */
-let closeTimer=0;
+let closeTimer=0,closing=false;
 function closePost(fromPop){if(!postOpen)return;
-if(!fromPop&&history.state&&history.state.rotPost){clearTimeout(closeTimer);closeTimer=setTimeout(()=>closePost(true),400);try{history.back();return;}catch(e){}}
-clearTimeout(closeTimer);postOpen=false;cur=null;sfx.back();post.classList.remove('show');post.setAttribute('aria-hidden','true');setBgInert(false);
+if(!fromPop&&history.state&&history.state.rotPost){if(closing)return; // Voltar duplo enquanto fecha: um history.back() só
+closing=true;clearTimeout(closeTimer);closeTimer=setTimeout(()=>closePost(true),400);try{history.back();return;}catch(e){}}
+clearTimeout(closeTimer);closing=false;postOpen=false;cur=null;sfx.back();post.classList.remove('show');post.setAttribute('aria-hidden','true');setBgInert(false);
 if(pending){const d=pending;pending=null;build(d);}else render();}
 addEventListener('popstate',()=>{if(postOpen)closePost(true);});
 function nextPost(){if(!cur)return;const n=cur.i+1;
@@ -566,6 +605,13 @@ if(INTRO.key(e))return;
 const k=keyOf(e),code=e.keyCode;
 // segurar OK/Voltar não pode disparar ações em cascata (abrir → próxima → próxima…)
 if(e.repeat&&(k==='Enter'||code===13||isBack(k,code))){e.preventDefault();return;}
+if(rmIsOpen){
+if(isBack(k,code))rmClose();
+else if(k==='ArrowLeft'||k==='ArrowUp')cue(rmMove(0),e,k);
+else if(k==='ArrowRight'||k==='ArrowDown')cue(rmMove(1),e,k);
+else if(k==='Enter'||code===13)rmAct(rf);
+else return;
+e.preventDefault();return;}
 if(postOpen){
 if(isBack(k,code))closePost();
 else if(k==='ArrowDown'){cue(readStep(1),e,k);}
@@ -660,10 +706,86 @@ else if(a==='fs')fsToggle();
 else if(a==='search')showToast('Busca: disponível em breve');
 else if(a==='add')showToast('Adicionar tema: disponível em breve');
 else if(a==='user')showToast('Perfil: disponível em breve');
+else if(a==='remote')rmOpen();
 else showToast(b.textContent.trim()+': disponível em breve');}
 hdItems.forEach((b,i)=>b.addEventListener('click',e=>{e.stopPropagation();if(postOpen)return;inHeader=true;hf=i;render();hdAct(i);}));
 async function fsToggle(){try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen({navigationUI:'hide'});}catch(err){showToast('Tela cheia indisponível neste navegador');}render();}
 document.addEventListener('fullscreenchange',()=>{fsSync();fit();render();});
+
+/* ================= Controle pelo celular (MQTT) ================= */
+/* Mesma estratégia do Read on TV clássico: a TV assina um canal num broker MQTT público (código de 5 letras guardado
+   no aparelho) e mostra um QR que abre c.html no celular. O celular publica comandos; a TV confirma (ack) para o celular
+   medir a ida e volta e converte cada comando numa tecla que passa pelo mesmo onKey do controle físico. Assim a
+   navegação espacial funciona igual no Silk do Fire TV Stick, sem depender do modo cursor do navegador.
+   A TV escuta em TODOS os brokers ao mesmo tempo: o celular usa qualquer um e troca sozinho se um não responder.
+   Prefixo e chaves próprios deste app: o Read on TV clássico mora na mesma origem (github.io) e não pode se misturar.
+   As bibliotecas só carregam quando a tela de pareamento abre ou quando já houve um celular pareado. */
+var RM_BROKERS=['wss://broker.emqx.io:8084/mqtt','wss://broker.hivemq.com:8884/mqtt'];
+var RM_PREFIX='readontv/on/',RM_KEY_CODE='readontv-on:remote-code',RM_KEY_PAIRED='readontv-on:remote-paired';
+var RM_LIBS=['https://cdn.jsdelivr.net/npm/mqtt@5.16.0/dist/mqtt.min.js','https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js'];
+var RM_KEYS={up:['ArrowUp',38],down:['ArrowDown',40],left:['ArrowLeft',37],right:['ArrowRight',39],ok:['Enter',13],back:['Escape',27],pgup:['PageUp',33],pgdn:['PageDown',34]};
+var RM_ICO_OK='<rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M10.5 18h3"/>',RM_ICO_WAIT='<path d="M20 12a8 8 0 0 1-14.3 4.9M4 12a8 8 0 0 1 14.3-4.9"/><path d="M18.5 3v4.2h-4.2M5.5 21v-4.2h4.2"/>';
+var rmEl=$('rm'),rmBtn=$('rmBtn'),rmBtns=[$('rmBack'),$('rmNew')],rmIsOpen=false,rf=0,rmToasted=false,rmLast={k:'',t:0};
+var rmSeen={n:null,t:0},rm={code:null,bi:0,clients:[],live:[],starting:false,paired:false};
+function rmNewCode(avoid){var A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',c;
+do{c='';for(var i=0;i<5;i++)c+=A[Math.floor(Math.random()*A.length)];}while(c===avoid);store.set(RM_KEY_CODE,c);return c;}
+rm.code=/^[A-Z0-9]{5}$/.test(store.get(RM_KEY_CODE)||'')?store.get(RM_KEY_CODE):rmNewCode();
+rm.paired=store.get(RM_KEY_PAIRED)==='1';
+function rmPhoneUrl(){return location.href.split('#')[0].split('?')[0].replace(/[^\/]*$/,'')+'c?c='+rm.code+'&b='+rm.bi;}
+function rmLive(){return rm.live.some(Boolean);}
+function rmReady(){return rm.paired?'Pronto. Use o celular para navegar.':'Aguardando o celular…';}
+function rmStatus(text,ok){$('rmStatusText').textContent=text;$('rmStatus').className='rm-status'+(ok?' ok':'');$('rmStatusIco').innerHTML=ok?RM_ICO_OK:RM_ICO_WAIT;}
+function rmSync(){rmBtn.setAttribute('aria-pressed',String(rm.paired));$('rmNewText').textContent=rm.paired?'Desconectar celular e gerar novo código':'Gerar novo código';}
+function rmRender(){const url=rmPhoneUrl();$('rmCode').textContent=rm.code;$('rmUrl').textContent=url.replace(/^https?:\/\//,'').replace(/\?.*$/,'');
+const box=$('rmQr');if(typeof qrcode==='undefined'){box.textContent='';return;}
+try{const q=qrcode(0,'M');q.addData(url);q.make();box.innerHTML=q.createSvgTag({cellSize:4,margin:0,scalable:true});}catch(e){box.textContent='';}}
+function rmLoadLibs(done){let i=0;(function next(){if(i>=RM_LIBS.length){done(true);return;}
+const s=document.createElement('script');s.src=RM_LIBS[i++];s.onload=next;s.onerror=()=>done(false);document.head.appendChild(s);})();}
+function rmStart(){if(rm.clients.length||rm.starting)return;rm.starting=true;rmStatus('Conectando…',false);
+rmLoadLibs(ok=>{rm.starting=false;if(!ok||typeof mqtt==='undefined'){rmStatus('Não foi possível carregar o controle. Verifique a internet.',false);return;}rmRender();rmConnect();});}
+function rmConnect(){rm.clients=[];rm.live=[];
+RM_BROKERS.forEach((url,i)=>{const c=mqtt.connect(url,{clientId:'rotv-on-tv-'+Math.random().toString(36).slice(2,10),clean:true,connectTimeout:10000,reconnectPeriod:3000,keepalive:30,timerVariant:'native'});
+rm.clients[i]=c;rm.live[i]=false;
+c.on('connect',()=>{const first=!rmLive();rm.live[i]=true;c.subscribe(RM_PREFIX+rm.code+'/cmd',{qos:0});
+if(first){rm.bi=i;rmRender();}rmStatus(rmReady(),rm.paired);});
+c.on('close',()=>{rm.live[i]=false;if(!rmLive())rmStatus('Reconectando…',false);});
+c.on('offline',()=>{if(!rmLive())rmStatus('Sem conexão com a internet',false);});
+c.on('error',()=>{}); // o mqtt.js segue tentando; o outro broker cobre enquanto isso
+c.on('message',(topic,payload)=>{let m;try{m=JSON.parse(String(payload));}catch(e){return;}
+if(!m||!RM_KEYS[m.k]||topic!==RM_PREFIX+rm.code+'/cmd')return;
+// mesmo comando chegando por dois caminhos (reconexão, dois brokers): executa uma vez só
+const now=Date.now();if(m.n===rmSeen.n&&now-rmSeen.t<1500)return;rmSeen={n:m.n,t:now};
+// confirmação pelo mesmo broker que trouxe o comando
+c.publish(RM_PREFIX+rm.code+'/ack',JSON.stringify({n:m.n}),{qos:0});
+remoteCommand(m.k);});});}
+/* Revoga o código: avisa o celular pareado, troca o código e passa a escutar só o novo */
+function rmRevoke(){const old=rm.code;rm.code=rmNewCode(old);rm.paired=false;rmToasted=false;
+try{localStorage.removeItem(RM_KEY_PAIRED);}catch(e){}
+rm.clients.forEach((c,i)=>{if(!rm.live[i])return;c.publish(RM_PREFIX+old+'/ack',JSON.stringify({revoked:true}),{qos:0});
+c.unsubscribe(RM_PREFIX+old+'/cmd');c.subscribe(RM_PREFIX+rm.code+'/cmd',{qos:0});});
+rmRender();rmSync();if(!rm.clients.length)rmStart();else rmStatus(rmLive()?'Novo código pronto. Aguardando o celular…':'Conectando…',false);}
+function remoteCommand(k){
+if(!rm.paired){rm.paired=true;store.set(RM_KEY_PAIRED,'1');rmSync();}
+rmStatus('Celular conectado',true);
+if(!rmToasted&&!rmIsOpen){rmToasted=true;showToast('Controle do celular conectado',2200);}
+// o primeiro comando com a tela de pareamento aberta só a fecha
+if(rmIsOpen){rmClose();return;}
+remoteKey(k);}
+/* Converte o comando numa tecla e passa pelo mesmo onKey do controle remoto (setas, OK, Voltar, páginas) */
+function remoteKey(k){const d=RM_KEYS[k],now=performance.now();
+// celular segurando a seta manda comandos a cada ~160 ms: trata como tecla repetida (som mais baixo)
+const rep=k===rmLast.k&&now-rmLast.t<260&&/^(up|down|left|right|pgup|pgdn)$/.test(k);rmLast={k,t:now};
+onKey({key:d[0],keyCode:d[1],repeat:rep,ctrlKey:false,metaKey:false,altKey:false,preventDefault(){}});}
+function rmFocus(){rmBtns.forEach((b,i)=>b.classList.toggle('on',i===rf));focusEl(rmBtns[rf]);}
+function rmMove(i){if(i===rf)return false;rf=i;rmFocus();return true;}
+function rmAct(i){if(i===0)rmClose();else{sfx.enter();rmRevoke();}}
+function rmOpen(){if(rmIsOpen)return;rmIsOpen=true;rf=0;rmEl.classList.add('show');rmEl.setAttribute('aria-hidden','false');setBgInert(true);
+rmRender();if(rm.clients.length)rmStatus(rmLive()?rmReady():'Conectando…',rmLive()&&rm.paired);rmStart();rmFocus();}
+function rmClose(){if(!rmIsOpen)return;rmIsOpen=false;sfx.back();rmEl.classList.remove('show');rmEl.setAttribute('aria-hidden','true');setBgInert(false);render();}
+rmBtns.forEach((b,i)=>{b.addEventListener('click',()=>{rf=i;rmFocus();rmAct(i);});b.addEventListener('mouseenter',()=>rmMove(i));});
+rmSync();
+// já pareado antes: reconecta em segundo plano depois que a página carregar
+if(rm.paired)addEventListener('load',()=>setTimeout(rmStart,1500));
 
 /* ================= Abertura: despacho de agência (Web Audio API + WAAPI) ================= */
 /* Roda em toda entrada (F5), com a linguagem do próprio app: fundo #2A2A2A, blocos retos, azul da marca, amarelo do foco.

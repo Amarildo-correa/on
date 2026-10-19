@@ -1,0 +1,250 @@
+<!doctype html>
+<!--
+  Controle remoto do Read on TV (versão /on) no celular. Mesma estratégia do Read on TV clássico (repositório tv).
+  A TV mostra um código (e um QR que abre esta página com ?c=CÓDIGO&b=BROKER).
+  Cada toque publica um comando num broker MQTT público; a TV confirma (ack) para medir a ida e volta.
+-->
+<html lang="pt-BR">
+<title>Read on TV · Controle</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<meta name="theme-color" content="#2A2A2A">
+<style>
+  :root { --bg: #2A2A2A; --fg: #FFFFFF; --muted: #B3B3B3; --accent: #4FB8FF; --accent-ink: #141414; --focus: #FFD60A; --ok: #7BE495; --bad: #FF8A80; --warn: #FFD54F; --tile: #454545; color-scheme: dark; }
+  html, body { margin: 0; background: var(--bg); color: var(--fg); font-family: Roboto, system-ui, sans-serif; }
+  [hidden] { display: none !important; }
+  .ok { color: var(--ok); } .bad { color: var(--bad); } .warn { color: var(--warn); }
+  main { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; padding: 16px; box-sizing: border-box; gap: 16px;
+    touch-action: manipulation; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
+  header { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  h1 { margin: 0; font-size: 20px; color: var(--accent); }
+  .st { font-size: 15px; font-weight: 700; text-align: right; }
+  .meta { font-size: 14px; color: var(--muted); margin: 0; }
+  button { -webkit-appearance: none; appearance: none; border: 0; border-radius: 18px; background: var(--tile); color: var(--fg); font: inherit; font-size: 34px; font-weight: 700; touch-action: manipulation; }
+  button:active, button.down { background: var(--accent); color: var(--accent-ink); }
+  /* Controle para uma mão (destro): anel direcional no canto inferior direito, Voltar à esquerda dele embaixo */
+  .remote { position: relative; width: 262px; height: 250px; margin: auto 0 0 auto;
+    margin-bottom: calc(8px + env(safe-area-inset-bottom, 0px)); }
+  .ring { position: absolute; top: 0; right: 0; width: 210px; height: 210px; display: block; overflow: visible;
+    filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .55)); }
+  .ring .seg { fill: transparent; cursor: pointer; }
+  .ring .seg.down { fill: rgba(79, 184, 255, .28); }
+  .ring .chev { fill: none; stroke: #9A9A9A; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+  .ring .seg.down + .chev { stroke: var(--accent); }
+  .ring .okc { fill: url(#gOk); stroke: #000; stroke-width: 1.5; cursor: pointer; }
+  .ring .okc.down { fill: #10304A; }
+  .ring .oklbl { fill: #D0D0D0; font: 700 15px system-ui, sans-serif; letter-spacing: .06em; pointer-events: none; }
+  .back-btn { position: absolute; left: 4px; bottom: 0; width: 56px; height: 56px; padding: 0; border-radius: 50%;
+    background: radial-gradient(circle at 50% 35%, #2E2E2E, #111 70%); box-shadow: inset 0 1px 0 #3A3A3A, 0 4px 10px rgba(0, 0, 0, .5);
+    display: flex; align-items: center; justify-content: center; color: #C8C8C8; }
+  .back-btn svg { width: 26px; height: 26px; pointer-events: none; }
+  .back-btn.down, .back-btn:active { background: #10304A; color: var(--accent); }
+  /* Página acima/abaixo: rolam a matéria aberta na TV */
+  .pg-btn { position: absolute; left: 4px; width: 56px; height: 56px; padding: 0; border-radius: 50%;
+    background: radial-gradient(circle at 50% 35%, #2E2E2E, #111 70%); box-shadow: inset 0 1px 0 #3A3A3A, 0 4px 10px rgba(0, 0, 0, .5);
+    display: flex; align-items: center; justify-content: center; color: #C8C8C8; }
+  .pg-btn svg { width: 26px; height: 26px; pointer-events: none; }
+  .pg-btn.down, .pg-btn:active { background: #10304A; color: var(--accent); }
+  .pg-btn.up { top: 0; } .pg-btn.dn { top: 68px; }
+  .join { display: flex; flex-direction: column; gap: 12px; margin: auto 0; }
+  .join input { font: inherit; font-size: 32px; letter-spacing: .2em; text-transform: uppercase; text-align: center; padding: 12px; border-radius: 12px; border: 2px solid #333; background: #1c1c1c; color: var(--fg); -webkit-user-select: text; user-select: text; }
+  .join button { height: 64px; font-size: 22px; background: var(--focus); color: var(--accent-ink); }
+  a { color: var(--accent); font-size: 14px; }
+</style>
+
+<!-- Entrar com o código -->
+<main id="join" hidden>
+  <header><h1>Controle Read on TV</h1></header>
+  <form class="join" id="joinForm">
+    <p class="meta">Na TV, abra o Read on TV e toque no ícone de celular no topo. Digite o código que aparecer:</p>
+    <input id="joinCode" maxlength="5" autocomplete="off" autocapitalize="characters" spellcheck="false" required>
+    <button type="submit">Conectar</button>
+  </form>
+</main>
+
+<!-- D-pad -->
+<main id="ph" hidden>
+  <header>
+    <h1>Controle <span id="phCode"></span></h1>
+    <div class="st warn" id="phStatus">Conectando…</div>
+  </header>
+  <p class="meta" id="phMeta">Toque em qualquer botão para testar.</p>
+  <a href="c" id="change">Trocar de TV</a>
+  <div class="remote">
+    <svg class="ring" viewBox="0 0 210 210" role="group" aria-label="Direcional">
+      <defs>
+        <radialGradient id="gRing" cx="50%" cy="42%" r="60%">
+          <stop offset="0" stop-color="#262626"/><stop offset=".75" stop-color="#121212"/><stop offset="1" stop-color="#060606"/>
+        </radialGradient>
+        <linearGradient id="gSheen" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#FFFFFF" stop-opacity=".10"/><stop offset=".5" stop-color="#FFFFFF" stop-opacity="0"/><stop offset="1" stop-color="#FFFFFF" stop-opacity=".05"/>
+        </linearGradient>
+        <radialGradient id="gOk" cx="50%" cy="38%" r="65%">
+          <stop offset="0" stop-color="#2C2C2C"/><stop offset="1" stop-color="#161616"/>
+        </radialGradient>
+      </defs>
+      <!-- Corpo do anel com bisel, como a referência -->
+      <circle cx="105" cy="105" r="103" fill="url(#gRing)" stroke="#3A3A3A" stroke-width="1.5"/>
+      <circle cx="105" cy="105" r="96" fill="none" stroke="url(#gSheen)" stroke-width="10"/>
+      <circle cx="105" cy="105" r="89" fill="none" stroke="#000" stroke-opacity=".6" stroke-width="1"/>
+      <circle cx="105" cy="105" r="47" fill="#050505" stroke="#2E2E2E" stroke-width="1"/>
+      <!-- Setores em arco: cada um é a área de toque de uma direção -->
+      <path class="seg" data-k="up" role="button" aria-label="Cima" d="M32.17 32.17A103 103 0 0 1 177.83 32.17L137.53 72.47A46 46 0 0 0 72.47 72.47Z"/>
+      <path class="chev" d="M110.4 33.5L105 24.5L99.6 33.5"/>
+      <path class="seg" data-k="right" role="button" aria-label="Direita" d="M177.83 32.17A103 103 0 0 1 177.83 177.83L137.53 137.53A46 46 0 0 0 137.53 72.47Z"/>
+      <path class="chev" d="M176.5 110.4L185.5 105L176.5 99.6"/>
+      <path class="seg" data-k="down" role="button" aria-label="Baixo" d="M177.83 177.83A103 103 0 0 1 32.17 177.83L72.47 137.53A46 46 0 0 0 137.53 137.53Z"/>
+      <path class="chev" d="M99.6 176.5L105 185.5L110.4 176.5"/>
+      <path class="seg" data-k="left" role="button" aria-label="Esquerda" d="M32.17 177.83A103 103 0 0 1 32.17 32.17L72.47 72.47A46 46 0 0 0 72.47 137.53Z"/>
+      <path class="chev" d="M33.5 99.6L24.5 105L33.5 110.4"/>
+      <circle class="okc" data-k="ok" role="button" aria-label="OK" cx="105" cy="105" r="41"/>
+      <text class="oklbl" x="105" y="110.5" text-anchor="middle">OK</text>
+    </svg>
+    <button class="pg-btn up" data-k="pgup" type="button" aria-label="Página acima">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 11l6-6 6 6M6 19l6-6 6 6"/></svg>
+    </button>
+    <button class="pg-btn dn" data-k="pgdn" type="button" aria-label="Página abaixo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 5l6 6 6-6M6 13l6 6 6-6"/></svg>
+    </button>
+    <button class="back-btn" data-k="back" type="button" aria-label="Voltar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>
+      </svg>
+    </button>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/mqtt@5.16.0/dist/mqtt.min.js"></script>
+<script>
+(function () {
+  /* Mesma lista do index.html deste app. A TV escuta em todos; o índice no link (&b=) só diz por qual começar */
+  var BROKERS = [
+    { name: 'EMQX', url: 'wss://broker.emqx.io:8084/mqtt' },
+    { name: 'HiveMQ', url: 'wss://broker.hivemq.com:8884/mqtt' }
+  ];
+  var PREFIX = 'readontv/on/'; /* próprio deste app: o Read on TV clássico usa a mesma origem */
+
+  var qs = {};
+  location.search.replace(/^\?/, '').split('&').forEach(function (p) {
+    if (!p) return;
+    var i = p.indexOf('=');
+    qs[decodeURIComponent(i < 0 ? p : p.slice(0, i))] = i < 0 ? '' : decodeURIComponent(p.slice(i + 1));
+  });
+  function $(id) { return document.getElementById(id); }
+  function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (err) { return null; } }
+  function clean(c) { return String(c || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 5); }
+
+  var code = clean(qs.c);
+  if (code.length === 5) startPad();
+  else startJoin();
+
+  function startJoin() {
+    $('join').hidden = false;
+    var last = clean(store('readontv-on:remote-last'));
+    if (last.length === 5) $('joinCode').value = last;
+    $('joinForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      var c = clean($('joinCode').value);
+      if (c.length === 5) location.href = location.pathname + '?c=' + c + '&b=' + (store('readontv-on:remote-b') || 0);
+    });
+    $('joinCode').focus();
+  }
+
+  function startPad() {
+    $('ph').hidden = false;
+    $('phCode').textContent = code;
+    function status(text, cls) { var el = $('phStatus'); el.textContent = text; el.className = 'st ' + cls; }
+    if (typeof mqtt === 'undefined') { status('Falha ao carregar', 'bad'); return; }
+    var bi = Math.min(BROKERS.length - 1, Math.max(0, parseInt(qs.b, 10) || 0));
+    store('readontv-on:remote-last', code);
+    store('readontv-on:remote-b', bi);
+
+    var seq = 0, sent = {}, lastRtt = null, acked = false, acks = 0, rtts = [];
+    /* A TV escuta em todos os brokers. Se o atual não responder em 12 s (ex.: "connack timeout",
+       porta bloqueada pela rede do celular), troca para o próximo e lembra o que funcionou. */
+    var client = null, downSince = 0, SWITCH_MS = 12000, revoked = false;
+    function connect() {
+      if (client) { try { client.end(true); } catch (err) {} }
+      downSince = Date.now();
+      status('Conectando…', 'warn');
+      var c = client = mqtt.connect(BROKERS[bi].url, {
+        clientId: 'rotv-on-ph-' + Math.random().toString(36).slice(2, 10),
+        clean: true, connectTimeout: 10000, reconnectPeriod: 3000, keepalive: 30, timerVariant: 'native'
+      });
+      c.on('connect', function () {
+        if (c !== client) return;
+        downSince = 0;
+        store('readontv-on:remote-b', bi);
+        c.subscribe(PREFIX + code + '/ack', { qos: 0 });
+        status(acked ? 'TV conectada' : 'Pronto · toque para testar', acked ? 'ok' : 'warn');
+      });
+      c.on('close', function () { if (c === client && !downSince) downSince = Date.now(); });
+      c.on('reconnect', function () { if (c === client) status('Reconectando…', 'warn'); });
+      c.on('offline', function () { if (c === client) status('Sem conexão', 'bad'); });
+      c.on('error', function () { if (c === client && BROKERS.length > 1) status('Servidor lento, tentando outro…', 'warn'); });
+      c.on('message', onAck);
+    }
+    setInterval(function () {
+      if (!revoked && downSince && Date.now() - downSince > SWITCH_MS && navigator.onLine !== false) {
+        bi = (bi + 1) % BROKERS.length;
+        connect();
+      }
+    }, 2000);
+    function onAck(topic, payload) {
+      var m; try { m = JSON.parse(String(payload)); } catch (err) { return; }
+      if (m && m.revoked) { revoke(); return; }
+      if (!m || !sent[m.n]) return;
+      lastRtt = Math.round(performance.now() - sent[m.n]);
+      delete sent[m.n];
+      acks++; rtts.push(lastRtt); if (rtts.length > 50) rtts.shift();
+      acked = true; status('TV conectada', 'ok'); /* também limpa um aviso de "não respondeu" anterior */
+      meta();
+    }
+    /* A TV gerou um código novo: este celular deixa de controlar e volta para a tela de código */
+    function revoke() {
+      revoked = true;
+      try { client.end(true); } catch (err) {}
+      try { localStorage.removeItem('readontv-on:remote-last'); } catch (err) {}
+      status('TV desconectou este celular', 'bad');
+      $('phMeta').textContent = 'Toque em "Trocar de TV" e digite o novo código que aparece na TV.';
+    }
+    connect();
+    function meta() {
+      var avg = rtts.length ? Math.round(rtts.reduce(function (x, y) { return x + y; }, 0) / rtts.length) : '—';
+      $('phMeta').textContent = 'Resposta da TV: ' + (lastRtt === null ? '—' : lastRtt + ' ms') + ' · média ' + avg + ' ms · ' + acks + '/' + seq + ' confirmados';
+    }
+
+    function send(k) {
+      if (revoked || !client || !client.connected) return;
+      seq++;
+      sent[seq] = performance.now();
+      /* Sem confirmação em 3 s: o código pode ter sido trocado na TV (ou a TV está desligada) */
+      var n = seq;
+      setTimeout(function () { if (sent[n] && !revoked) status('A TV não respondeu. Confira o código na TV.', 'bad'); }, 3000);
+      client.publish(PREFIX + code + '/cmd', JSON.stringify({ k: k, n: seq }), { qos: 0 });
+      if (navigator.vibrate) { try { navigator.vibrate(12); } catch (err) {} }
+      for (var n in sent) if (performance.now() - sent[n] > 5000) delete sent[n];
+      meta();
+    }
+
+    /* Toque dispara na hora (pointerdown); setas repetem enquanto o dedo fica pressionado */
+    var holdT = null, repT = null;
+    function stop(btn) { clearTimeout(holdT); clearInterval(repT); holdT = repT = null; if (btn) btn.classList.remove('down'); }
+    Array.prototype.forEach.call(document.querySelectorAll('#ph [data-k]'), function (btn) {
+      var k = btn.getAttribute('data-k');
+      btn.addEventListener('pointerdown', function (e) {
+        e.preventDefault();
+        stop();
+        btn.classList.add('down');
+        send(k);
+        if (['up', 'down', 'left', 'right', 'pgup', 'pgdn'].indexOf(k) !== -1) {
+          holdT = setTimeout(function () { repT = setInterval(function () { send(k); }, 160); }, 450);
+        }
+      });
+      ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (t) { btn.addEventListener(t, function () { stop(btn); }); });
+      btn.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+    });
+  }
+})();
+</script>
+</html>
