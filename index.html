@@ -315,6 +315,21 @@ if(!/<rss[\s>]/i.test(txt))throw new Error('Resposta não é RSS');
 if(i!==proxyPref){proxyPref=i;store.set(PREF_KEY,String(i));}
 return txt;}catch(e){lastErr=e;}}
 throw lastErr||new Error('Falha ao carregar '+url);}
+/* ================= Faixa local: Novo Hamburgo/RS =================
+   data/novo-hamburgo.json é gerado por uma coleta diária (manchetes + resumo próprio + link da fonte).
+   Mesma origem do app: sem CORS e sem proxy. */
+const NH_URL='data/novo-hamburgo.json',NH_TITLE='Novo Hamburgo';
+const escHtml=s=>String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+async function loadNH(){
+try{const d=JSON.parse(await fetchText(NH_URL+'?t='+Math.floor(Date.now()/600000),8000));
+const items=(d.items||[]).map((it,i)=>{const t=Date.parse(it.date);
+return{id:'nh-'+(it.link||i),title:it.title,link:it.link,img:/^https?:\/\//.test(it.img||'')?it.img:'',date:isNaN(t)?null:t,
+author:'',src:it.source||'',cat:it.cat||'Novo Hamburgo',
+html:'<p>'+escHtml(it.summary)+'</p><p><strong>Matéria completa em '+escHtml(it.source||'na fonte')+'.</strong></p>'};})
+.filter(it=>it.title&&it.link).slice(0,MAX_PER_RAIL);
+return items.length?{title:NH_TITLE,items}:null;}
+catch(e){console.warn('[Read on TV] faixa Novo Hamburgo indisponível:',e);return null;}}
+
 function parseFeed(xml){
 const doc=new DOMParser().parseFromString(xml,'text/xml');
 if(doc.getElementsByTagName('parsererror').length)throw new Error('XML inválido');
@@ -506,7 +521,7 @@ if(postOpen&&cur)renderMeta(RAILS[cur.k].items[cur.i]);}
 const cap=t=>t?t.charAt(0).toUpperCase()+t.slice(1):'';
 function renderMeta(it){pAgo.textContent=cap(ago(it));
 pBy.textContent=it.author?'Por '+it.author:'';
-pSrc.style.display=it.link?'block':'none';}
+pSrc.textContent='Fonte: '+(it.src||'Agência Brasil');pSrc.style.display=it.link?'block':'none';}
 const focusEl=el=>{if(el)try{el.focus({preventScroll:true});}catch(e){}};
 const smooth=()=>reduced.matches?'auto':'smooth';
 const reduced=matchMedia('(prefers-reduced-motion: reduce)');
@@ -956,11 +971,14 @@ function readCache(){try{const c=JSON.parse(store.get(CACHE_KEY)||'null');if(c&&
 let loading=false;
 async function loadAll(){
 if(loading)return;loading=true;
+const nhP=loadNH();
 try{
 const latest=parseFeed(await getFeed(FEED_BASE+'ultimasnoticias/feed.xml'));
 if(!latest.length)throw new Error('Feed vazio');
+const nh=await nhP;
 const base=[{title:'Destaques',big:true,items:latest.slice(0,5)},{title:'Últimas notícias',items:latest.slice(5,5+MAX_PER_RAIL)}];
-const previous=source==='live'||source==='cache'?RAILS.filter(R=>R.title!=='Destaques'&&R.title!=='Últimas notícias'):[];
+if(nh)base.push(nh);
+const previous=source==='live'||source==='cache'?RAILS.filter(R=>R.title!=='Destaques'&&R.title!=='Últimas notícias'&&R.title!==NH_TITLE):[];
 build(base.concat(previous));source='live';setLive(true,'Ao vivo: Agência Brasil');
 const res=await Promise.allSettled(EDITORIAS.map(([slug])=>getFeed(FEED_BASE+slug+'/feed.xml').then(parseFeed)));
 const eds=[];
@@ -971,7 +989,9 @@ const full=base.concat(eds);build(full);saveCache(full);
 setLive(true,'Ao vivo: Agência Brasil · atualizado às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}));
 }catch(err){
 console.warn('[Read on TV] feed indisponível:',err);
-if(source==='skeleton'){build(DEMO);source='demo';setLive(false,'Sem conexão: notícias de exemplo');showToast('Não foi possível carregar a Agência Brasil. Exibindo exemplos.',3200);}
+const nh=await nhP;
+if(source==='skeleton'&&nh){build([nh]);source='nh';setLive(false,'Agência Brasil indisponível: só Novo Hamburgo');showToast('Não foi possível carregar a Agência Brasil. Exibindo Novo Hamburgo.',3200);}
+else if(source==='skeleton'){build(DEMO);source='demo';setLive(false,'Sem conexão: notícias de exemplo');showToast('Não foi possível carregar a Agência Brasil. Exibindo exemplos.',3200);}
 else{setLive(false,'Sem conexão: exibindo notícias salvas');if(source==='cache')showToast('Sem conexão. Exibindo as últimas notícias salvas.',3000);}
 }finally{loading=false;}}
 
