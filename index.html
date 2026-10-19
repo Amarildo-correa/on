@@ -325,7 +325,8 @@ try{const d=JSON.parse(await fetchText(NH_URL+'?t='+Math.floor(Date.now()/600000
 const items=(d.items||[]).map((it,i)=>{const t=Date.parse(it.date);
 return{id:'nh-'+(it.link||i),title:it.title,link:it.link,img:/^https?:\/\//.test(it.img||'')?it.img:'',date:isNaN(t)?null:t,
 author:'',src:it.source||'',cat:it.cat||'Novo Hamburgo',
-html:'<p>'+escHtml(it.summary)+'</p><p><strong>Matéria completa em '+escHtml(it.source||'na fonte')+'.</strong></p>'};})
+html:(Array.isArray(it.body)&&it.body.length?it.body:[it.summary]).map(p=>'<p>'+escHtml(p)+'</p>').join('')
++(it.source?'<p><em>Com informações de '+escHtml(it.source)+'.</em></p>':'')};})
 .filter(it=>it.title&&it.link).slice(0,MAX_PER_RAIL);
 return items.length?{title:NH_TITLE,items}:null;}
 catch(e){console.warn('[Read on TV] faixa Novo Hamburgo indisponível:',e);return null;}}
@@ -521,7 +522,7 @@ if(postOpen&&cur)renderMeta(RAILS[cur.k].items[cur.i]);}
 const cap=t=>t?t.charAt(0).toUpperCase()+t.slice(1):'';
 function renderMeta(it){pAgo.textContent=cap(ago(it));
 pBy.textContent=it.author?'Por '+it.author:'';
-pSrc.textContent='Fonte: '+(it.src||'Agência Brasil');pSrc.style.display=it.link?'block':'none';}
+pSrc.textContent=it.src?'Com informações de '+it.src:'Fonte: Agência Brasil';pSrc.style.display=it.link?'block':'none';}
 const focusEl=el=>{if(el)try{el.focus({preventScroll:true});}catch(e){}};
 const smooth=()=>reduced.matches?'auto':'smooth';
 const reduced=matchMedia('(prefers-reduced-motion: reduce)');

@@ -24,8 +24,8 @@ Como funciona:
 
 ## Faixa Novo Hamburgo
 
-A faixa "Novo Hamburgo" lê `data/novo-hamburgo.json`, servido pelo próprio Pages (sem proxy de CORS). O arquivo é atualizado por uma tarefa agendada do Claude todo dia às 07h15 (America/Sao_Paulo): ela junta as notícias das últimas ~36 h de abc+ (ex-Jornal NH), Portal Martin Behrend, DuduNews, Câmara Municipal e Google News, escreve um resumo curto próprio para cada manchete e faz commit aqui. O texto completo fica na fonte indicada em cada item.
+A faixa "Novo Hamburgo" lê `data/novo-hamburgo.json`, servido pelo próprio Pages (sem proxy de CORS). O arquivo é atualizado por uma tarefa agendada do Claude todo dia às 07h15 (America/Sao_Paulo): ela lê as matérias das últimas ~36 h de abc+ (ex-Jornal NH), Portal Martin Behrend, DuduNews, Câmara Municipal e outras fontes, extrai os fatos e redige uma matéria própria (texto original, sem trechos copiados), que o app exibe inteira, com o crédito "Com informações de …". Notícias cujo texto original não pôde ser lido não entram.
 
-Formato de cada item: `title`, `summary`, `cat`, `source`, `link`, `img` (URL ou vazio), `date` (ISO 8601 com fuso). Máximo de 12 itens, mais recentes primeiro.
+Formato de cada item: `title`, `summary`, `body` (lista de parágrafos), `cat`, `source`, `link`, `img` (URL ou vazio), `date` (ISO 8601 com fuso). Máximo de 12 itens, mais recentes primeiro.
 
 Arquivos: `index.html` (app da TV), `c.html` (controle no celular) e `data/novo-hamburgo.json` (faixa local).

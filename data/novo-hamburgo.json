@@ -1,20 +1,17 @@
 {
-  "updated": "2026-10-19T14:10:00-03:00",
+  "updated": "2026-10-19T14:40:00-03:00",
   "title": "Novo Hamburgo",
-  "note": "Manchetes coletadas por Claude. Resumos próprios; matéria completa na fonte.",
+  "note": "Matérias redigidas pelo Read on TV a partir dos fatos publicados pelas fontes citadas em cada item.",
   "items": [
     {
-      "title": "Rota dos Casarões vira caça a selos pelo centro histórico",
-      "summary": "O passeio pelos casarões históricos da cidade ganhou um formato de coleção de selos para incentivar os visitantes a percorrer todo o roteiro.",
-      "cat": "Cultura",
-      "source": "R7",
-      "link": "https://news.google.com/rss/articles/CBMi3AFBVV95cUxNUnplbEVNODdjRk91LVh6U1ozNEI2aHNhbk82aW0xcDhsTWFPeE5FWF9sTjBabVdLUF9fMklaQWgtV3FaWWJ1VkdNdWtLVFJob1pfekZuaTlLUWlWMktwdlpac21fclJ1bE1HUkVVQWYwR1NxMFQwVHUtRWlRVThMYi13Znl1SURXeE00UUs3UTBLVlc4SWJsYjg4S0JtUkYwM0FxemdJQ2dfY0hHRUxzXzAySnRuSEVRSm9ZSDhyZ29SWVRXczdUdXlUSUo4SkYxZHFzakd2c3VqeUFn?oc=5",
-      "img": "",
-      "date": "2026-10-19T13:39:00-03:00"
-    },
-    {
-      "title": "Operação tapa-buracos provoca fila de quilômetros na BR-116 entre São Leopoldo e Novo Hamburgo",
-      "summary": "Obras de recuperação do asfalto na rodovia federal travaram o trânsito nesta segunda-feira no trecho entre as duas cidades. Quem vai pegar a BR-116 deve prever atraso ou buscar outro caminho.",
+      "title": "Tapa-buracos na BR-116 trava o trânsito entre São Leopoldo e Novo Hamburgo",
+      "summary": "Reparos em um trecho de cerca de 3 km da rodovia estreitam as faixas e formam filas de quilômetros nesta segunda-feira.",
+      "body": [
+        "Quem passou pela BR-116 nesta segunda-feira (19) entre São Leopoldo e Novo Hamburgo enfrentou fila de quilômetros. A causa é uma operação de tapa-buracos que começou perto do posto da Polícia Rodoviária Federal, em São Leopoldo, e avança no sentido de Novo Hamburgo, com reparos espalhados por pouco mais de três quilômetros.",
+        "O serviço é feito em três etapas, cada uma com uma equipe própria: primeiro o asfalto danificado é retirado por fresagem, depois o local é limpo e, por fim, recebe a ligação asfáltica e a nova camada de pavimento. Para isso, ora a faixa da direita, ora a da esquerda fica interditada, o que estreita a pista e provoca a lentidão.",
+        "Chama atenção que o mesmo trecho passou por revitalização e recapeamento há menos de um ano. Em vários pontos o pavimento já mostra desgaste, a camada superficial está se soltando e surgiram buracos.",
+        "O Dnit foi questionado sobre o motivo do problema precoce, sobre quem vai pagar os reparos e sobre o cronograma para o resto da semana, mas ainda não havia respondido. A orientação para quem precisa usar a rodovia é sair mais cedo ou procurar rotas alternativas."
+      ],
       "cat": "Trânsito",
       "source": "abc+",
       "link": "https://www.abcmais.com/brasil/rio-grande-do-sul/vale-do-rio-dos-sinos/novo-hamburgo/atencao-motoristas-operacao-tapa-buracos-causa-congestionamento-quilometrico-na-br-116-entre-sao-leopoldo-e-novo-hamburgo/",
@@ -22,17 +19,14 @@
       "date": "2026-10-19T12:01:00-03:00"
     },
     {
-      "title": "Prefeitura orienta sobre os canais oficiais para indicar recursos parlamentares",
-      "summary": "O município divulgou quais são os caminhos formais para a indicação de emendas e recursos de parlamentares.",
-      "cat": "Cidade",
-      "source": "Prefeitura de Novo Hamburgo",
-      "link": "https://news.google.com/rss/articles/CBMirwFBVV95cUxOVU5QTzY5QzhjWWJFMmRkX0I5WUlVeUVqczQtbWc2bjFYb2NrSkRRUGowUm50NEtzTjloUjd3ZnZzYTRrZFoyRER1UHVrbVVHUmxjdUhpcG1oQUhnRUVvdjBPT1JaY0R5eGVUOEdneG9BVk9UNHJUZU84UnZZTG1tbVlyTjZIYkxqT1FsTUZxUXJaX0NlWVdnbGswQWI5d25jdTBtWnJYS2J4UW9HUUhN?oc=5",
-      "img": "",
-      "date": "2026-10-19T11:01:00-03:00"
-    },
-    {
-      "title": "Trem entre Porto Alegre e Novo Hamburgo fica mais rápido e ganha novos horários",
-      "summary": "A Trensurb reduziu o tempo de viagem na linha e a nova grade de horários já está em vigor.",
+      "title": "Viagem de trem entre Porto Alegre e Novo Hamburgo cai para 55 minutos",
+      "summary": "A Trensurb encurtou o trajeto em cerca de cinco minutos e mudou os intervalos dos trens aos sábados, domingos e feriados.",
+      "body": [
+        "O percurso de trem entre a Estação Mercado, em Porto Alegre, e a Estação Novo Hamburgo agora leva 55 minutos, cerca de cinco a menos do que antes. Com isso, a Trensurb ajustou a grade de horários de fim de semana e feriados, que já vale desde este sábado.",
+        "O ganho de tempo veio da recuperação do sistema de sinalização, danificado pelas enchentes de 2024. Com a sinalização restabelecida e a reconstrução das subestações de energia em andamento, os trens puderam voltar à velocidade normal em trechos onde circulavam mais devagar por segurança.",
+        "Aos sábados, os trens saem do Mercado a cada 12 minutos das 5h até o fim da tarde, com intervalo de 11 minutos entre 16h43 e 18h12. À noite os intervalos aumentam: 15 minutos entre 19h e 21h45 e 20 minutos até as 23h. No sentido contrário, a partir de Novo Hamburgo, o intervalo é de 10 minutos no começo da manhã (6h14 às 7h25), 12 minutos durante o dia, 15 minutos no começo da noite e 20 minutos depois das 20h45.",
+        "Aos domingos e feriados, os trens partem do Mercado a cada 20 minutos o dia todo, das 5h às 23h. Saindo de Novo Hamburgo, o intervalo também é de 20 minutos até 21h15 e passa a 22 minutos até o fim da operação."
+      ],
       "cat": "Mobilidade",
       "source": "abc+",
       "link": "https://www.abcmais.com/regiao/viagem-de-trem-entre-porto-alegre-e-novo-hamburgo-fica-mais-rapida-veja-o-que-mudou-nos-horarios/",
@@ -40,8 +34,14 @@
       "date": "2026-10-19T10:53:00-03:00"
     },
     {
-      "title": "Avenida Coronel Travassos tem trecho bloqueado até quarta-feira para recapeamento",
-      "summary": "O recapeamento da avenida entrou na reta final. Até quarta (21), o trecho entre a Rua Bento Gonçalves e a Avenida Pedro Adams Filho fica fechado ao tráfego.",
+      "title": "Avenida Coronel Travassos fica fechada até quarta para a fase final do recapeamento",
+      "summary": "O trecho entre a Rua Bento Gonçalves e a Avenida Pedro Adams Filho está bloqueado nos dois sentidos; ônibus e moradores seguem passando.",
+      "body": [
+        "A reta final do recapeamento da Avenida Coronel Travassos foi antecipada, e até quarta-feira (21) fica bloqueado o trecho entre a Rua Bento Gonçalves e a Avenida Pedro Adams Filho, nos dois sentidos. Durante a interdição, só o transporte público e quem mora ou trabalha na região podem circular.",
+        "A mudança no cronograma levou em conta a previsão de tempo seco até quinta-feira (22). A obra completa um mês nesta semana.",
+        "No fim de semana, as equipes terminaram de raspar o asfalto antigo entre a Rua Paquetá e a Pedro Adams Filho e aplicaram a primeira camada de pavimento novo entre as ruas Paquetá e Canela. Nesse segmento ainda falta uma segunda camada, que nivela a superfície, e depois toda a avenida recebe a pintura da sinalização.",
+        "A Coronel Travassos é a primeira das 18 ruas incluídas no pacote inicial de R$ 24 milhões em melhorias viárias. Somadas todas as etapas previstas, o investimento em asfalto na cidade deve chegar a cerca de R$ 140 milhões."
+      ],
       "cat": "Trânsito",
       "source": "Portal Martin Behrend",
       "link": "https://martinbehrend.com.br/novo-hamburgo/obras-em-novo-hamburgo-avenida-coronel-travassos-tem-grande-bloqueio-por-tres-dias",
@@ -49,8 +49,14 @@
       "date": "2026-10-19T10:40:00-03:00"
     },
     {
-      "title": "50ª Fimec já vendeu 90% da área cinco meses antes da feira",
-      "summary": "A feira internacional de couros, químicos, componentes e máquinas para calçados acontece em março de 2027, na Fenac, e a comercialização dos espaços está adiantada.",
+      "title": "Fimec 2027 já tem 90% dos estandes vendidos",
+      "summary": "A 50ª edição da feira do setor coureiro-calçadista será de 9 a 11 de março na Fenac, com volta de curtumes e empresas químicas.",
+      "body": [
+        "Faltando cinco meses para a feira, a 50ª Fimec já comercializou mais de 90% da área destinada aos expositores. A edição comemorativa acontece de 9 a 11 de março de 2027 na Fenac, na Avenida Nações Unidas, em Novo Hamburgo.",
+        "Segundo o diretor-presidente da Fenac, Marlos Schmidt, o bom ritmo de vendas reúne empresas que vão expor pela primeira vez e marcas que tinham deixado de participar e decidiram voltar. A organização também quer melhorar o perfil dos visitantes, aposta que já deu resultado na edição passada.",
+        "Um dos focos é o setor de couro. A Fenac trabalha para recuperar a presença dos curtumes e das indústrias químicas, e parte dessas empresas já confirmou retorno. No dia 10 de março à tarde, a programação inclui a quinta edição do Fórum de Sustentabilidade do Centro das Indústrias de Curtumes do Brasil (CICB), com tema ainda a ser anunciado.",
+        "A Fimec é considerada a principal feira do segmento na América Latina e uma das três maiores do mundo. A edição anterior reuniu 400 expositores, 23 mil visitantes e representantes de 33 países."
+      ],
       "cat": "Economia",
       "source": "DuduNews",
       "link": "https://dudunews.com.br/a-50a-fimec-ja-tem-90-da-area-vendida-cinco-meses-antes-do-evento-em-novo-hamburgo/",
@@ -58,17 +64,15 @@
       "date": "2026-10-19T10:23:00-03:00"
     },
     {
-      "title": "Outubro Rosa: Liga Feminina reforça a importância da mamografia",
-      "summary": "A entidade de Novo Hamburgo chama a atenção para o diagnóstico precoce do câncer de mama.",
-      "cat": "Saúde",
-      "source": "R7",
-      "link": "https://news.google.com/rss/articles/CBMi-wFBVV95cUxONDI5bnFvUW5uTGNTVHVqbmo2cFZLeC1CUS15N3RoQnY3ZXM2V0ZjazRYLTBiM1Rlb1NYNmpnQk93aTF6NEl4UTJreXhfUmJGZ094RDlVbG5WODZLU052MW10OHBjejJiV08yNXFCX0ltQWpTQ29ubXZtVWUwX3FTQnpOcjRlclpGdS1ZTlYzWURHSk0wcWZqcVlXb1FDR0ZVX3lmQTkzSXFzN3lPRzNnNzR5NFJxamF2X3dCZXZPbzcyclh6enViMVhkTFdnNDU0elg0RUFWVTJSdmh4SGJrWTFHWjhzY2pNWURZNFJZUkpWOHR1SHJYdU5HRQ?oc=5",
-      "img": "",
-      "date": "2026-10-19T09:51:00-03:00"
-    },
-    {
-      "title": "Prefeitura entrega ao Ministério Público Federal levantamento sobre as emendas Pix",
-      "summary": "O procurador da República havia dado 90 dias para explicações sobre os repasses. O município respondeu em oito e afirma seguir as regras de transparência.",
+      "title": "Prefeitura responde ao MPF sobre 25 emendas Pix que somam R$ 12,8 milhões",
+      "summary": "O município tinha 90 dias, mas enviou o relatório em oito. Onze emendas já foram executadas ou estão em andamento; parte do dinheiro ainda não chegou da União.",
+      "body": [
+        "A Prefeitura de Novo Hamburgo enviou ao Ministério Público Federal um relatório sobre a situação das 25 emendas Pix recebidas de deputados federais e senadores, que juntas somam R$ 12,81 milhões. O procurador da República Celso Tres havia pedido as informações no dia 5 e dado 90 dias de prazo; o prefeito Gustavo Finck (PP) assinou a resposta, com 26 páginas, no dia 13.",
+        "O pedido faz parte de um acompanhamento que o MPF realiza desde o início de 2025 em mais de cem municípios gaúchos para verificar a transparência no uso desse tipo de repasse. O procurador deixou claro que nenhuma autoridade é investigada.",
+        "Pelo levantamento do MPF, três emendas estavam sem plano de ação cadastrado, oito sem relatório de gestão e as demais com dados a regularizar. A Prefeitura explica que as sem plano de ação ainda não foram totalmente pagas pela União. Cinco emendas para a pavimentação da pista do Aeroporto Regional Pedro Adams Neto dependem umas das outras e, como nem todas foram quitadas, a obra não pode começar.",
+        "Outros casos esbarram em recursos ainda não liberados, em trâmites em Brasília ou na falta de engenheiros na Prefeitura para tocar os projetos. Onze emendas já foram executadas ou estão em execução, entre elas a compra de viaturas e motos para a Guarda Municipal, veículos para a Adevis e a Apae, parquinhos infantis e equipamentos para academias ao ar livre.",
+        "O governo municipal afirma que cumpre as regras de transparência, que os dados estão publicados no site oficial e que prepara melhorias nos canais de consulta."
+      ],
       "cat": "Política",
       "source": "abc+",
       "link": "https://www.abcmais.com/politica/prefeitura-de-novo-hamburgo-apresenta-radiografia-das-emendas-pix-ao-ministerio-publico-federal/",
@@ -76,8 +80,14 @@
       "date": "2026-10-19T06:15:00-03:00"
     },
     {
-      "title": "Loucura por Sapatos termina com balanço positivo da organização",
-      "summary": "A feira na Fenac durou dez dias, de 9 a 18 de outubro, e reuniu cerca de 200 expositores e mais de 500 marcas.",
+      "title": "Loucura por Sapatos fecha o ano com 46 mil visitantes",
+      "summary": "A edição de outubro na Fenac superou o público do mesmo período de 2025; a organização aprovou as novidades, como a área de mobilidade elétrica.",
+      "body": [
+        "Terminou no domingo (18), depois de dez dias, a segunda e última edição de 2026 da Loucura por Sapatos, na Fenac. A feira recebeu 46 mil visitantes, mais do que em outubro do ano passado e perto do público registrado em abril. O valor movimentado em vendas não foi divulgado.",
+        "Para o diretor-presidente da Fenac, Marlos Schmidt, a meta de trazer mais marcas, mais empresas e mais oferta de calçados foi cumprida. Entre as novidades estiveram uma área de mobilidade elétrica, pensada para atrair o público jovem, e uma arena de robótica, além dos espaços de gastronomia, agricultura familiar, artesanato e brinquedos para as crianças.",
+        "A mudança mais debatida foi juntar o Festival das Cervejas Artesanais à praça de alimentação no piso inferior. Segundo Schmidt, a decisão gerava dúvidas no início, mas teve apoio dos expositores e acabou sendo considerada um acerto.",
+        "Os resultados variaram entre os lojistas. O dirigente reconhece que houve reclamações de parte deles, mas avalia que se saiu melhor quem entendeu o momento do mercado e planejou produto e preço para a feira. Ele lembra que mesmo os insatisfeitos costumam voltar nas edições seguintes."
+      ],
       "cat": "Economia",
       "source": "abc+",
       "link": "https://www.abcmais.com/brasil/rio-grande-do-sul/vale-do-rio-dos-sinos/novo-hamburgo/valeu-a-pena-olhar-o-resultado-organizacao-avalia-edicao-de-outubro-da-loucura-por-sapatos/",
@@ -85,8 +95,29 @@
       "date": "2026-10-18T20:51:00-03:00"
     },
     {
-      "title": "Tarifa zero nos ônibus começa em 2027 e será integral no ano seguinte, diz o prefeito",
-      "summary": "Em entrevista, Gustavo Finck fez um balanço dos dois primeiros anos de governo, confirmou que vai buscar a reeleição e detalhou o cronograma da gratuidade no transporte.",
+      "title": "Ospa abre 30 bolsas de R$ 800 para jovens do Santo Afonso aprenderem música",
+      "summary": "O projeto Ospa Alcance atende moradores de 10 a 18 anos de áreas prioritárias de Novo Hamburgo e São Leopoldo; inscrições até 27 de outubro.",
+      "body": [
+        "A Escola de Música da Orquestra Sinfônica de Porto Alegre está com inscrições abertas para o Ospa Alcance, que oferece 30 bolsas mensais de R$ 800 a jovens de 10 a 18 anos. Os bolsistas terão aulas gratuitas de trompete, trombone ou percussão sinfônica, com 10 vagas para cada instrumento, além de teoria e percepção musical.",
+        "Podem se candidatar moradores dos territórios prioritários do programa RS Seguro, da Secretaria da Segurança Pública. Em Novo Hamburgo, a área contemplada é o território Santo Afonso, que inclui partes dos bairros Industrial, Santo Afonso e Liberdade. Em São Leopoldo, entram partes de Campina, Rio dos Sinos, Santos Dumont e Scharlau.",
+        "Não é preciso saber música nem ter instrumento, que será emprestado pelo projeto. Os participantes também recebem R$ 54 de auxílio para o transporte. O curso dura dez meses, começa em novembro e terá aulas uma ou duas vezes por semana, no bairro Praia de Belas, em Porto Alegre, no Foro Central II ou na Casa da Ospa.",
+        "A seleção tem duas fases: comprovação de que o candidato mora em uma das áreas previstas e entrevista com a coordenação e a psicóloga do projeto. As inscrições são feitas por formulário on-line até as 12h de 27 de outubro."
+      ],
+      "cat": "Educação",
+      "source": "DuduNews",
+      "link": "https://dudunews.com.br/jovens-de-novo-hamburgo-e-sao-leopoldo-podem-concorrer-a-bolsas-de-r-800-para-aprender-musica/",
+      "img": "https://dudunews.com.br/wp-content/uploads/2026/10/16180148_2299401_GDO.jpg",
+      "date": "2026-10-18T19:28:00-03:00"
+    },
+    {
+      "title": "Finck promete tarifa zero nos ônibus a partir de 2027 e confirma que vai à reeleição",
+      "summary": "Em entrevista, o prefeito falou também de diques e casas de bombas, do pacote de asfalto, da volta do tratamento de câncer pelo SUS e da pista de atletismo no Jardim Mauá.",
+      "body": [
+        "O prefeito Gustavo Finck (PP) afirmou que a gratuidade no transporte coletivo de Novo Hamburgo começa em 2027 e passa a valer integralmente em 2028. Segundo ele, a Prefeitura já subsidia mais da metade do valor da passagem hoje, e o modelo de Canoas serve de referência. As declarações foram dadas em entrevista ao videocast Sabe-Tudo Cast, do Jornal NH, gravada na sexta-feira (16) para marcar a metade do mandato.",
+        "Sobre enchentes, Finck disse que a casa de bombas do Santo Afonso será reformada e que hoje opera com seis bombas. Ele busca R$ 800 milhões junto ao governo do Estado para elevar o dique do bairro e construir duas novas casas de bombas, em parceria com São Leopoldo.",
+        "O prefeito reconheceu que o asfalto da cidade está, em geral, em mau estado e colocou o problema ao lado da saúde e das cheias entre os maiores desafios. O pacote de pavimentação previsto chega a cerca de R$ 140 milhões. Na saúde, a promessa é anunciar no centenário da cidade, em 5 de abril de 2027, a volta do tratamento oncológico pelo SUS, que hoje obriga os pacientes a se deslocar até Taquara. Onde ficava o campo do Botafogo, no Jardim Mauá, deve surgir a primeira pista de atletismo do município, com conclusão prevista até o fim de 2027.",
+        "Finck disse pela primeira vez que vai concorrer à reeleição em 2028 e elogiou o vice Gerson Haas. Também comentou a CPI aberta na Câmara sobre o duplo salário pago à secretária da Fazenda, defendendo punição se houver irregularidade, e admitiu ter errado ao publicar, na noite do primeiro turno, ataques a adversários políticos, post que acabou apagado."
+      ],
       "cat": "Política",
       "source": "abc+",
       "link": "https://www.abcmais.com/politica/tarifa-zero-nos-onibus-de-novo-hamburgo-comeca-em-2027-e-sera-integral-no-ano-seguinte-diz-gustavo-finck/",
@@ -94,8 +125,29 @@
       "date": "2026-10-18T18:00:00-03:00"
     },
     {
-      "title": "Mais de 1,5 mil estudantes disputam vagas na Liberato",
-      "summary": "A prova de domingo selecionou alunos para os cursos técnicos de Química, Mecânica, Eletrotécnica e Eletrônica da fundação.",
+      "title": "Deputado eleito de Erechim foi o quinto mais votado em Novo Hamburgo",
+      "summary": "Rony Gabriel (Podemos) teve 6,2 mil votos na cidade; Lucas Redecker (PSD) liderou entre os candidatos a deputado federal.",
+      "body": [
+        "O vereador de Erechim Rony Gabriel (Podemos), eleito em 2024 com pouco mais de 2 mil votos, conquistou uma vaga de deputado federal na eleição de 4 de outubro com 223.643 votos, a quarta maior votação do Rio Grande do Sul. Desse total, 6.200 vieram de Novo Hamburgo, o que o colocou em quinto lugar na cidade, à frente do colega de partido Eliton Ávila, vereador hamburguense, que somou 5.535.",
+        "Sem ligação conhecida com o município, o desempenho é atribuído principalmente à presença nas redes sociais: Rony tem cerca de 2,2 milhões de seguidores no Instagram. A migração de eleitores do Norte do Estado para a região e a busca por renovação também ajudam a explicar o resultado.",
+        "No Vale do Sinos, mais de dez ex-prefeitos tentaram vaga de deputado e apenas um foi eleito. O caso reacendeu no Congresso a discussão sobre mudar o sistema de eleição de deputados, com propostas como o voto distrital misto, em que metade das vagas iria para os mais votados de cada distrito, e o distritão, em que simplesmente os mais votados seriam eleitos.",
+        "Os mais votados para deputado federal em Novo Hamburgo foram Lucas Redecker (PSD), com 10.576 votos, Maurício Marcon (PL), com 9.104, Patricia Beck (PP), com 8.475, Fufa (PT), com 6.457, e Rony Gabriel, com 6.200. Completam a lista dos dez primeiros Eliton Ávila (Podemos), Fernanda Melchionna (PSOL), Gustavo Victorino (Republicanos), Felipe Camozzato (Novo) e Bibo Nunes (PL)."
+      ],
+      "cat": "Política",
+      "source": "Portal Martin Behrend",
+      "link": "https://martinbehrend.com.br/politica/por-que-um-vereador-de-erechim-fez-62-mil-votos-em-novo-hamburgo-sem-conhecer-a-cidade",
+      "img": "https://martinbehrend.com.br/wp-content/uploads/2026/10/urna-eletronica-me.jpg",
+      "date": "2026-10-18T15:29:00-03:00"
+    },
+    {
+      "title": "Prova da Liberato reúne quase 1,6 mil candidatos a cerca de 100 vagas",
+      "summary": "O processo seletivo para os cursos técnicos integrados ao ensino médio teve 1.777 inscritos e abstenção de pouco mais de 10%.",
+      "body": [
+        "A Fundação Escola Técnica Liberato Salzano Vieira da Cunha aplicou no domingo (18) a prova para o ensino médio técnico. Dos 1.777 inscritos, 1.587 compareceram, uma abstenção de 10,39%. Estão em disputa cerca de 100 vagas nos cursos diurnos de Química, Mecânica, Eletrotécnica e Eletrônica, todos integrados ao ensino médio.",
+        "A prova teve 20 questões de matemática, 20 de português baseadas em um livro indicado pela banca e uma redação. A obra deste ano foi Até que o Divórcio nos Reúna, da escritora gaúcha Bruna Tessuto. A escola costuma escolher livros com temas da adolescência, para que os candidatos se identifiquem com os personagens.",
+        "A seleção foi antecipada de novembro para outubro nos últimos anos, para não coincidir com vestibulares e o Enem, que usam o prédio da escola. O conteúdo também foi ajustado, porque muitos candidatos ainda não concluíram o 9º ano.",
+        "Segundo a diretora de Ensino, Íris Lisbôa, a procura se explica pela qualidade do ensino e pela boa aceitação dos formados no mercado: a maioria acaba contratada pelas empresas onde faz estágio."
+      ],
       "cat": "Educação",
       "source": "abc+",
       "link": "https://www.abcmais.com/brasil/rio-grande-do-sul/vale-do-rio-dos-sinos/novo-hamburgo/diferencial-para-o-mercado-de-trabalho-mais-de-15-mil-estudantes-disputam-vagas-na-liberato-confira/",
@@ -103,8 +155,29 @@
       "date": "2026-10-18T15:10:00-03:00"
     },
     {
-      "title": "Seleção brasileira de punhobol treina na Ginástica a um ano do Mundial",
-      "summary": "Cerca de 25 atletas da seleção fizeram um treino coletivo no sábado nos campos da Sociedade Ginástica, que vai sediar o Mundial em 2027.",
+      "title": "Atriz hamburguense disputa a Maratona de Monólogos em Canela",
+      "summary": "Larissa Martins apresenta um texto de Vera Karam na sexta-feira (23), às 21h, no Teatro Municipal de Canela, em mostra dedicada às mulheres.",
+      "body": [
+        "A atriz Larissa Martins, de Novo Hamburgo, foi selecionada para a mostra competitiva estadual da VI Maratona de Monólogos – Em Cena Elas, que acontece de 19 a 24 de outubro no Teatro Municipal de Canela. Ela apresenta Maldito Coração, Me Alegra Que Tu Sofras, da dramaturga gaúcha Vera Karam, na sexta-feira (23), às 21h, com tradução em Libras.",
+        "A peça trata com humor e ironia de desencontros amorosos, solidão, ciúme e falhas de comunicação, alternando cenas cômicas e incômodas a partir de situações do dia a dia.",
+        "Para Larissa, encarar um monólogo longe de casa e diante de um público desconhecido é um desafio que representa crescimento profissional. Ela também valoriza o fato de a programação ser toda dedicada a mulheres, já que, na avaliação dela, a presença feminina nos palcos de Novo Hamburgo ainda é pequena.",
+        "O festival volta depois de sete anos sem edições. Além das mostras competitivas estadual e universitária, tem espetáculos convidados, oficinas, debates gratuitos e a entrega do Troféu Nydia Guimarães à atriz Sandra Dani. Os ingressos custam R$ 25, com meia-entrada para estudantes e idosos."
+      ],
+      "cat": "Cultura",
+      "source": "Portal Martin Behrend",
+      "link": "https://martinbehrend.com.br/novo-hamburgo/atriz-de-novo-hamburgo-participa-da-vi-maratona-de-monologos-em-cena-elas",
+      "img": "https://martinbehrend.com.br/wp-content/uploads/2026/10/larissa-martins.jpg",
+      "date": "2026-10-18T13:08:00-03:00"
+    },
+    {
+      "title": "Seleção de punhobol treina na Ginástica a um ano do Mundial em Novo Hamburgo",
+      "summary": "Cerca de 25 atletas participaram do treino; o campeonato terá 16 países e expectativa de 30 mil pessoas em outubro de 2027.",
+      "body": [
+        "A seleção brasileira masculina de punhobol fez treinos coletivos no sábado (17) e no domingo (18) nos campos da Sociedade Ginástica Novo Hamburgo, exatamente um ano antes da final do 17º Campeonato Mundial de Seleções, que o clube vai sediar. Cerca de 25 jogadores dos principais clubes do país participaram. O técnico, o hamburguense Daniel Becker, terá de escolher apenas dez para o torneio, e parte do grupo deve vir da própria Ginástica, hoje a principal força da modalidade no Brasil.",
+        "O Mundial será de 12 a 17 de outubro de 2027, no ano do centenário da cidade, com 16 seleções. A Alemanha defende o título; o Brasil foi campeão em 1999, na Suíça, e em 2003, em Porto Alegre. A única vez que Novo Hamburgo recebeu a competição foi em 1976, quando o Brasil terminou em segundo lugar.",
+        "Os organizadores, o casal Márcio e Denise Jung, esperam 30 mil pessoas nos seis dias de disputa. Uma arena será montada em torno dos dois campos principais do clube. Logo depois, de 21 a 24 de outubro, a Ginástica recebe ainda o Mundial Masters, com seis categorias masculinas e femininas.",
+        "A organização está em busca de patrocinadores e aposta no impacto para hotéis, restaurantes, turismo e transporte da região. O evento deve ter transmissão de TV em países europeus onde o punhobol é tradicional, como Alemanha, Suíça, Áustria e Itália."
+      ],
       "cat": "Esporte",
       "source": "Portal Martin Behrend",
       "link": "https://martinbehrend.com.br/esporte/a-um-ano-do-mundial-em-novo-hamburgo-selecao-brasileira-de-punhobol-realiza-treino-na-ginastica",
