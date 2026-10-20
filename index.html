@@ -9,7 +9,7 @@
 <style>
 /* Palco 1920x1080 escalado; margem de segurança 96/54; cabeçalho em uma linha; foco fixo, trilhos se movem */
 :root{--letterbox:#0E0E0E;--bg:#2A2A2A;--card:#141414;--thumb:#1F1F1F;--rule:#3A3A3A;--title:#E0E0E0;--sub:#B3B3B3;--focus:#FFD60A;--brand:#4FB8FF;
---font:"Roboto",system-ui,-apple-system,"Segoe UI",sans-serif;--safe-x:96px;--safe-y:54px;--gap:32px;--ring:5px;--zoom:1.1;--move:.36s cubic-bezier(.22,.61,.36,1);color-scheme:dark}
+--font:"Roboto",system-ui,-apple-system,"Segoe UI",sans-serif;--safe-x:96px;--safe-y:54px;--gap:32px;--ring:5px;--zoom:1.1;--move:.36s cubic-bezier(.22,.61,.36,1);--pop:cubic-bezier(.34,1.45,.64,1);color-scheme:dark}
 html,body{height:100%;margin:0;background:var(--letterbox);overflow:hidden}
 .viewport{position:fixed;top:0;right:0;bottom:0;left:0;overflow:hidden;background:var(--letterbox)}
 .stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;overflow:hidden;background:var(--bg);color:var(--title);font-family:var(--font);transform-origin:center}
@@ -52,10 +52,13 @@ html,body{height:100%;margin:0;background:var(--letterbox);overflow:hidden}
 .rail{position:absolute;left:0;width:100%;transition:top var(--move)}
 .track{position:absolute;top:0;left:var(--safe-x);display:flex;transition:transform var(--move)}
 .track>.card+.card{margin-left:var(--gap)}
-.card{flex:none;width:var(--w);height:var(--h);background:var(--card);display:flex;flex-direction:column;cursor:pointer;outline:none;transform-origin:0 0;will-change:transform;transition:transform var(--move),margin-right var(--move),background-color var(--move)}
+.card{flex:none;width:var(--w);height:var(--h);background:var(--card);display:flex;flex-direction:column;position:relative;cursor:pointer;outline:none;transform-origin:0 0;will-change:transform;transition:transform var(--move),margin-right var(--move),background-color var(--move),box-shadow var(--move)}
+/* anel do foco é parte do card: aparece no card novo em vez de deslizar até ele */
+.card::before{content:"";position:absolute;top:calc(var(--ring) * -1);right:calc(var(--ring) * -1);bottom:calc(var(--ring) * -1);left:calc(var(--ring) * -1);border:var(--ring) solid var(--focus);z-index:2;pointer-events:none;opacity:0;transition:opacity .12s}
+.card.on::before{opacity:1}
 .card .t,.card .cat,.card .s{transition:color var(--move),border-color var(--move)}
 /* card focado cresce por inteiro (imagem, tag, título e hora) e empurra os vizinhos à direita; o trilho de baixo desce via JS */
-.card.on{transform:scale(var(--zoom));margin-right:calc(var(--w) * (var(--zoom) - 1))}
+.card.on{transform:scale(var(--zoom));margin-right:calc(var(--w) * (var(--zoom) - 1));box-shadow:0 18px 44px rgba(0,0,0,.55);transition-timing-function:var(--pop),var(--pop),ease,ease}
 .card.row{flex-direction:row}
 .thumb{position:relative;flex:none;height:calc(var(--w) * 9 / 16);background:var(--thumb);overflow:hidden}
 .row .thumb{width:var(--tw);height:100%}
@@ -80,8 +83,6 @@ html,body{height:100%;margin:0;background:var(--letterbox);overflow:hidden}
 .skl{display:block;height:26px;background:var(--thumb);animation:pulse 1.4s ease-in-out infinite}
 .skl.c{width:30%;height:22px}.skl.a{width:92%;height:40px}.skl.b{width:64%;height:40px}.skl.d{width:26%;height:24px;margin-top:auto}
 @keyframes pulse{50%{opacity:.55}}
-.ring{position:absolute;left:calc(var(--safe-x) - var(--ring));top:0;box-sizing:border-box;border:var(--ring) solid var(--focus);z-index:2;pointer-events:none;transition:width var(--move),height var(--move),opacity .15s}
-.ring.off{opacity:0}
 .toast{position:absolute;left:50%;bottom:var(--safe-y);transform:translateX(-50%);z-index:8;background:var(--card);border:2px solid var(--rule);padding:18px 32px;font-size:26px;color:var(--title);opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1}
 
@@ -191,7 +192,7 @@ html,body{height:100%;margin:0;background:var(--letterbox);overflow:hidden}
 .intro-gate kbd{font:inherit;font-weight:900;color:var(--card);background:var(--focus);padding:6px 22px;margin:0 6px}
 .intro-gate small{font-size:24px;color:#7A7A7A}
 .intro-gate .iw-cur{width:28px;height:44px;margin:0}
-@media (prefers-reduced-motion:reduce){.rails,.rail,.card,.card .t,.card .cat,.card .s,.track,.ring,.toast,.post,.rm,.rm-btn,.p-prog,.p-btn{transition:none}.sk .thumb,.skl,.iw-cur{animation:none}}
+@media (prefers-reduced-motion:reduce){.rails,.rail,.card,.card::before,.card .t,.card .cat,.card .s,.track,.toast,.post,.rm,.rm-btn,.p-prog,.p-btn{transition:none}.sk .thumb,.skl,.iw-cur{animation:none}}
 </style>
 </head>
 <body>
@@ -227,7 +228,6 @@ html,body{height:100%;margin:0;background:var(--letterbox);overflow:hidden}
 </div>
 </header>
 <div class="rails" id="rails"></div>
-<div class="ring" id="ring"></div>
 
 <section class="post" id="post" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="pHead">
 <div class="p-side">
@@ -439,9 +439,9 @@ function cue(moved,e){if(moved)sfx.nav(e.repeat);}
 /* ================= Layout dos trilhos ================= */
 // espaçamento e anel vêm dos tokens do CSS: o mesmo --gap separa cards (horizontal) e trilhos (vertical)
 const cssPx=n=>parseFloat(getComputedStyle(document.documentElement).getPropertyValue(n))||0;
-const GAP=cssPx('--gap'),RING=cssPx('--ring'),ZOOM=cssPx('--zoom')||1,FIX_TOP=252,BIG={w:720,h:590},ROW={w:720,h:300,tw:280};
+const GAP=cssPx('--gap'),ZOOM=cssPx('--zoom')||1,FIX_TOP=252,BIG={w:720,h:590},ROW={w:720,h:300,tw:280};
 const $=id=>document.getElementById(id);
-const fsBtn=$('fsBtn'),railsEl=$('rails'),ring=$('ring'),stage=$('stage'),toast=$('toast'),titleEl=$('railTitle'),liveIcon=$('liveIcon');
+const fsBtn=$('fsBtn'),railsEl=$('rails'),stage=$('stage'),toast=$('toast'),titleEl=$('railTitle'),liveIcon=$('liveIcon');
 const post=$('post'),pHero=$('pHero'),pHead=$('pHead'),pAgo=$('pAgo'),pBy=$('pBy'),pSrc=$('pSrc'),pTimeTxt=$('pTimeTxt'),pScroll=$('pScroll'),pBody=$('pBody'),pProg=$('pProg');
 const navBtns=[...post.querySelectorAll('.p-btn')];const NB={back:0,next:1,listen:2};let pf=NB.next,words=0;
 const SHOW_SOON=true; // false oculta busca, temas e perfil enquanto não têm tela própria
@@ -507,15 +507,14 @@ function render(){
 if(!RAILS.length)return;
 const R=RAILS[r];
 titleEl.textContent=R.title;
-hdItems.forEach((b,i)=>b.classList.toggle('on',inHeader&&i===hf));ring.classList.toggle('off',inHeader||postOpen);
+hdItems.forEach((b,i)=>b.classList.toggle('on',inHeader&&i===hf));
 railsEl.style.transform='translateY('+(FIX_TOP-tops[r])+'px)';
 // o card focado cresce ZOOM vezes: os trilhos abaixo descem o mesmo tanto para manter o --gap
-const grow=inHeader?0:R.h*(ZOOM-1),fw=inHeader?R.w:R.w*ZOOM,fh=inHeader?R.h:R.h*ZOOM;
+const grow=inHeader?0:R.h*(ZOOM-1);
 tracks.forEach((t,k)=>{t.parentNode.style.top=(tops[k]+(k>r?grow:0))+'px';
 // posição medida no DOM: não depende de flex gap nem de largura fixa
 // posição calculada (não medida): a margem do card que perde o foco ainda está animando
 t.style.transform='translateX('+(-idx[k]*(RAILS[k].w+GAP))+'px)';});
-ring.style.top=(FIX_TOP-RING)+'px';ring.style.width=(fw+RING*2)+'px';ring.style.height=(fh+RING*2)+'px';
 if(inHeader){if(prev){prev.classList.remove('on');prev=null;}try{hdItems[hf].focus({preventScroll:true});}catch(e){}}
 else{const c=cards[r][idx[r]];if(prev&&prev!==c)prev.classList.remove('on');c.classList.add('on');prev=c;
 if(!postOpen){try{c.focus({preventScroll:true});}catch(e){}}}
@@ -536,7 +535,7 @@ const focusEl=el=>{if(el)try{el.focus({preventScroll:true});}catch(e){}};
 const smooth=()=>reduced.matches?'auto':'smooth';
 const reduced=matchMedia('(prefers-reduced-motion: reduce)');
 /* fundo inerte enquanto a matéria está aberta */
-const bgEls=[document.querySelector('.top'),railsEl,ring];
+const bgEls=[document.querySelector('.top'),railsEl];
 function setBgInert(on){bgEls.forEach(el=>{if(on){el.setAttribute('inert','');el.setAttribute('aria-hidden','true');}else{el.removeAttribute('inert');el.removeAttribute('aria-hidden');}});}
 /* blocos de leitura: cada um recebe foco para que o leitor de tela da TV leia o texto */
 let blocks=[],rb=-1;
@@ -665,7 +664,12 @@ else if(k==='ArrowUp'){if(r>0)r--;else{inHeader=true;hf=HD_HOME;}}
 else if(k==='Enter'||code===13){open();used='open';}
 else if(isBack(k,code)){back();used='back';}
 else used=false;
-if(used){e.preventDefault();if(used===true){render();cue(focusSig()!==sig0,e,k);}}}
+if(used){e.preventDefault();if(used===true){render();const moved=focusSig()!==sig0;cue(moved,e,k);if(!moved)bump(k);}}}
+// feedback de D-pad na borda: o card focado dá um toque curto na direção pressionada e volta
+const BUMP={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]};
+function bump(k){const d=BUMP[k],c=prev;if(!d||!c||reduced.matches||!c.animate)return;
+if(c._bump)c._bump.cancel();const o=d[0]*14+'px '+d[1]*14+'px';
+c._bump=c.animate([{translate:'0 0'},{translate:o,offset:.35},{translate:'0 0'}],{duration:280,easing:'ease-out'});}
 // posição do foco: o som de navegação só toca quando o foco realmente muda
 function focusSig(){return (inHeader?'h'+hf:'r'+r+':'+idx[r]);}
 document.addEventListener('keydown',onKey);
@@ -941,7 +945,7 @@ logo.animate([{transform:'none'},{transform:'translate('+dx+'px,'+dy+'px) scale(
 [plate,bar,tag,wire,rule,rowsEl].forEach(n=>anim(n,[{opacity:getComputedStyle(n).opacity},{opacity:0}],0,dur*.45,'ease','forwards'));
 anim(bg,[{opacity:1},{opacity:0}],dur*.25,dur*.75,'ease','forwards');
 const D=dur*.3;
-[[document.querySelector('.hd-bar'),0],...[...document.querySelectorAll('.hd-info>:not(.hd-logo)')].map(n=>[n,70]),[railsEl,150],[ring,150]]
+[[document.querySelector('.hd-bar'),0],...[...document.querySelectorAll('.hd-info>:not(.hd-logo)')].map(n=>[n,70]),[railsEl,150]]
 .forEach(([n,d])=>anim(n,[{opacity:0,translate:'0 36px'},{opacity:1,translate:'0 0'}],D+d,dur*.8,undefined,'backwards'));
 if(snd&&ctx&&fast){const now=ctx.currentTime;master.gain.cancelScheduledValues(now);master.gain.setValueAtTime(master.gain.value,now);master.gain.setTargetAtTime(.0001,now,.07);}
 setTimeout(()=>finish(fast),dur+40);}
