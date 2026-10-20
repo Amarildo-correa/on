@@ -59,7 +59,8 @@ html,body{height:100%;margin:0;background:var(--letterbox);overflow:hidden}
 .card .t,.card .cat,.card .s{transition:color var(--tint),border-color var(--tint)}
 /* card focado cresce por inteiro (imagem, tag, título e hora) e empurra os vizinhos à direita; o trilho de baixo desce via JS */
 /* deslize do trilho, zoom, margem e descida do trilho de baixo usam a mesma --move: o card alvo cresce enquanto desliza e chega à posição do foco já no tamanho final */
-.card.on{transform:scale(var(--zoom));margin-right:calc(var(--w) * (var(--zoom) - 1));box-shadow:0 18px 44px rgba(0,0,0,.55)}
+/* foco cresce só na altura (scaleY): largura e gap horizontal ficam iguais; o trilho de baixo desce via JS */
+.card.on{transform:scaleY(var(--zoom));box-shadow:0 18px 44px rgba(0,0,0,.55)}
 .card.row{flex-direction:row}
 .thumb{position:relative;flex:none;height:calc(var(--w) * 9 / 16);background:var(--thumb);overflow:hidden}
 .row .thumb{width:var(--tw);height:100%}
