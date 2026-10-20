@@ -50,8 +50,6 @@ html,body{height:100%;margin:0;background:var(--letterbox);overflow:hidden}
 .hd-wx svg{width:46px;height:46px;stroke-width:1.9;color:var(--brand);margin-right:10px}
 .rails{position:absolute;left:0;top:0;width:100%;z-index:1;transition:transform var(--move)}
 .rail{position:absolute;left:0;width:100%}
-/* rótulo visível de cada trilho (o do trilho focado fica sob o cabeçalho e aparece no h1) */
-.rail-lbl{position:absolute;left:var(--safe-x);top:-58px;margin:0;font-size:30px;font-weight:700;line-height:40px;color:#fff;white-space:nowrap}
 .track{position:absolute;top:0;left:var(--safe-x);display:flex;transition:transform var(--move)}
 .track>.card+.card{margin-left:var(--gap)}
 .card{flex:none;width:var(--w);height:var(--h);background:var(--card);display:flex;flex-direction:column;cursor:pointer;outline:none}
@@ -491,8 +489,7 @@ const oldIdx={};RAILS.forEach((R,k)=>{const it=R.items[idx[k]];if(it)oldIdx[R.ti
 RAILS=data.filter(R=>R.items&&R.items.length).map(R=>Object.assign({},R,R.big?BIG:ROW));
 railsEl.textContent='';tops=[];tracks=[];cards=[];prev=null;let y=FIX_TOP;
 RAILS.forEach((R,k)=>{
-const rail=document.createElement('section');rail.className='rail';rail.style.top=y+'px';
-const h=document.createElement('h2');h.className='rail-lbl';h.textContent=R.title;rail.appendChild(h);
+const rail=document.createElement('section');rail.className='rail';rail.style.top=y+'px';rail.setAttribute('aria-label',R.title);
 const tr=document.createElement('div');tr.className='track';
 tr.style.setProperty('--w',R.w+'px');tr.style.setProperty('--h',R.h+'px');if(R.tw)tr.style.setProperty('--tw',R.tw+'px');
 cards[k]=R.items.map((it,i)=>{const c=makeCard(R,it,k,i);tr.appendChild(c);return c;});
