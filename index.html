@@ -9,7 +9,7 @@
 <style>
 /* Palco 1920x1080 escalado; margem de segurança 96/54; cabeçalho em uma linha; foco fixo, trilhos se movem */
 :root{--letterbox:#0E0E0E;--bg:#2A2A2A;--card:#141414;--thumb:#1F1F1F;--rule:#3A3A3A;--title:#E0E0E0;--sub:#B3B3B3;--focus:#FFD60A;--brand:#4FB8FF;
---font:"Roboto",system-ui,-apple-system,"Segoe UI",sans-serif;--safe-x:96px;--safe-y:54px;--gap:32px;--ring:5px;--zoom:1.1;--move:.65s cubic-bezier(.4,0,.2,1);color-scheme:dark}
+--font:"Roboto",system-ui,-apple-system,"Segoe UI",sans-serif;--safe-x:96px;--safe-y:54px;--gap:32px;--ring:5px;--zoom:1.1;--move:.6s cubic-bezier(.33,0,.2,1);--tint:.14s ease;color-scheme:dark}
 html,body{height:100%;margin:0;background:var(--letterbox);overflow:hidden}
 .viewport{position:fixed;top:0;right:0;bottom:0;left:0;overflow:hidden;background:var(--letterbox)}
 .stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;overflow:hidden;background:var(--bg);color:var(--title);font-family:var(--font);transform-origin:center}
@@ -52,11 +52,11 @@ html,body{height:100%;margin:0;background:var(--letterbox);overflow:hidden}
 .rail{position:absolute;left:0;width:100%;transition:top var(--move)}
 .track{position:absolute;top:0;left:var(--safe-x);display:flex;transition:transform var(--move)}
 .track>.card+.card{margin-left:var(--gap)}
-.card{flex:none;width:var(--w);height:var(--h);background:var(--card);display:flex;flex-direction:column;position:relative;cursor:pointer;outline:none;transform-origin:0 0;will-change:transform;transition:transform var(--move),margin-right var(--move),background-color var(--move),box-shadow var(--move)}
+.card{flex:none;width:var(--w);height:var(--h);background:var(--card);display:flex;flex-direction:column;position:relative;cursor:pointer;outline:none;transform-origin:0 0;will-change:transform;transition:transform var(--move),margin-right var(--move),background-color var(--tint),box-shadow var(--move)}
 /* anel do foco é parte do card: aparece no card novo em vez de deslizar até ele */
 .card::before{content:"";position:absolute;top:calc(var(--ring) * -1);right:calc(var(--ring) * -1);bottom:calc(var(--ring) * -1);left:calc(var(--ring) * -1);border:var(--ring) solid var(--focus);z-index:2;pointer-events:none;opacity:0;transition:opacity .12s}
 .card.on::before{opacity:1}
-.card .t,.card .cat,.card .s{transition:color var(--move),border-color var(--move)}
+.card .t,.card .cat,.card .s{transition:color var(--tint),border-color var(--tint)}
 /* card focado cresce por inteiro (imagem, tag, título e hora) e empurra os vizinhos à direita; o trilho de baixo desce via JS */
 /* deslize do trilho, zoom, margem e descida do trilho de baixo usam a mesma --move: o card alvo cresce enquanto desliza e chega à posição do foco já no tamanho final */
 .card.on{transform:scale(var(--zoom));margin-right:calc(var(--w) * (var(--zoom) - 1));box-shadow:0 18px 44px rgba(0,0,0,.55)}
