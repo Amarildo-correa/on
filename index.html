@@ -79,7 +79,6 @@ html,body{height:100%;margin:0;background:var(--letterbox);overflow:hidden}
 @keyframes pulse{50%{opacity:.55}}
 .ring{position:absolute;left:calc(var(--safe-x) - var(--ring));top:0;box-sizing:border-box;border:var(--ring) solid var(--focus);z-index:2;pointer-events:none;transition:width var(--move),height var(--move),opacity .15s}
 .ring.off{opacity:0}
-.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .toast{position:absolute;left:50%;bottom:var(--safe-y);transform:translateX(-50%);z-index:8;background:var(--card);border:2px solid var(--rule);padding:18px 32px;font-size:26px;color:var(--title);opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1}
 
@@ -435,7 +434,9 @@ function cue(moved,e){if(moved)sfx.nav(e.repeat);}
 ['keydown','pointerdown','touchstart'].forEach(ev=>addEventListener(ev,()=>sfx.unlock(),{capture:true,passive:true}));
 
 /* ================= Layout dos trilhos ================= */
-const GAP=32,SPACE=96,FIX_TOP=252,RING=5,BIG={w:720,h:590},ROW={w:720,h:300,tw:280};
+// espaçamento e anel vêm dos tokens do CSS: o mesmo --gap separa cards (horizontal) e trilhos (vertical)
+const cssPx=n=>parseFloat(getComputedStyle(document.documentElement).getPropertyValue(n))||0;
+const GAP=cssPx('--gap'),RING=cssPx('--ring'),FIX_TOP=252,BIG={w:720,h:590},ROW={w:720,h:300,tw:280};
 const $=id=>document.getElementById(id);
 const fsBtn=$('fsBtn'),railsEl=$('rails'),ring=$('ring'),stage=$('stage'),toast=$('toast'),titleEl=$('railTitle'),liveIcon=$('liveIcon');
 const post=$('post'),pHero=$('pHero'),pHead=$('pHead'),pAgo=$('pAgo'),pBy=$('pBy'),pSrc=$('pSrc'),pTimeTxt=$('pTimeTxt'),pScroll=$('pScroll'),pBody=$('pBody'),pProg=$('pProg');
@@ -467,7 +468,7 @@ if(want&&!th._on){th._on=true;setImg(th,th._src,th._cat,th._w,th._h);}
 else if(!want&&th._on){th._on=false;dropImg(th);}});});}
 
 function makeCard(R,it,k,i){
-const c=document.createElement('article');c.className='card'+(R.big?' big':' row')+(it.sk?' sk':'');c.tabIndex=-1;
+const c=document.createElement('article');c.className='card'+(R.big?' big':' row')+(it.sk?' sk':'');c.tabIndex=-1;c._it=it;
 const th=document.createElement('div');th.className='thumb';
 const b=document.createElement('div');b.className='body';
 if(it.sk){c.setAttribute('aria-hidden','true');b.innerHTML='<span class="skl c"></span><span class="skl a"></span><span class="skl b"></span><span class="skl d"></span>';}
@@ -477,8 +478,8 @@ if(it.img){th._src=it.img;th._cat=it.cat;th._w=R.big?R.w:R.tw;th._h=R.big?340:R.
 const cat=document.createElement('span');cat.className='cat';cat.textContent=it.cat;
 const t=document.createElement('h3');t.className='t';t.textContent=it.title;
 const s=document.createElement('p');s.className='s';s.textContent=ago(it);
-b.append(cat,t,s);c._s=s;c.setAttribute('aria-label',it.cat+'. '+it.title+'. '+ago(it));}
-c.append(th,b);c._it=it;
+b.append(cat,t,s);c._s=s;setAge(c,ago(it));}
+c.append(th,b);
 c.addEventListener('click',()=>{if(postOpen)return;if(!inHeader&&r===k&&idx[k]===i)open();else{inHeader=false;r=k;idx[k]=i;render();sfx.nav();}});
 return c;}
 
@@ -493,7 +494,7 @@ const rail=document.createElement('section');rail.className='rail';rail.style.to
 const tr=document.createElement('div');tr.className='track';
 tr.style.setProperty('--w',R.w+'px');tr.style.setProperty('--h',R.h+'px');if(R.tw)tr.style.setProperty('--tw',R.tw+'px');
 cards[k]=R.items.map((it,i)=>{const c=makeCard(R,it,k,i);tr.appendChild(c);return c;});
-rail.appendChild(tr);railsEl.appendChild(rail);tops.push(y);tracks.push(tr);y+=R.h+SPACE;});
+rail.appendChild(tr);railsEl.appendChild(rail);tops.push(y);tracks.push(tr);y+=R.h+GAP;});
 idx=RAILS.map(R=>{const i=R.items.findIndex(it=>it.id===oldIdx[R.title]);return i<0?0:i;});
 const nr=RAILS.findIndex(R=>R.title===keepTitle);r=nr<0?0:nr;
 if(keepId){const i=RAILS[r].items.findIndex(it=>it.id===keepId);if(i>=0)idx[r]=i;}
@@ -515,7 +516,8 @@ syncImgs();
 stage.scrollLeft=0;stage.scrollTop=0;}
 
 function showToast(msg,ms){if(INTRO.hold(msg,ms))return;toast.textContent=msg;toast.classList.add('show');clearTimeout(showToast.t);showToast.t=setTimeout(()=>toast.classList.remove('show'),ms||1800);}
-function updateAges(){cards.forEach(row=>row.forEach(c=>{if(c._s&&c._it.date){const a=rel(c._it.date);c._s.textContent=a;c.setAttribute('aria-label',c._it.cat+'. '+c._it.title+'. '+a);}}));
+function setAge(c,a){c._s.textContent=a;c.setAttribute('aria-label',c._it.cat+'. '+c._it.title+'. '+a);}
+function updateAges(){cards.forEach(row=>row.forEach(c=>{if(c._s&&c._it.date)setAge(c,rel(c._it.date));}));
 if(postOpen&&cur)renderMeta(RAILS[cur.k].items[cur.i]);}
 
 /* ================= Tela da matéria ================= */
