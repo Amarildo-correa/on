@@ -609,9 +609,9 @@ syncImgs();
 stage.scrollLeft=0;stage.scrollTop=0;}
 
 function showToast(msg,ms){if(INTRO.hold(msg,ms))return;toast.textContent=msg;toast.classList.add('show');clearTimeout(showToast.t);showToast.t=setTimeout(()=>toast.classList.remove('show'),ms||1800);}
-/* hora curta nos cards ("há 1 hora" → "1h", "há 39 minutos" → "39min") */
+/* hora curta nos cards ("há 1 hora" → "há 1h", "há 39 minutos" → "há 39min") */
 const SHORT={minuto:'min',hora:'h',dia:'d',semana:'sem'};
-const shortAgo=a=>{const m=/^há (\d+) (minuto|hora|dia|semana)s?$/.exec(a||'');return m?m[1]+SHORT[m[2]]:a;};
+const shortAgo=a=>{const m=/^há (\d+) (minuto|hora|dia|semana)s?$/.exec(a||'');return m?'há '+m[1]+SHORT[m[2]]:a;};
 function setAge(c,a){c._s.textContent=shortAgo(a);c.setAttribute('aria-label',c._it.cat+'. '+c._it.title+'. '+a+(isSeen(c._it)?'. Lida':''));}
 function updateAges(){cards.forEach(row=>row.forEach(c=>{if(c._s&&c._it.date)setAge(c,rel(c._it.date));}));
 if(postOpen&&cur)renderMeta(RAILS[cur.k].items[cur.i]);}
