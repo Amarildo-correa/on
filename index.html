@@ -73,31 +73,36 @@ html,body{height:100%;margin:0;background:var(--letterbox);overflow:hidden}
    lido (.seen): título mais escuro e ícone de olho; focado (.on): superfície amarela, textos escuros */
 .body{flex:1;min-width:0;box-sizing:border-box;display:flex;flex-direction:column}
 .big .body{padding:33px 48px 34px 40px}
-.row .body{padding:18px 32px 18px 39px}
+.row .body{padding:23px 32px 26px 39px}
 .t{margin:0;font-size:41px;font-weight:700;line-height:48px;color:#EEE;overflow-wrap:anywhere}
 .row .t{flex:none;height:147px;line-height:49px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;text-overflow:ellipsis}
 /* card grande: o corte em 2 linhas é feito em JS (fitTitles) para o "…" ficar dentro da placa escura/amarela; max-height é só a rede de segurança */
 .big .t{position:absolute;left:29px;right:52px;bottom:calc(100% - var(--th) - 10px);z-index:2;max-height:99px;overflow:hidden;padding-top:3px}
 .big .t .hl{background:var(--card);padding:3px 25px 3px 12px;-webkit-box-decoration-break:clone;box-decoration-break:clone;transition:background-color var(--tint)}
 .cat{flex:none;font-size:35px;font-weight:700;line-height:35px;text-transform:uppercase;color:var(--brand);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.row .cat{margin-top:25px;max-width:100%}
-.big .cat{min-width:0}
+.cat{min-width:0}
 .meta{flex:none;display:flex;align-items:center;min-width:0;border-top:4px solid #EEE;white-space:nowrap}
 .big .meta{height:57px;padding-top:12px}
-.row .meta{height:42px;margin-top:25px;padding-top:19px}
+.row .meta{height:42px;margin-top:28px;padding-top:10px}
+.row .meta .s{margin-left:auto;padding-left:24px}
 .c-sep{flex:none;width:4px;height:57px;margin:0 19px 0 24px;background:var(--brand)}
 .s{flex:none;display:flex;align-items:center;font-size:35px;font-weight:700;line-height:1;color:#B8B8B8}
-.s svg,.c-eye{display:block;flex:none;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round}
+.s svg,.c-mark svg{display:block;flex:none;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round}
 .s svg{width:34px;height:34px;stroke-width:2.4;margin:0 15px 0 -2px}
-.c-eye{width:44px;height:44px;stroke-width:2.4;margin-left:auto;padding-left:20px;color:#EEE;visibility:hidden}
-.card.seen .c-eye{visibility:visible}
+/* matéria lida: olho no canto superior direito da foto, sobre uma máscara escura radial que o destaca */
+.c-mark{position:absolute;top:0;right:0;bottom:0;left:0;z-index:1;pointer-events:none;display:none;
+background:radial-gradient(circle at 100% 0,rgba(0,0,0,.87) 0,rgba(0,0,0,.7) 120px,rgba(0,0,0,.45) 240px,rgba(0,0,0,.22) 300px,rgba(0,0,0,0) 345px)}
+.c-mark svg{position:absolute;width:80px;height:80px;stroke-width:2.2;color:#fff;filter:drop-shadow(0 2px 6px rgba(0,0,0,.45))}
+.big .c-mark svg{top:35px;right:68px}
+.row .c-mark svg{top:22px;right:27px}
+.card.seen .c-mark{display:block}
 .card.seen .t{color:#ADADAD}
 .card.big.seen .meta{border-top-color:#ADADAD}
 /* card focado: superfície amarela com textos escuros */
 .card.on{background:var(--focus)}
 .card.on .t,.card.on.seen .t{color:#000}
 .card.big.on .t .hl{background:var(--focus)}
-.card.on .cat,.card.on .s,.card.on .c-eye{color:var(--card)}
+.card.on .cat,.card.on .s{color:var(--card)}
 .card.on .c-sep{background:var(--card)}
 .card.on .meta,.card.big.seen.on .meta{border-top-color:var(--card)}
 .card.on .thumb::after{content:"";position:absolute;top:0;right:0;bottom:0;left:0;z-index:1;border:7px solid var(--focus);pointer-events:none}
@@ -422,7 +427,7 @@ const DEMO=[
 ['Educação','Inscrições para o vestibular terminam nesta sexta','há 4 horas'],
 ['Transporte','Metrô amplia horário de funcionamento aos sábados','há 6 horas']]}
 ].map((R,k)=>({title:R.title,big:R.big,items:R.items.map((a,i)=>({id:'demo-'+k+'-'+i,cat:a[0],title:a[1],ago:a[2],link:'',author:'',date:null,html:'',
-img:'https://picsum.photos/seed/readontv-'+k+'-'+i+'/'+(R.big?720:268)+'/'+(R.big?432:333)}))}));
+img:'https://picsum.photos/seed/readontv-'+k+'-'+i+'/'+(R.big?720:268)+'/'+(R.big?432:280)}))}));
 const SKELETON=[{title:'Destaques',big:true,items:[0,1,2].map(i=>({id:'sk'+i,sk:true}))},{title:'Últimas notícias',items:[0,1,2].map(i=>({id:'skr'+i,sk:true}))}];
 
 /* ================= Sons da interface (Web Audio API) ================= */
@@ -465,7 +470,7 @@ function cue(moved,e){if(moved)sfx.nav(e.repeat);}
 /* ================= Layout dos trilhos ================= */
 // espaçamento e anel vêm dos tokens do CSS: o mesmo --gap separa cards (horizontal) e trilhos (vertical)
 const cssPx=n=>parseFloat(getComputedStyle(document.documentElement).getPropertyValue(n))||0;
-const GAP=cssPx('--gap'),ZOOM=cssPx('--zoom')||1,FIX_TOP=252,BIG={w:720,h:572,th:432},ROW={w:776,h:333,tw:268};
+const GAP=cssPx('--gap'),ZOOM=cssPx('--zoom')||1,FIX_TOP=252,BIG={w:720,h:572,th:432},ROW={w:776,h:280,tw:268};
 /* matérias já abertas: o card mostra o olho e o título fica mais escuro (localStorage) */
 const SEEN_KEY='readontv-on:seen',SEEN_MAX=600;
 const seen=(()=>{let list=[];try{const v=JSON.parse(store.get(SEEN_KEY)||'[]');if(Array.isArray(v))list=v.filter(x=>typeof x==='string');}catch(e){}return new Set(list);})();
@@ -476,7 +481,7 @@ while(seen.size>SEEN_MAX)seen.delete(seen.values().next().value);
 store.set(SEEN_KEY,JSON.stringify([...seen]));
 cards.forEach(row=>row.forEach(c=>{if(c._it&&String(c._it.id)===id){c.classList.add('seen');setAge(c,ago(c._it));}}));}
 const ICO_CLOCK='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M12 6.8v5.6l3.6 2.2"/></svg>';
-const ICO_EYE='<svg class="c-eye" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>';
+const ICO_EYE='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/></svg>';
 const $=id=>document.getElementById(id);
 const fsBtn=$('fsBtn'),railsEl=$('rails'),stage=$('stage'),toast=$('toast'),titleEl=$('railTitle'),liveIcon=$('liveIcon');
 const post=$('post'),pHero=$('pHero'),pHead=$('pHead'),pAgo=$('pAgo'),pBy=$('pBy'),pSrc=$('pSrc'),pTimeTxt=$('pTimeTxt'),pScroll=$('pScroll'),pBody=$('pBody'),pProg=$('pProg');
@@ -521,9 +526,9 @@ const t=document.createElement('h3');t.className='t';
 if(R.big){const hl=document.createElement('span');hl.className='hl';hl.textContent=it.title;t.appendChild(hl);c._hl=hl;}else t.textContent=it.title;
 const meta=document.createElement('div');meta.className='meta';
 const s=document.createElement('span');s.className='s';s.innerHTML=ICO_CLOCK;const st=document.createElement('span');s.appendChild(st);
-if(R.big){const sep=document.createElement('span');sep.className='c-sep';sep.setAttribute('aria-hidden','true');meta.append(cat,sep,s);}else meta.append(s);
-meta.insertAdjacentHTML('beforeend',ICO_EYE);
-if(R.big)b.append(meta);else b.append(t,cat,meta);
+if(R.big){const sep=document.createElement('span');sep.className='c-sep';sep.setAttribute('aria-hidden','true');meta.append(cat,sep,s);}else{meta.append(cat,s);c._short=true;}
+const mark=document.createElement('div');mark.className='c-mark';mark.innerHTML=ICO_EYE;th.appendChild(mark);
+if(R.big)b.append(meta);else b.append(t,meta);
 if(R.big)c.appendChild(t);
 c._s=st;setAge(c,ago(it));}
 c.append(th,b);
@@ -581,7 +586,10 @@ syncImgs();
 stage.scrollLeft=0;stage.scrollTop=0;}
 
 function showToast(msg,ms){if(INTRO.hold(msg,ms))return;toast.textContent=msg;toast.classList.add('show');clearTimeout(showToast.t);showToast.t=setTimeout(()=>toast.classList.remove('show'),ms||1800);}
-function setAge(c,a){c._s.textContent=a;c.setAttribute('aria-label',c._it.cat+'. '+c._it.title+'. '+a+(isSeen(c._it)?'. Lida':''));}
+/* card em linha: hora curta ("há 1 hora" → "1h", "há 39 minutos" → "39min") */
+const SHORT={minuto:'min',hora:'h',dia:'d',semana:'sem'};
+const shortAgo=a=>{const m=/^há (\d+) (minuto|hora|dia|semana)s?$/.exec(a||'');return m?m[1]+SHORT[m[2]]:a;};
+function setAge(c,a){c._s.textContent=c._short?shortAgo(a):a;c.setAttribute('aria-label',c._it.cat+'. '+c._it.title+'. '+a+(isSeen(c._it)?'. Lida':''));}
 function updateAges(){cards.forEach(row=>row.forEach(c=>{if(c._s&&c._it.date)setAge(c,rel(c._it.date));}));
 if(postOpen&&cur)renderMeta(RAILS[cur.k].items[cur.i]);}
 
