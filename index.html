@@ -78,7 +78,11 @@ background:var(--focus);color:var(--card);font-weight:700;white-space:nowrap;ove
 .row .thumb{width:var(--tw);height:100%}
 .big .thumb{height:var(--th)}
 .thumb img{position:absolute;top:0;right:0;bottom:0;left:0;width:100%;height:100%;object-fit:cover;display:block}
-.thumb.noimg::before,.p-hero.noimg::before{content:attr(data-cat);position:absolute;top:0;right:0;bottom:0;left:0;display:grid;place-items:center;padding:0 24px;text-align:center;font-size:36px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:#343434}
+/* sem foto: ícone Lucide que representa a editoria, centralizado sobre o fundo da miniatura */
+.ph-ico{position:absolute;left:50%;top:50%;width:136px;height:136px;transform:translate(-50%,-50%);color:#464646;stroke-width:1.8;display:none;pointer-events:none}
+.big .ph-ico{width:160px;height:160px;margin-top:-40px}
+.p-hero .ph-ico{width:190px;height:190px;margin-top:-30px}
+.thumb.noimg .ph-ico,.p-hero.noimg .ph-ico{display:block}
 /* ===== Cards da Home =====
    grande: foto no topo, título em placa escura sobre a base da foto, fio claro e linha "EDITORIA ... relógio 1h"
    linha: foto à esquerda; título, fio e linha "EDITORIA ... relógio 1h" à direita
@@ -527,8 +531,20 @@ const w=Math.floor(d/7);if(w<5)return 'há '+w+(w===1?' semana':' semanas');
 return new Date(ms).toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric',timeZone:'America/Sao_Paulo'});}
 const ago=it=>it.date?rel(it.date):(it.ago||'');
 function dropImg(box){box.querySelectorAll('img').forEach(i=>{i._dead=true;i.remove();i.removeAttribute('src');});}
+/* ícone da editoria para quando não há foto (busca por palavra-chave, sem acento; padrão: jornal) */
+const CAT_ICO=[[/alert|defesa civil|tempestade/,'triangle-alert'],[/clima|tempo|meteorolog/,'cloud-sun-rain'],[/politic|eleic|governo/,'landmark'],
+[/econom|financ|negocio|mercado/,'trending-up'],[/justic|judic|stf|tribunal/,'scale'],[/direitos humanos|social|cidadania/,'hand-heart'],
+[/saude|medic|hospital/,'heart-pulse'],[/educac|escola|ensino|universidade/,'graduation-cap'],[/internac|mundo|global/,'globe'],
+[/esporte|futebol|futsal/,'trophy'],[/cidade|bairro|prefeitura|urban/,'building-2'],[/cultura|arte|cinema|teatro/,'drama'],[/music|show/,'music'],
+[/tecnolog|inovac|internet/,'cpu'],[/ciencia|pesquisa/,'flask-conical'],[/transporte|onibus|mobilidade/,'bus'],[/transito|veiculo/,'car'],
+[/seguranca|policia|crime/,'siren'],[/meio ambiente|ambiental|natureza/,'leaf'],[/novo hamburgo|regiao|local/,'map-pin']];
+function catIcon(cat){const c=String(cat||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+for(const [re,n] of CAT_ICO)if(re.test(c))return n;return 'newspaper';}
+function setPh(box,cat){let el=box.querySelector('.ph-ico');
+if(!el){box.insertAdjacentHTML('beforeend',ico('newspaper','ph-ico'));el=box.lastElementChild;}
+setIco(el,catIcon(cat));}
 function setImg(box,src,cat,w,h){
-box.dataset.cat=cat||'';box.classList.remove('noimg');dropImg(box);
+box.dataset.cat=cat||'';box.classList.remove('noimg');dropImg(box);setPh(box,cat);
 if(!src){box.classList.add('noimg');return;}
 const im=new Image(),small=sized(src,w,h);let tried=small===src;im.alt='';im.decoding='async';
 im.addEventListener('error',()=>{if(im._dead)return;if(!tried){tried=true;im.src=src;return;}im.remove();box.classList.add('noimg');});
@@ -546,6 +562,7 @@ if(it.sk){c.setAttribute('aria-hidden','true');b.innerHTML='<span class="skl c">
 else{c.setAttribute('role','link');
 th.dataset.cat=it.cat;c._th=th;
 if(it.img){th._src=it.img;th._cat=it.cat;th._w=R.big?R.w:R.tw;th._h=R.big?R.th:R.h;}else th.classList.add('noimg');
+setPh(th,it.cat);
 if(isSeen(it))c.classList.add('seen');
 const cat=document.createElement('span');cat.className='cat';cat.textContent=it.cat;
 const t=document.createElement('h3');t.className='t';

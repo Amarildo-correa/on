@@ -34,6 +34,6 @@ O ícone de lixeira no cabeçalho (à esquerda do celular) apaga, após um segun
 
 ## Ícones
 
-Os ícones vêm da biblioteca [Lucide](https://lucide.dev) via CDN (`lucide@1.52.0`, jsDelivr), em `index.html` e `c.html`. No HTML, cada ícone é um `<svg data-ico="nome">` que recebe o desenho ao carregar; no JS, `ico('nome')` gera o SVG e `setIco(el, 'nome')` troca o ícone (clima, tela cheia, status do pareamento). O símbolo do logo continua desenhado no próprio HTML, por ser parte da marca.
+Os ícones vêm da biblioteca [Lucide](https://lucide.dev) via CDN (`lucide@1.52.0`, jsDelivr), em `index.html` e `c.html`. No HTML, cada ícone é um `<svg data-ico="nome">` que recebe o desenho ao carregar; no JS, `ico('nome')` gera o SVG e `setIco(el, 'nome')` troca o ícone (clima, tela cheia, status do pareamento). Sem foto, a miniatura do card (e a capa da matéria) mostra um ícone da editoria, escolhido por palavra-chave em `CAT_ICO` (ex.: Alerta → `triangle-alert`, Esportes → `trophy`, Justiça → `scale`; padrão `newspaper`). O símbolo do logo continua desenhado no próprio HTML, por ser parte da marca.
 
 Arquivos: `index.html` (app da TV), `c.html` (controle no celular) e `data/novo-hamburgo.json` (faixa local).
