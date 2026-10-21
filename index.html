@@ -51,6 +51,17 @@ html,body{height:100%;margin:0;background:var(--letterbox);overflow:hidden}
 .hd-city{color:#fff}
 .hd-wx{display:flex;align-items:center;color:#fff;font-weight:700;font-variant-numeric:tabular-nums}
 .hd-wx svg{width:46px;height:46px;stroke-width:1.9;color:var(--brand);margin-right:10px}
+/* foco da previsão do tempo: faixa amarela sobre o título (h1) e a data, do separador do logo até a margem direita */
+.hd-meta{cursor:pointer}
+.top .hd-wxbar{position:absolute;top:20px;right:74px;left:var(--wb-left,480px);height:92px;box-sizing:border-box;padding:0 36px 0 48px;display:flex;align-items:center;justify-content:flex-end;
+background:var(--focus);color:var(--card);font-weight:700;white-space:nowrap;overflow:hidden;visibility:hidden;z-index:1}
+.top .hd-wxbar.on{visibility:visible}
+.wb-txt{min-width:0;font-size:44px;line-height:1.1;overflow:hidden;text-overflow:ellipsis}
+.top .hd-wxbar .wb-go{width:38px;height:38px;stroke-width:3;margin:0 28px 0 30px}
+.wb-city{flex:none;font-size:40px;line-height:1}
+.wb-sep{flex:none;width:4px;height:56px;margin:0 30px;background:currentColor}
+.wb-wx{flex:none;display:flex;align-items:center;font-size:40px;line-height:1;font-variant-numeric:tabular-nums}
+.top .hd-wxbar .wb-wx svg{width:48px;height:48px;stroke-width:2.4;margin-right:10px}
 .rails{position:absolute;left:0;top:0;width:100%;z-index:1;transition:transform var(--move)}
 .rail{position:absolute;left:0;width:100%}
 .track{position:absolute;top:0;left:var(--safe-x);display:flex;transition:transform var(--move)}
@@ -257,6 +268,7 @@ background:radial-gradient(circle at 100% 0,rgba(0,0,0,.87) 0,rgba(0,0,0,.7) 120
 <span class="hd-sep" aria-hidden="true"></span>
 <span class="hd-wx" id="hdWx"><svg viewBox="0 0 24 24" aria-hidden="true" id="wxIcon" data-ico="cloud"></svg><span id="wxTemp">--°</span></span>
 </div>
+<button class="hd-wxbar" id="wxBar" type="button" tabindex="-1"><span class="wb-txt">Veja a previsão do tempo completa</span><svg class="wb-go" viewBox="0 0 24 24" aria-hidden="true" data-ico="chevron-right"></svg><span class="wb-city" id="wbCity"></span><span class="wb-sep" aria-hidden="true"></span><span class="wb-wx"><svg viewBox="0 0 24 24" aria-hidden="true" id="wbIcon" data-ico="cloud"></svg><span id="wbTemp">--°</span></span></button>
 </div>
 </header>
 <div class="rails" id="rails"></div>
@@ -504,7 +516,7 @@ const SHOW_SOON=true; // false oculta busca, temas e perfil enquanto não têm t
 document.querySelectorAll('[data-soon]').forEach(b=>{b.hidden=!SHOW_SOON;});
 const hdItems=[...document.querySelectorAll('.top [data-hd]')].filter(b=>!b.hidden),HD_HOME=hdItems.findIndex(b=>b.dataset.hd==='home');
 let hf=HD_HOME;
-let RAILS=[],tops=[],tracks=[],cards=[],idx=[],r=0,inHeader=false,prev=null,postOpen=false,cur=null,pending=null,source='skeleton';
+let RAILS=[],tops=[],tracks=[],cards=[],idx=[],r=0,inHeader=false,inWx=false,prev=null,postOpen=false,cur=null,pending=null,source='skeleton';
 const cleanCache=new Map();
 
 function rel(ms){const s=Math.max(0,(Date.now()-ms)/1000);
@@ -546,7 +558,7 @@ if(R.big)b.append(meta);else b.append(t,meta);
 if(R.big)c.appendChild(t);
 c._s=st;setAge(c,ago(it));}
 c.append(th,b);
-c.addEventListener('click',()=>{if(postOpen)return;if(!inHeader&&r===k&&idx[k]===i)open();else{inHeader=false;r=k;idx[k]=i;render();sfx.nav();}});
+c.addEventListener('click',()=>{if(postOpen)return;if(!inHeader&&r===k&&idx[k]===i)open();else{inHeader=false;inWx=false;r=k;idx[k]=i;render();sfx.nav();}});
 return c;}
 
 /* título do card grande: no máximo 2 linhas; corta na palavra e põe o "…" dentro do span (assim ele recebe o fundo da placa) */
@@ -586,10 +598,11 @@ if(!RAILS.length)return;
 const R=RAILS[r];
 titleEl.textContent=R.title;
 hdItems.forEach((b,i)=>b.classList.toggle('on',inHeader&&i===hf));
+wxBar.classList.toggle('on',inWx);
 railsEl.style.transform='translateY('+(FIX_TOP-tops[r])+'px)';
 // cada trilho desliza até o card focado (posição calculada pela largura do card + --gap)
 tracks.forEach((t,k)=>{t.style.transform='translateX('+(-idx[k]*(RAILS[k].w+GAP))+'px)';});
-if(inHeader){if(prev){prev.classList.remove('on');prev=null;}try{hdItems[hf].focus({preventScroll:true});}catch(e){}}
+if(inHeader||inWx){if(prev){prev.classList.remove('on');prev=null;}try{(inWx?wxBar:hdItems[hf]).focus({preventScroll:true});}catch(e){}}
 else{const c=cards[r][idx[r]];if(prev&&prev!==c)prev.classList.remove('on');c.classList.add('on');prev=c;
 if(!postOpen){try{c.focus({preventScroll:true});}catch(e){}}}
 syncImgs();
@@ -643,7 +656,7 @@ pScroll.scrollTop=0;post.classList.add('show');post.setAttribute('aria-hidden','
 if(!wasOpen){try{history.pushState({rotPost:1},'');}catch(e){}}
 const hasNext=i<RAILS[k].items.length-1;navBtns[NB.next].setAttribute('aria-disabled',String(!hasNext));
 pf=hasNext?NB.next:NB.back;setNav(false);
-idx[k]=i;r=k;inHeader=false;render();updateProg();requestAnimationFrame(updateProg);
+idx[k]=i;r=k;inHeader=false;inWx=false;render();updateProg();requestAnimationFrame(updateProg);
 focusEl(pScroll);}
 /* fechar passa pelo histórico: o Voltar do Fire TV/Android TV (popstate) também fecha a matéria */
 let closeTimer=0,closing=false;
@@ -696,7 +709,7 @@ try{if(window.webOS&&typeof webOS.platformBack==='function'){webOS.platformBack(
 try{window.close();}catch(e){}}
 // Voltar na raiz pede confirmação para evitar saída acidental
 let exitArm=0;
-function back(){sfx.back();if(inHeader){inHeader=false;r=0;}else if(idx[r]>0)idx[r]=0;else if(r>0)r=0;
+function back(){sfx.back();if(inHeader||inWx){inHeader=false;inWx=false;r=0;}else if(idx[r]>0)idx[r]=0;else if(r>0)r=0;
 else{const now=Date.now();if(now-exitArm<2500){exitApp();return;}exitArm=now;showToast('Pressione Voltar novamente para sair',2500);return;}
 exitArm=0;render();}
 // botões da matéria: pula os desabilitados (aria-disabled)
@@ -725,8 +738,16 @@ else if(k==='Enter'||code===13)act(pf);
 else return;
 e.preventDefault();return;}
 let used=true;const sig0=focusSig();
+/* faixa da previsão do tempo: entre o cabeçalho (acima) e os trilhos (abaixo) */
+if(inWx&&!isBack(k,code)){
+if(k==='ArrowDown'){inWx=false;r=0;render();}
+else if(k==='ArrowUp'){inWx=false;inHeader=true;hf=HD_HOME;render();}
+else if(k==='Enter'||code===13)wxAct();
+else if(!k.startsWith('Arrow'))return;
+if(k.startsWith('Arrow'))cue(focusSig()!==sig0,e,k);
+e.preventDefault();return;}
 if(inHeader&&!isBack(k,code)){
-if(k==='ArrowDown'){inHeader=false;r=0;render();}
+if(k==='ArrowDown'){inHeader=false;inWx=true;render();}
 else if(k==='ArrowRight'){if(hf<hdItems.length-1){hf++;render();}}
 else if(k==='ArrowLeft'){if(hf>0){hf--;render();}}
 else if(k==='Enter'||code===13)hdAct(hf);
@@ -737,7 +758,7 @@ if(!RAILS.length)return;
 if(k==='ArrowRight'){if(idx[r]<RAILS[r].items.length-1)idx[r]++;}
 else if(k==='ArrowLeft'){if(idx[r]>0)idx[r]--;}
 else if(k==='ArrowDown'){if(r<RAILS.length-1)r++;}
-else if(k==='ArrowUp'){if(r>0)r--;else{inHeader=true;hf=HD_HOME;}}
+else if(k==='ArrowUp'){if(r>0)r--;else inWx=true;}
 else if(k==='Enter'||code===13){open();used='open';}
 else if(isBack(k,code)){back();used='back';}
 else used=false;
@@ -748,7 +769,7 @@ function bump(k){const d=BUMP[k],c=prev;if(!d||!c||reduced.matches||!c.animate)r
 if(c._bump)c._bump.cancel();const o=d[0]*14+'px '+d[1]*14+'px';
 c._bump=c.animate([{translate:'0 0'},{translate:o,offset:.35},{translate:'0 0'}],{duration:280,easing:'ease-out'});}
 // posição do foco: o som de navegação só toca quando o foco realmente muda
-function focusSig(){return (inHeader?'h'+hf:'r'+r+':'+idx[r]);}
+function focusSig(){return (inWx?'w':inHeader?'h'+hf:'r'+r+':'+idx[r]);}
 document.addEventListener('keydown',onKey);
 
 /* ================= Gamepad API (Xbox, PlayStation, genéricos) ================= */
@@ -790,7 +811,7 @@ $('hdCity').textContent=CITY.name;
 const WX={sun:'sun',partly:'cloud-sun',cloud:'cloud',fog:'cloud-fog',rain:'cloud-rain',snow:'cloud-snow',storm:'cloud-lightning'};
 const WX_LABEL={sun:'Céu limpo',partly:'Parcialmente nublado',cloud:'Nublado',fog:'Neblina',rain:'Chuva',snow:'Neve',storm:'Tempestade'};
 function wxKind(c){return c===0?'sun':c<=2?'partly':c===3?'cloud':c<=48?'fog':(c>=71&&c<=77)||c===85||c===86?'snow':c>=95?'storm':'rain';}
-function setWx(t,code){const k=code==null?'cloud':wxKind(code);setIco($('wxIcon'),WX[k]);
+function setWx(t,code){const k=code==null?'cloud':wxKind(code);setIco($('wxIcon'),WX[k]);setTimeout(wxBarSync); // depois do script: a faixa da previsão é criada mais abaixo
 $('wxTemp').textContent=t==null?'--°':Math.round(t)+'°';$('hdWx').title=t==null?'Clima indisponível':WX_LABEL[k]+' em '+CITY.name;}
 const WX_KEY='readontv:wx:v1',WX_MS=30*60*1000;
 async function loadWx(){
@@ -810,7 +831,19 @@ else if(a==='user')showToast('Perfil: disponível em breve');
 else if(a==='remote')rmOpen();
 else if(a==='clear')clearData();
 else showToast(b.textContent.trim()+': disponível em breve');}
-hdItems.forEach((b,i)=>b.addEventListener('click',e=>{e.stopPropagation();if(postOpen)return;inHeader=true;hf=i;render();hdAct(i);}));
+hdItems.forEach((b,i)=>b.addEventListener('click',e=>{e.stopPropagation();if(postOpen)return;inWx=false;inHeader=true;hf=i;render();hdAct(i);}));
+/* ===== Previsão do tempo no cabeçalho =====
+   Recebe foco entre a barra do cabeçalho e os trilhos: a faixa amarela cobre o título e a data e convida a abrir a previsão completa. */
+const wxBar=$('wxBar');
+function wxBarSync(){$('wbCity').textContent=$('hdCity').textContent;$('wbTemp').textContent=$('wxTemp').textContent;
+setIco($('wbIcon'),$('wxIcon').getAttribute('data-ico'));
+wxBar.setAttribute('aria-label','Veja a previsão do tempo completa. '+$('hdCity').textContent+', '+$('wxTemp').textContent);}
+// a faixa começa logo depois do separador do logo (largura do logo depende da fonte carregada)
+function wxBarPlace(){const sep=document.querySelector('.hd-info>.hd-sep');if(sep)wxBar.style.setProperty('--wb-left',(sep.offsetLeft+sep.offsetWidth+7)+'px');}
+function wxAct(){sfx.enter();showToast('Previsão do tempo completa: disponível em breve');}
+wxBarSync();wxBarPlace();if(document.fonts)document.fonts.ready.then(wxBarPlace);
+document.querySelector('.hd-meta').addEventListener('click',e=>{e.stopPropagation();if(postOpen)return;inHeader=false;inWx=true;render();wxAct();});
+wxBar.addEventListener('click',e=>{e.stopPropagation();if(postOpen)return;wxAct();});
 /* ===== Limpar dados salvos (ícone de lixeira no cabeçalho) =====
    Pede confirmação com um segundo OK em até 3 s (sem diálogos do navegador, que travam o controle remoto da TV).
    Apaga só o que é deste app: o github.io é uma origem compartilhada por outros apps (ex.: o Read on TV clássico),
