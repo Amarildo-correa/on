@@ -28,6 +28,10 @@ A faixa "Novo Hamburgo" lê `data/novo-hamburgo.json`, servido pelo próprio Pag
 
 Formato de cada item: `title`, `summary`, `body` (lista de parágrafos), `cat`, `source`, `link`, `img` (URL ou vazio), `date` (ISO 8601 com fuso). Máximo de 12 itens, mais recentes primeiro.
 
+## Limpar dados salvos
+
+O ícone de lixeira no cabeçalho (à esquerda do celular) apaga, após um segundo OK em até 3 s, os dados deste app: notícias salvas, matérias lidas, clima, preferências (sons, abertura, proxy) e o código do celular pareado. Também limpa o `sessionStorage`, os cookies visíveis ao JavaScript no caminho do app e caches do Cache Storage com nome do app, e recarrega a página. Não usa `localStorage.clear()` porque o `github.io` é uma origem compartilhada com outros apps. O cache HTTP do navegador não pode ser apagado por JavaScript.
+
 ## Ícones
 
 Os ícones vêm da biblioteca [Lucide](https://lucide.dev) via CDN (`lucide@1.52.0`, jsDelivr), em `index.html` e `c.html`. No HTML, cada ícone é um `<svg data-ico="nome">` que recebe o desenho ao carregar; no JS, `ico('nome')` gera o SVG e `setIco(el, 'nome')` troca o ícone (clima, tela cheia, status do pareamento). O símbolo do logo continua desenhado no próprio HTML, por ser parte da marca.

@@ -243,6 +243,7 @@ background:radial-gradient(circle at 100% 0,rgba(0,0,0,.87) 0,rgba(0,0,0,.7) 120
 <button class="hd-ico" type="button" tabindex="-1" data-hd="add" data-soon aria-label="Adicionar tema" title="Adicionar tema"><svg viewBox="0 0 24 24" aria-hidden="true" data-ico="plus"></svg></button>
 </nav>
 <div class="hd-end">
+<button class="hd-ico" id="clearBtn" type="button" tabindex="-1" data-hd="clear" aria-label="Limpar dados salvos" title="Limpar dados salvos"><svg viewBox="0 0 24 24" aria-hidden="true" data-ico="trash-2"></svg></button>
 <button class="hd-ico" id="rmBtn" type="button" tabindex="-1" data-hd="remote" aria-label="Controle pelo celular" title="Controle pelo celular" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true" data-ico="smartphone"></svg></button>
 <button class="hd-ico" id="fsBtn" type="button" tabindex="-1" data-hd="fs" aria-label="Tela cheia" title="Tela cheia"><svg viewBox="0 0 24 24" aria-hidden="true" data-ico="maximize-2"></svg></button>
 <button class="hd-ico" type="button" tabindex="-1" data-hd="user" data-soon aria-label="Perfil" title="Perfil"><svg viewBox="0 0 24 24" aria-hidden="true" data-ico="user"></svg></button>
@@ -814,8 +815,32 @@ else if(a==='search')showToast('Busca: disponível em breve');
 else if(a==='add')showToast('Adicionar tema: disponível em breve');
 else if(a==='user')showToast('Perfil: disponível em breve');
 else if(a==='remote')rmOpen();
+else if(a==='clear')clearData();
 else showToast(b.textContent.trim()+': disponível em breve');}
 hdItems.forEach((b,i)=>b.addEventListener('click',e=>{e.stopPropagation();if(postOpen)return;inHeader=true;hf=i;render();hdAct(i);}));
+/* ===== Limpar dados salvos (ícone de lixeira no cabeçalho) =====
+   Pede confirmação com um segundo OK em até 3 s (sem diálogos do navegador, que travam o controle remoto da TV).
+   Apaga só o que é deste app: o github.io é uma origem compartilhada por outros apps (ex.: o Read on TV clássico),
+   então localStorage.clear() apagaria os dados deles também. Depois recarrega a página do zero. */
+const APP_KEYS=()=>[CACHE_KEY,PREF_KEY,WX_KEY,SEEN_KEY,RM_KEY_CODE,RM_KEY_PAIRED,'readontv:sfx','readontv:intro'];
+let clearArm=0;
+async function clearData(){const now=Date.now();
+if(now-clearArm>3000){clearArm=now;showToast('Pressione OK de novo para apagar notícias salvas, lidas e preferências',3000);return;}
+clearArm=0;
+// localStorage: chaves do app (e as do prefixo próprio readontv-on:)
+try{const ks=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('readontv-on:')===0)ks.push(k);}
+APP_KEYS().concat(ks).forEach(k=>{try{localStorage.removeItem(k);}catch(e){}});}catch(e){}
+try{sessionStorage.clear();}catch(e){}
+// Cache Storage: só caches com nome do app (o app não usa service worker; os de outros apps da origem ficam)
+try{if(window.caches){const names=await caches.keys();await Promise.all(names.filter(n=>/readontv/i.test(n)).map(n=>caches.delete(n)));}}catch(e){}
+// cookies visíveis ao JS, no caminho do app (HttpOnly e os de outros caminhos não são acessíveis daqui)
+try{const dir=location.pathname.replace(/[^\/]*$/,'');document.cookie.split(';').forEach(c=>{const n=c.split('=')[0].trim();if(!n)return;
+[dir,dir.replace(/\/$/,'')].forEach(path=>{document.cookie=n+'=;expires=Thu, 01 Jan 1970 00:00:00 GMT;max-age=0;path='+(path||'/');});});}catch(e){}
+// o controle do celular pareado deixa de valer: o código salvo foi apagado
+try{rm.clients.forEach(c=>{try{c.end(true);}catch(e){}});}catch(e){}
+showToast('Dados apagados. Recarregando…',1500);
+// recarrega ignorando o que estiver em memória (o cache HTTP do navegador não pode ser apagado por JavaScript)
+setTimeout(()=>location.reload(),1200);}
 async function fsToggle(){try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen({navigationUI:'hide'});}catch(err){showToast('Tela cheia indisponível neste navegador');}render();}
 document.addEventListener('fullscreenchange',()=>{fsSync();fit();render();});
 
