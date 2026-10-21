@@ -442,7 +442,7 @@ const DEMO=[
 ['Educação','Inscrições para o vestibular terminam nesta sexta','há 4 horas'],
 ['Transporte','Metrô amplia horário de funcionamento aos sábados','há 6 horas']]}
 ].map((R,k)=>({title:R.title,big:R.big,items:R.items.map((a,i)=>({id:'demo-'+k+'-'+i,cat:a[0],title:a[1],ago:a[2],link:'',author:'',date:null,html:'',
-img:'https://picsum.photos/seed/readontv-'+k+'-'+i+'/'+(R.big?720:268)+'/'+(R.big?432:280)}))}));
+img:'https://picsum.photos/seed/readontv-'+k+'-'+i+'/'+(R.big?776:268)+'/'+(R.big?432:280)}))}));
 const SKELETON=[{title:'Destaques',big:true,items:[0,1,2].map(i=>({id:'sk'+i,sk:true}))},{title:'Últimas notícias',items:[0,1,2].map(i=>({id:'skr'+i,sk:true}))}];
 
 /* ================= Sons da interface (Web Audio API) ================= */
@@ -485,7 +485,7 @@ function cue(moved,e){if(moved)sfx.nav(e.repeat);}
 /* ================= Layout dos trilhos ================= */
 // espaçamento e anel vêm dos tokens do CSS: o mesmo --gap separa cards (horizontal) e trilhos (vertical)
 const cssPx=n=>parseFloat(getComputedStyle(document.documentElement).getPropertyValue(n))||0;
-const GAP=cssPx('--gap'),FIX_TOP=252,BIG={w:720,h:572,th:432},ROW={w:776,h:280,tw:268};
+const GAP=cssPx('--gap'),FIX_TOP=252,BIG={w:776,h:572,th:432},ROW={w:776,h:280,tw:268};
 /* matérias já abertas: o card mostra o olho e o título fica mais escuro (localStorage) */
 const SEEN_KEY='readontv-on:seen',SEEN_MAX=600;
 const seen=(()=>{let list=[];try{const v=JSON.parse(store.get(SEEN_KEY)||'[]');if(Array.isArray(v))list=v.filter(x=>typeof x==='string');}catch(e){}return new Set(list);})();
