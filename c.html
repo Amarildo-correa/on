@@ -101,19 +101,33 @@
       <text class="oklbl" x="105" y="110.5" text-anchor="middle">OK</text>
     </svg>
     <button class="pg-btn up" data-k="pgup" type="button" aria-label="Página acima">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 11l6-6 6 6M6 19l6-6 6 6"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-ico="chevrons-up"></svg>
     </button>
     <button class="pg-btn dn" data-k="pgdn" type="button" aria-label="Página abaixo">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 5l6 6 6-6M6 13l6 6 6-6"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-ico="chevrons-down"></svg>
     </button>
     <button class="back-btn" data-k="back" type="button" aria-label="Voltar">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>
-      </svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-ico="undo-2"></svg>
     </button>
   </div>
 </main>
 
+<script src="https://cdn.jsdelivr.net/npm/lucide@1.52.0/dist/umd/lucide.min.js"></script>
+<script>
+/* ícones Lucide (CDN): preenche cada <svg data-ico="nome"> mantendo o tamanho e o traço definidos no próprio svg */
+(function () {
+  var icons = (window.lucide && window.lucide.icons) || {};
+  var svgs = document.querySelectorAll('svg[data-ico]');
+  for (var i = 0; i < svgs.length; i++) {
+    var name = svgs[i].getAttribute('data-ico').replace(/(^|-)([a-z0-9])/g, function (_, a, b) { return b.toUpperCase(); });
+    var node = icons[name];
+    if (!node) continue;
+    svgs[i].innerHTML = node.map(function (n) {
+      return '<' + n[0] + Object.keys(n[1]).map(function (k) { return ' ' + k + '="' + n[1][k] + '"'; }).join('') + '/>';
+    }).join('');
+  }
+})();
+</script>
 <script src="https://cdn.jsdelivr.net/npm/mqtt@5.16.0/dist/mqtt.min.js"></script>
 <script>
 (function () {

@@ -28,4 +28,8 @@ A faixa "Novo Hamburgo" lê `data/novo-hamburgo.json`, servido pelo próprio Pag
 
 Formato de cada item: `title`, `summary`, `body` (lista de parágrafos), `cat`, `source`, `link`, `img` (URL ou vazio), `date` (ISO 8601 com fuso). Máximo de 12 itens, mais recentes primeiro.
 
+## Ícones
+
+Os ícones vêm da biblioteca [Lucide](https://lucide.dev) via CDN (`lucide@1.52.0`, jsDelivr), em `index.html` e `c.html`. No HTML, cada ícone é um `<svg data-ico="nome">` que recebe o desenho ao carregar; no JS, `ico('nome')` gera o SVG e `setIco(el, 'nome')` troca o ícone (clima, tela cheia, status do pareamento). O símbolo do logo continua desenhado no próprio HTML, por ser parte da marca.
+
 Arquivos: `index.html` (app da TV), `c.html` (controle no celular) e `data/novo-hamburgo.json` (faixa local).
