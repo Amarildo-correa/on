@@ -76,7 +76,8 @@ html,body{height:100%;margin:0;background:var(--letterbox);overflow:hidden}
 .row .body{padding:18px 32px 18px 39px}
 .t{margin:0;font-size:41px;font-weight:700;line-height:48px;color:#EEE;overflow-wrap:anywhere}
 .row .t{flex:none;height:147px;line-height:49px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;text-overflow:ellipsis}
-.big .t{position:absolute;left:29px;right:52px;bottom:calc(100% - var(--th) - 10px);z-index:2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-overflow:ellipsis;padding-top:3px}
+/* card grande: o corte em 2 linhas é feito em JS (fitTitles) para o "…" ficar dentro da placa escura/amarela; max-height é só a rede de segurança */
+.big .t{position:absolute;left:29px;right:52px;bottom:calc(100% - var(--th) - 10px);z-index:2;max-height:99px;overflow:hidden;padding-top:3px}
 .big .t .hl{background:var(--card);padding:3px 25px 3px 12px;-webkit-box-decoration-break:clone;box-decoration-break:clone;transition:background-color var(--tint)}
 .cat{flex:none;font-size:35px;font-weight:700;line-height:35px;text-transform:uppercase;color:var(--brand);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .row .cat{margin-top:25px;max-width:100%}
@@ -517,7 +518,7 @@ if(it.img){th._src=it.img;th._cat=it.cat;th._w=R.big?R.w:R.tw;th._h=R.big?R.th:R
 if(isSeen(it))c.classList.add('seen');
 const cat=document.createElement('span');cat.className='cat';cat.textContent=it.cat;
 const t=document.createElement('h3');t.className='t';
-if(R.big){const hl=document.createElement('span');hl.className='hl';hl.textContent=it.title;t.appendChild(hl);}else t.textContent=it.title;
+if(R.big){const hl=document.createElement('span');hl.className='hl';hl.textContent=it.title;t.appendChild(hl);c._hl=hl;}else t.textContent=it.title;
 const meta=document.createElement('div');meta.className='meta';
 const s=document.createElement('span');s.className='s';s.innerHTML=ICO_CLOCK;const st=document.createElement('span');s.appendChild(st);
 if(R.big){const sep=document.createElement('span');sep.className='c-sep';sep.setAttribute('aria-hidden','true');meta.append(cat,sep,s);}else meta.append(s);
@@ -529,6 +530,20 @@ c.append(th,b);
 c.addEventListener('click',()=>{if(postOpen)return;if(!inHeader&&r===k&&idx[k]===i)open();else{inHeader=false;r=k;idx[k]=i;render();sfx.nav();}});
 return c;}
 
+/* título do card grande: no máximo 2 linhas; corta na palavra e põe o "…" dentro do span (assim ele recebe o fundo da placa) */
+const TITLE_LINES=2;
+function fitTitle(c){const hl=c._hl,full=c._it&&c._it.title;if(!hl||!full)return;
+const fits=()=>hl.getClientRects().length<=TITLE_LINES;
+hl.textContent=full;if(fits())return;
+const words=full.split(/\s+/);let lo=1,hi=words.length-1,best=0;
+const cut=n=>words.slice(0,n).join(' ').replace(/[\s,;:.\-–—]+$/,'')+'…';
+while(lo<=hi){const m=(lo+hi)>>1;hl.textContent=cut(m);if(fits()){best=m;lo=m+1;}else hi=m-1;}
+if(best){hl.textContent=cut(best);return;}
+// uma palavra só já não cabe: corta por caractere
+let n=full.length;do{hl.textContent=full.slice(0,--n)+'…';}while(n>1&&!fits());}
+function fitTitles(){cards.forEach(row=>row.forEach(c=>{if(c._hl)fitTitle(c);}));}
+// a fonte web muda a largura do texto: refaz o corte quando ela terminar de carregar
+if(document.fonts){document.fonts.ready.then(fitTitles);if(document.fonts.addEventListener)document.fonts.addEventListener('loadingdone',fitTitles);}
 function build(data){
 if(postOpen){pending=data;return;}
 const keepTitle=RAILS[r]&&RAILS[r].title,keepId=RAILS[r]&&RAILS[r].items[idx[r]]&&RAILS[r].items[idx[r]].id;
@@ -541,6 +556,7 @@ const tr=document.createElement('div');tr.className='track';
 tr.style.setProperty('--w',R.w+'px');tr.style.setProperty('--h',R.h+'px');if(R.tw)tr.style.setProperty('--tw',R.tw+'px');if(R.th)tr.style.setProperty('--th',R.th+'px');
 cards[k]=R.items.map((it,i)=>{const c=makeCard(R,it,k,i);tr.appendChild(c);return c;});
 rail.appendChild(tr);railsEl.appendChild(rail);tops.push(y);tracks.push(tr);y+=R.h+GAP;});
+fitTitles();
 idx=RAILS.map(R=>{const i=R.items.findIndex(it=>it.id===oldIdx[R.title]);return i<0?0:i;});
 const nr=RAILS.findIndex(R=>R.title===keepTitle);r=nr<0?0:nr;
 if(keepId){const i=RAILS[r].items.findIndex(it=>it.id===keepId);if(i>=0)idx[r]=i;}
