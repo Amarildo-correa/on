@@ -48,7 +48,7 @@ html,body{height:100%;margin:0;background:var(--letterbox);overflow:hidden}
 .hd-info h1{flex:0 1 auto;min-width:0;margin:0;font-size:48px;font-weight:500;line-height:1.2;color:#fff;overflow:hidden;text-overflow:ellipsis}
 .hd-meta{flex:none;margin-left:auto;padding-left:32px;display:flex;align-items:center;font-size:38px;font-weight:500;line-height:1}
 .hd-date{color:#CFCFCF;font-variant-numeric:tabular-nums}
-.hd-city{color:var(--brand)}
+.hd-city{color:#fff}
 .hd-wx{display:flex;align-items:center;color:#fff;font-weight:700;font-variant-numeric:tabular-nums}
 .hd-wx svg{width:46px;height:46px;stroke-width:1.9;color:var(--brand);margin-right:10px}
 .rails{position:absolute;left:0;top:0;width:100%;z-index:1;transition:transform var(--move)}
@@ -59,7 +59,7 @@ html,body{height:100%;margin:0;background:var(--letterbox);overflow:hidden}
 /* anel do foco é parte do card: aparece no card novo em vez de deslizar até ele */
 .card::before{content:"";position:absolute;top:calc(var(--ring) * -1);right:calc(var(--ring) * -1);bottom:calc(var(--ring) * -1);left:calc(var(--ring) * -1);border:var(--ring) solid var(--focus);z-index:2;pointer-events:none;opacity:0;transition:opacity .12s}
 .card.on::before{opacity:1}
-.card .t,.card .cat,.card .s,.card .meta,.card .c-sep,.card .c-eye{transition:color var(--tint),border-color var(--tint),background-color var(--tint)}
+.card .t,.card .cat,.card .s,.card .meta,.card .c-mark svg{transition:color var(--tint),border-color var(--tint),background-color var(--tint)}
 /* card focado mantém o tamanho: só ganha o anel, a superfície amarela e a sombra */
 .card.on{box-shadow:0 18px 44px rgba(0,0,0,.55)}
 .card.row{flex-direction:row}
@@ -69,9 +69,9 @@ html,body{height:100%;margin:0;background:var(--letterbox);overflow:hidden}
 .thumb img{position:absolute;top:0;right:0;bottom:0;left:0;width:100%;height:100%;object-fit:cover;display:block}
 .thumb.noimg::before,.p-hero.noimg::before{content:attr(data-cat);position:absolute;top:0;right:0;bottom:0;left:0;display:grid;place-items:center;padding:0 24px;text-align:center;font-size:36px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:#343434}
 /* ===== Cards da Home =====
-   grande: foto no topo, título em placa escura sobre a base da foto, fio claro e linha "EDITORIA | hora ... olho"
-   linha: foto à esquerda; título, editoria, fio e linha "hora ... olho" à direita
-   lido (.seen): título mais escuro e ícone de olho; focado (.on): superfície amarela, textos escuros */
+   grande: foto no topo, título em placa escura sobre a base da foto, fio claro e linha "EDITORIA ... relógio 1h"
+   linha: foto à esquerda; título, fio e linha "EDITORIA ... relógio 1h" à direita
+   lido (.seen): título mais escuro e olho no canto da foto; focado (.on): superfície amarela, textos escuros */
 .body{flex:1;min-width:0;box-sizing:border-box;display:flex;flex-direction:column}
 .big .body{padding:33px 48px 34px 40px}
 .row .body{padding:23px 32px 26px 39px}
@@ -85,8 +85,7 @@ html,body{height:100%;margin:0;background:var(--letterbox);overflow:hidden}
 .meta{flex:none;display:flex;align-items:center;min-width:0;border-top:4px solid #EEE;white-space:nowrap}
 .big .meta{height:57px;padding-top:12px}
 .row .meta{height:42px;margin-top:18px;padding-top:20px}
-.row .meta .s{margin-left:auto;padding-left:24px}
-.c-sep{flex:none;width:4px;height:57px;margin:0 19px 0 24px;background:var(--brand)}
+.meta .s{margin-left:auto;padding-left:24px}
 .s{flex:none;display:flex;align-items:center;font-size:35px;font-weight:700;line-height:1;color:#B8B8B8}
 .s svg,.c-mark svg{display:block;flex:none;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round}
 .s svg{width:34px;height:34px;stroke-width:2.4;margin:0 15px 0 -2px}
@@ -105,7 +104,6 @@ background:radial-gradient(circle at 100% 0,rgba(0,0,0,.87) 0,rgba(0,0,0,.7) 120
 .card.on .t,.card.on.seen .t{color:#000}
 .card.big.on .t .hl{background:var(--focus)}
 .card.on .cat,.card.on .s{color:var(--card)}
-.card.on .c-sep{background:var(--card)}
 .card.on .meta,.card.big.seen.on .meta{border-top-color:var(--card)}
 .card.on .thumb::after{content:"";position:absolute;top:0;right:0;bottom:0;left:0;z-index:1;border:7px solid var(--focus);pointer-events:none}
 .card.big.on .thumb::after{border-bottom:0}
@@ -542,7 +540,7 @@ const t=document.createElement('h3');t.className='t';
 if(R.big){const hl=document.createElement('span');hl.className='hl';hl.textContent=it.title;t.appendChild(hl);c._hl=hl;}else t.textContent=it.title;
 const meta=document.createElement('div');meta.className='meta';
 const s=document.createElement('span');s.className='s';s.innerHTML=ICO_CLOCK;const st=document.createElement('span');s.appendChild(st);
-if(R.big){const sep=document.createElement('span');sep.className='c-sep';sep.setAttribute('aria-hidden','true');meta.append(cat,sep,s);}else{meta.append(cat,s);c._short=true;}
+meta.append(cat,s);
 const mark=document.createElement('div');mark.className='c-mark';mark.innerHTML=ICO_EYE;th.appendChild(mark);
 if(R.big)b.append(meta);else b.append(t,meta);
 if(R.big)c.appendChild(t);
@@ -598,10 +596,10 @@ syncImgs();
 stage.scrollLeft=0;stage.scrollTop=0;}
 
 function showToast(msg,ms){if(INTRO.hold(msg,ms))return;toast.textContent=msg;toast.classList.add('show');clearTimeout(showToast.t);showToast.t=setTimeout(()=>toast.classList.remove('show'),ms||1800);}
-/* card em linha: hora curta ("há 1 hora" → "1h", "há 39 minutos" → "39min") */
+/* hora curta nos cards ("há 1 hora" → "1h", "há 39 minutos" → "39min") */
 const SHORT={minuto:'min',hora:'h',dia:'d',semana:'sem'};
 const shortAgo=a=>{const m=/^há (\d+) (minuto|hora|dia|semana)s?$/.exec(a||'');return m?m[1]+SHORT[m[2]]:a;};
-function setAge(c,a){c._s.textContent=c._short?shortAgo(a):a;c.setAttribute('aria-label',c._it.cat+'. '+c._it.title+'. '+a+(isSeen(c._it)?'. Lida':''));}
+function setAge(c,a){c._s.textContent=shortAgo(a);c.setAttribute('aria-label',c._it.cat+'. '+c._it.title+'. '+a+(isSeen(c._it)?'. Lida':''));}
 function updateAges(){cards.forEach(row=>row.forEach(c=>{if(c._s&&c._it.date)setAge(c,rel(c._it.date));}));
 if(postOpen&&cur)renderMeta(RAILS[cur.k].items[cur.i]);}
 
