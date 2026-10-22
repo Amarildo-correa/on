@@ -34,17 +34,13 @@
   .ring .okc { fill: url(#gOk); stroke: #000; stroke-width: 1.5; cursor: pointer; }
   .ring .okc.down { fill: #10304A; }
   .ring .oklbl { fill: #D0D0D0; font: 700 15px system-ui, sans-serif; letter-spacing: .06em; pointer-events: none; }
-  .back-btn { position: absolute; left: 4px; bottom: 0; width: 56px; height: 56px; padding: 0; border-radius: 50%;
+  /* Botões redondos à esquerda do anel: Voltar embaixo; página acima/abaixo rolam a matéria aberta na TV */
+  .back-btn, .pg-btn { position: absolute; left: 4px; width: 56px; height: 56px; padding: 0; border-radius: 50%;
     background: radial-gradient(circle at 50% 35%, #2E2E2E, #111 70%); box-shadow: inset 0 1px 0 #3A3A3A, 0 4px 10px rgba(0, 0, 0, .5);
     display: flex; align-items: center; justify-content: center; color: #C8C8C8; }
-  .back-btn svg { width: 26px; height: 26px; pointer-events: none; }
-  .back-btn.down, .back-btn:active { background: #10304A; color: var(--accent); }
-  /* Página acima/abaixo: rolam a matéria aberta na TV */
-  .pg-btn { position: absolute; left: 4px; width: 56px; height: 56px; padding: 0; border-radius: 50%;
-    background: radial-gradient(circle at 50% 35%, #2E2E2E, #111 70%); box-shadow: inset 0 1px 0 #3A3A3A, 0 4px 10px rgba(0, 0, 0, .5);
-    display: flex; align-items: center; justify-content: center; color: #C8C8C8; }
-  .pg-btn svg { width: 26px; height: 26px; pointer-events: none; }
-  .pg-btn.down, .pg-btn:active { background: #10304A; color: var(--accent); }
+  .back-btn svg, .pg-btn svg { width: 26px; height: 26px; pointer-events: none; }
+  .back-btn.down, .back-btn:active, .pg-btn.down, .pg-btn:active { background: #10304A; color: var(--accent); }
+  .back-btn { bottom: 0; }
   .pg-btn.up { top: 0; } .pg-btn.dn { top: 68px; }
   .join { display: flex; flex-direction: column; gap: 12px; margin: auto 0; }
   .join input { font: inherit; font-size: 32px; letter-spacing: .2em; text-transform: uppercase; text-align: center; padding: 12px; border-radius: 12px; border: 2px solid #333; background: #1c1c1c; color: var(--fg); -webkit-user-select: text; user-select: text; }
@@ -56,7 +52,7 @@
 <main id="join" hidden>
   <header><h1>Controle Read on TV</h1></header>
   <form class="join" id="joinForm">
-    <p class="meta">Na TV, abra o Read on TV e toque no ícone de celular no topo. Digite o código que aparecer:</p>
+    <p class="meta">Na TV, abra o Read on TV, vá ao menu lateral e escolha Controle. Digite o código que aparecer:</p>
     <input id="joinCode" maxlength="5" autocomplete="off" autocapitalize="characters" spellcheck="false" required>
     <button type="submit">Conectar</button>
   </form>
@@ -113,53 +109,39 @@
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/lucide@1.52.0/dist/umd/lucide.min.js"></script>
-<script>
-/* ícones Lucide (CDN): preenche cada <svg data-ico="nome"> mantendo o tamanho e o traço definidos no próprio svg */
-(function () {
-  var icons = (window.lucide && window.lucide.icons) || {};
-  var svgs = document.querySelectorAll('svg[data-ico]');
-  for (var i = 0; i < svgs.length; i++) {
-    var name = svgs[i].getAttribute('data-ico').replace(/(^|-)([a-z0-9])/g, function (_, a, b) { return b.toUpperCase(); });
-    var node = icons[name];
-    if (!node) continue;
-    svgs[i].innerHTML = node.map(function (n) {
-      return '<' + n[0] + Object.keys(n[1]).map(function (k) { return ' ' + k + '="' + n[1][k] + '"'; }).join('') + '/>';
-    }).join('');
-  }
-})();
-</script>
+<script src="shared.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mqtt@5.16.0/dist/mqtt.min.js"></script>
 <script>
 (function () {
-  /* Mesma lista do index.html deste app. A TV escuta em todos; o índice no link (&b=) só diz por qual começar */
-  var BROKERS = [
-    { name: 'EMQX', url: 'wss://broker.emqx.io:8084/mqtt' },
-    { name: 'HiveMQ', url: 'wss://broker.hivemq.com:8884/mqtt' }
-  ];
-  var PREFIX = 'readontv/on/'; /* próprio deste app: o Read on TV clássico usa a mesma origem */
+  ROTV.drawIcons();
 
-  var qs = {};
-  location.search.replace(/^\?/, '').split('&').forEach(function (p) {
-    if (!p) return;
-    var i = p.indexOf('=');
-    qs[decodeURIComponent(i < 0 ? p : p.slice(0, i))] = i < 0 ? '' : decodeURIComponent(p.slice(i + 1));
-  });
+  var BROKERS = ROTV.BROKERS;
+  var KEY_LAST_CODE = 'readontv-on:remote-last', KEY_BROKER = 'readontv-on:remote-b';
+  var SWITCH_MS = 12000;   /* sem conexão por 12 s (ex.: porta bloqueada pela rede do celular): troca de broker */
+  var ACK_WARN_MS = 3000;  /* sem confirmação em 3 s: o código pode ter sido trocado na TV (ou a TV está desligada) */
+  var REPEAT_KEYS = ['up', 'down', 'left', 'right', 'pgup', 'pgdn'];
+
   function $(id) { return document.getElementById(id); }
-  function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (err) { return null; } }
-  function clean(c) { return String(c || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 5); }
+  var storage = {
+    get: function (k) { try { return localStorage.getItem(k); } catch (err) { return null; } },
+    set: function (k, v) { try { localStorage.setItem(k, v); } catch (err) {} },
+    remove: function (k) { try { localStorage.removeItem(k); } catch (err) {} }
+  };
+  function cleanCode(c) { return String(c || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 5); }
 
-  var code = clean(qs.c);
+  var params = new URLSearchParams(location.search);
+  var code = cleanCode(params.get('c'));
   if (code.length === 5) startPad();
   else startJoin();
 
   function startJoin() {
     $('join').hidden = false;
-    var last = clean(store('readontv-on:remote-last'));
+    var last = cleanCode(storage.get(KEY_LAST_CODE));
     if (last.length === 5) $('joinCode').value = last;
     $('joinForm').addEventListener('submit', function (e) {
       e.preventDefault();
-      var c = clean($('joinCode').value);
-      if (c.length === 5) location.href = location.pathname + '?c=' + c + '&b=' + (store('readontv-on:remote-b') || 0);
+      var c = cleanCode($('joinCode').value);
+      if (c.length === 5) location.href = location.pathname + '?c=' + c + '&b=' + (storage.get(KEY_BROKER) || 0);
     });
     $('joinCode').focus();
   }
@@ -167,83 +149,82 @@
   function startPad() {
     $('ph').hidden = false;
     $('phCode').textContent = code;
-    function status(text, cls) { var el = $('phStatus'); el.textContent = text; el.className = 'st ' + cls; }
-    if (typeof mqtt === 'undefined') { status('Falha ao carregar', 'bad'); return; }
-    var bi = Math.min(BROKERS.length - 1, Math.max(0, parseInt(qs.b, 10) || 0));
-    store('readontv-on:remote-last', code);
-    store('readontv-on:remote-b', bi);
+    if (typeof mqtt === 'undefined') { setStatus('Falha ao carregar', 'bad'); return; }
+    /* o índice no link (&b=) só diz por qual broker começar */
+    var bi = Math.min(BROKERS.length - 1, Math.max(0, parseInt(params.get('b'), 10) || 0));
+    storage.set(KEY_LAST_CODE, code);
+    storage.set(KEY_BROKER, bi);
 
-    var seq = 0, sent = {}, lastRtt = null, acked = false, acks = 0, rtts = [];
-    /* A TV escuta em todos os brokers. Se o atual não responder em 12 s (ex.: "connack timeout",
-       porta bloqueada pela rede do celular), troca para o próximo e lembra o que funcionou. */
-    var client = null, downSince = 0, SWITCH_MS = 12000, revoked = false;
+    var seq = 0, sentAt = {}, lastRtt = null, acked = false, acks = 0, rtts = [];
+    var client = null, downSince = 0, revoked = false;
+
     function connect() {
       if (client) { try { client.end(true); } catch (err) {} }
       downSince = Date.now();
-      status('Conectando…', 'warn');
-      var c = client = mqtt.connect(BROKERS[bi].url, {
-        clientId: 'rotv-on-ph-' + Math.random().toString(36).slice(2, 10),
-        clean: true, connectTimeout: 10000, reconnectPeriod: 3000, keepalive: 30, timerVariant: 'native'
-      });
+      setStatus('Conectando…', 'warn');
+      var c = client = mqtt.connect(BROKERS[bi], ROTV.mqttOptions('ph'));
       c.on('connect', function () {
         if (c !== client) return;
         downSince = 0;
-        store('readontv-on:remote-b', bi);
-        c.subscribe(PREFIX + code + '/ack', { qos: 0 });
-        status(acked ? 'TV conectada' : 'Pronto · toque para testar', acked ? 'ok' : 'warn');
+        storage.set(KEY_BROKER, bi);
+        c.subscribe(ROTV.TOPIC_PREFIX + code + '/ack', { qos: 0 });
+        setStatus(acked ? 'TV conectada' : 'Pronto · toque para testar', acked ? 'ok' : 'warn');
       });
       c.on('close', function () { if (c === client && !downSince) downSince = Date.now(); });
-      c.on('reconnect', function () { if (c === client) status('Reconectando…', 'warn'); });
-      c.on('offline', function () { if (c === client) status('Sem conexão', 'bad'); });
-      c.on('error', function () { if (c === client && BROKERS.length > 1) status('Servidor lento, tentando outro…', 'warn'); });
+      c.on('reconnect', function () { if (c === client) setStatus('Reconectando…', 'warn'); });
+      c.on('offline', function () { if (c === client) setStatus('Sem conexão', 'bad'); });
+      c.on('error', function () { if (c === client && BROKERS.length > 1) setStatus('Servidor lento, tentando outro…', 'warn'); });
       c.on('message', onAck);
     }
+    /* broker atual sem resposta: passa para o próximo (o que conectar fica lembrado) */
     setInterval(function () {
       if (!revoked && downSince && Date.now() - downSince > SWITCH_MS && navigator.onLine !== false) {
         bi = (bi + 1) % BROKERS.length;
         connect();
       }
     }, 2000);
+
     function onAck(topic, payload) {
       var m; try { m = JSON.parse(String(payload)); } catch (err) { return; }
       if (m && m.revoked) { revoke(); return; }
-      if (!m || !sent[m.n]) return;
-      lastRtt = Math.round(performance.now() - sent[m.n]);
-      delete sent[m.n];
+      if (!m || !sentAt[m.n]) return;
+      lastRtt = Math.round(performance.now() - sentAt[m.n]);
+      delete sentAt[m.n];
       acks++; rtts.push(lastRtt); if (rtts.length > 50) rtts.shift();
-      acked = true; status('TV conectada', 'ok'); /* também limpa um aviso de "não respondeu" anterior */
-      meta();
+      acked = true; setStatus('TV conectada', 'ok'); /* também limpa um aviso de "não respondeu" anterior */
+      updateMeta();
     }
     /* A TV gerou um código novo: este celular deixa de controlar e volta para a tela de código */
     function revoke() {
       revoked = true;
       try { client.end(true); } catch (err) {}
-      try { localStorage.removeItem('readontv-on:remote-last'); } catch (err) {}
-      status('TV desconectou este celular', 'bad');
+      storage.remove(KEY_LAST_CODE);
+      setStatus('TV desconectou este celular', 'bad');
       $('phMeta').textContent = 'Toque em "Trocar de TV" e digite o novo código que aparece na TV.';
     }
-    connect();
-    function meta() {
+    function updateMeta() {
       var avg = rtts.length ? Math.round(rtts.reduce(function (x, y) { return x + y; }, 0) / rtts.length) : '—';
       $('phMeta').textContent = 'Resposta da TV: ' + (lastRtt === null ? '—' : lastRtt + ' ms') + ' · média ' + avg + ' ms · ' + acks + '/' + seq + ' confirmados';
     }
-
     function send(k) {
       if (revoked || !client || !client.connected) return;
-      seq++;
-      sent[seq] = performance.now();
-      /* Sem confirmação em 3 s: o código pode ter sido trocado na TV (ou a TV está desligada) */
-      var n = seq;
-      setTimeout(function () { if (sent[n] && !revoked) status('A TV não respondeu. Confira o código na TV.', 'bad'); }, 3000);
-      client.publish(PREFIX + code + '/cmd', JSON.stringify({ k: k, n: seq }), { qos: 0 });
+      var n = ++seq, now = performance.now();
+      sentAt[n] = now;
+      setTimeout(function () { if (sentAt[n] && !revoked) setStatus('A TV não respondeu. Confira o código na TV.', 'bad'); }, ACK_WARN_MS);
+      client.publish(ROTV.TOPIC_PREFIX + code + '/cmd', JSON.stringify({ k: k, n: n }), { qos: 0 });
       if (navigator.vibrate) { try { navigator.vibrate(12); } catch (err) {} }
-      for (var n in sent) if (performance.now() - sent[n] > 5000) delete sent[n];
-      meta();
+      for (var old in sentAt) if (now - sentAt[old] > 5000) delete sentAt[old];
+      updateMeta();
     }
 
-    /* Toque dispara na hora (pointerdown); setas repetem enquanto o dedo fica pressionado */
-    var holdT = null, repT = null;
-    function stop(btn) { clearTimeout(holdT); clearInterval(repT); holdT = repT = null; if (btn) btn.classList.remove('down'); }
+    connect();
+    bindButtons(send);
+  }
+
+  /* Toque dispara na hora (pointerdown); setas repetem enquanto o dedo fica pressionado */
+  function bindButtons(send) {
+    var holdTimer = null, repeatTimer = null;
+    function stop(btn) { clearTimeout(holdTimer); clearInterval(repeatTimer); holdTimer = repeatTimer = null; if (btn) btn.classList.remove('down'); }
     Array.prototype.forEach.call(document.querySelectorAll('#ph [data-k]'), function (btn) {
       var k = btn.getAttribute('data-k');
       btn.addEventListener('pointerdown', function (e) {
@@ -251,14 +232,16 @@
         stop();
         btn.classList.add('down');
         send(k);
-        if (['up', 'down', 'left', 'right', 'pgup', 'pgdn'].indexOf(k) !== -1) {
-          holdT = setTimeout(function () { repT = setInterval(function () { send(k); }, 160); }, 450);
+        if (REPEAT_KEYS.indexOf(k) !== -1) {
+          holdTimer = setTimeout(function () { repeatTimer = setInterval(function () { send(k); }, 160); }, 450);
         }
       });
       ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (t) { btn.addEventListener(t, function () { stop(btn); }); });
       btn.addEventListener('contextmenu', function (e) { e.preventDefault(); });
     });
   }
+
+  function setStatus(text, cls) { var el = $('phStatus'); el.textContent = text; el.className = 'st ' + cls; }
 })();
 </script>
 </html>
