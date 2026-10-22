@@ -65,6 +65,8 @@ background:var(--focus);color:var(--card);font-weight:700;white-space:nowrap;ove
 .side{position:absolute;top:0;left:0;bottom:0;width:var(--rail-x);box-sizing:border-box;z-index:7;background:transparent;font-family:var(--font);pointer-events:none;transition:width var(--move),background-color .2s}
 .side button{pointer-events:auto}
 .side.open{pointer-events:auto}
+/* overlay que realça os ícones quando recolhida: faixa escura atrás da coluna, abaixo do cabeçalho (não cobre o logo) */
+.side:not(.open)::before{content:"";position:absolute;left:0;top:244px;bottom:0;width:184px;z-index:-1;pointer-events:none;background:linear-gradient(to right,rgba(10,10,10,.82) 0,rgba(10,10,10,.6) 120px,rgba(10,10,10,0) 184px)}
 .side.open{width:600px;background:var(--bg)}
 .side button{border:0;margin:0;outline:none;cursor:pointer;font-family:var(--font);background:transparent}
 .side svg{display:block;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
@@ -98,7 +100,7 @@ background:var(--focus);color:var(--card);font-weight:700;white-space:nowrap;ove
 /* anel do foco é parte do card: aparece no card novo em vez de deslizar até ele */
 .card::before{content:"";position:absolute;top:calc(var(--ring) * -1);right:calc(var(--ring) * -1);bottom:calc(var(--ring) * -1);left:calc(var(--ring) * -1);border:var(--ring) solid var(--focus);z-index:2;pointer-events:none;opacity:0;transition:opacity .12s}
 .card.on::before{opacity:1}
-.card .t,.card .cat,.card .s,.card .meta,.card .c-mark svg{transition:color var(--tint),border-color var(--tint),background-color var(--tint)}
+.card .t,.card .cat,.card .s,.card .meta{transition:color var(--tint),border-color var(--tint),background-color var(--tint)}
 /* card focado mantém o tamanho: só ganha o anel, a superfície amarela e a sombra */
 .card.on{box-shadow:0 18px 44px rgba(0,0,0,.55)}
 .thumb{position:relative;flex:none;height:calc(var(--w) * 9 / 16);background:var(--thumb);overflow:hidden}
@@ -125,15 +127,9 @@ background:var(--focus);color:var(--card);font-weight:700;white-space:nowrap;ove
 .big .meta{height:57px;padding-top:12px}
 .meta .s{margin-left:auto;padding-left:24px}
 .s{flex:none;display:flex;align-items:center;font-size:35px;font-weight:700;line-height:1;color:#B8B8B8}
-.s svg,.c-mark svg{display:block;flex:none;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round}
+.s svg{display:block;flex:none;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round}
 .s svg{width:34px;height:34px;stroke-width:2.4;margin:0 15px 0 -2px}
 /* matéria lida: olho no canto superior direito da foto, sobre uma máscara escura radial que o destaca */
-.c-mark{position:absolute;top:0;right:0;bottom:0;left:0;z-index:1;pointer-events:none;display:none;
-background:radial-gradient(circle at 100% 0,rgba(0,0,0,.87) 0,rgba(0,0,0,.7) 120px,rgba(0,0,0,.45) 240px,rgba(0,0,0,.22) 300px,rgba(0,0,0,0) 345px)}
-.c-mark svg{position:absolute;width:80px;height:80px;stroke-width:2.2;color:#fff;filter:drop-shadow(0 2px 6px rgba(0,0,0,.45))}
-.big .c-mark svg{top:35px;right:68px}
-.card.seen .c-mark{display:block}
-.card.on .c-mark svg{color:var(--focus)}
 .card.seen .t{color:#ADADAD}
 .card.big.seen .meta{border-top-color:#ADADAD}
 /* card focado: superfície amarela com textos escuros */
@@ -544,7 +540,6 @@ while(seen.size>SEEN_MAX)seen.delete(seen.values().next().value);
 store.set(SEEN_KEY,JSON.stringify([...seen]));
 cards.forEach(row=>row.forEach(c=>{if(c._it&&String(c._it.id)===id){c.classList.add('seen');setAge(c,ago(c._it));}}));}
 const ICO_CLOCK=ico('clock');
-const ICO_EYE=ico('eye');
 const $=id=>document.getElementById(id);
 const fsBtn=$('fsBtn'),railsEl=$('rails'),stage=$('stage'),toast=$('toast'),titleEl=$('railTitle'),liveIcon=$('liveIcon');
 const post=$('post'),pHero=$('pHero'),pHead=$('pHead'),pAgo=$('pAgo'),pBy=$('pBy'),pSrc=$('pSrc'),pTimeTxt=$('pTimeTxt'),pScroll=$('pScroll'),pBody=$('pBody'),pProg=$('pProg');
@@ -606,7 +601,6 @@ const hl=document.createElement('span');hl.className='hl';hl.textContent=it.titl
 const meta=document.createElement('div');meta.className='meta';
 const s=document.createElement('span');s.className='s';s.innerHTML=ICO_CLOCK;const st=document.createElement('span');s.appendChild(st);
 meta.append(cat,s);
-const mark=document.createElement('div');mark.className='c-mark';mark.innerHTML=ICO_EYE;th.appendChild(mark);
 b.append(meta);c.appendChild(t);
 c._s=st;setAge(c,ago(it));}
 c.append(th,b);
