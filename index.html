@@ -73,9 +73,11 @@ background:var(--focus);color:var(--card);font-weight:700;white-space:nowrap;ove
 .side.open{width:600px;background:var(--bg)}
 .side button{border:0;margin:0;outline:none;cursor:pointer;font-family:var(--font);background:transparent}
 .side svg{display:block;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.side-logo{position:absolute;left:72px;top:128px;display:flex;align-items:center;font-family:"Raleway",var(--font);font-size:58px;font-weight:800;line-height:1;color:#fff;white-space:nowrap;opacity:0;visibility:hidden;transition:opacity .2s}
+/* logo do menu aberto: maior, em caixa alta e mais apagado (opacidade .8) */
+.side-logo{position:absolute;left:90px;top:104px;display:flex;align-items:center;font-family:"Raleway",var(--font);font-size:66px;font-weight:800;line-height:1;text-transform:uppercase;color:#fff;white-space:nowrap;opacity:0;visibility:hidden;transition:opacity .2s}
 .side-logo b{font-weight:800;color:var(--brand);margin-left:.26em}
-.side.open .side-logo{opacity:1;visibility:visible}
+.side-logo svg{width:1em;height:1em;margin-left:0;color:var(--brand);fill:currentColor;stroke:none}
+.side.open .side-logo{opacity:.8;visibility:visible}
 .side-list{position:absolute;left:72px;right:0;top:252px;display:flex;flex-direction:column;gap:18px}
 .side.open .side-list{right:88px}
 .side-btn{display:flex;align-items:center;width:100%;height:66px;box-sizing:border-box;padding:0 20px 0 12px;color:#fff;transition:background-color .12s,color .12s}
@@ -299,7 +301,7 @@ background:radial-gradient(circle at 100% 0,rgba(0,0,0,.87) 0,rgba(0,0,0,.7) 120
 <main class="main" id="main"><div class="rails" id="rails"></div></main>
 
 <nav class="side" id="side" aria-label="Menu">
-<div class="side-logo" aria-hidden="true">read on<b>TV</b></div>
+<div class="side-logo" aria-hidden="true">read on<b>TV</b><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6.2" cy="17.8" r="2.2"/><path d="M4 4.4v2.9c7 0 12.7 5.7 12.7 12.7h2.9C19.6 11.4 12.6 4.4 4 4.4zm0 5.7V13c3.9 0 7.1 3.2 7.1 7.1H14c0-5.5-4.5-10-10-10z"/></svg></div>
 <div class="side-list">
 <button class="side-btn side-search" id="sideSearch" type="button" tabindex="-1" data-side="search"><span class="side-ic"><svg viewBox="0 0 24 24" aria-hidden="true" data-ico="search"></svg></span><span class="side-tx">Buscar notícias</span></button>
 <button class="side-btn" type="button" tabindex="-1" data-side="home" aria-current="page"><span class="side-ic"><svg viewBox="0 0 24 24" aria-hidden="true" data-ico="house"></svg></span><span class="side-tx">Início</span></button>
