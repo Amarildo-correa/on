@@ -98,13 +98,14 @@ background:var(--focus);color:var(--card);font-weight:700;white-space:nowrap;ove
 .stage.side-open .hd-info .hd-logo,.stage.side-open .hd-info .hd-sep,.stage.side-open #railTitle{visibility:hidden}
 .stage.side-open .hd-nav .hd-link,.stage.side-open .hd-nav .hd-ico{color:#5E5E5E}
 .stage.side-open .hd-nav .hd-link[aria-current="page"]{color:#5E5E5E}
-/* main: começa 24px antes de --rail-x (folga para o anel de foco e o toque de borda) e corta o que passa por baixo do menu */
-.main{position:absolute;top:0;bottom:0;left:calc(var(--rail-x) - 24px);right:0;overflow:hidden}
+/* main: começa 24px antes de --rail-x (folga para o anel de foco). O que desliza para a esquerda continua visível atrás do menu
+   (peek); o recorte só esconde a faixa do cabeçalho (y < 244), para trilhos que sobem não aparecerem no canto superior esquerdo */
+.main{position:absolute;top:0;bottom:0;left:calc(var(--rail-x) - 24px);right:0;clip-path:polygon(-4000px 244px,100% 244px,100% 100%,-4000px 100%)}
 .rails{position:absolute;left:0;top:0;width:100%;z-index:1;transition:transform var(--move)}
 .rail{position:absolute;left:0;width:100%}
 .track{position:absolute;top:0;left:24px;display:flex;transition:transform var(--move)}
 .track>.card+.card{margin-left:var(--gap)}
-.card{flex:none;width:var(--w);height:var(--h);background:var(--card);display:flex;flex-direction:column;position:relative;cursor:pointer;outline:none;transition:background-color var(--tint)}
+.card{flex:none;width:var(--w);height:var(--h);background:var(--card);display:flex;flex-direction:column;position:relative;cursor:pointer;outline:none;transition:background-color var(--tint),opacity var(--move)}
 /* anel do foco é parte do card: aparece no card novo em vez de deslizar até ele */
 .card::before{content:"";position:absolute;top:calc(var(--ring) * -1);right:calc(var(--ring) * -1);bottom:calc(var(--ring) * -1);left:calc(var(--ring) * -1);border:var(--ring) solid var(--focus);z-index:2;pointer-events:none;opacity:0;transition:opacity .12s}
 .card.on::before{opacity:1}
@@ -151,6 +152,8 @@ background:radial-gradient(circle at 100% 0,rgba(0,0,0,.87) 0,rgba(0,0,0,.7) 120
 .card.big.on .t .hl{background:var(--focus)}
 .card.on .cat,.card.on .s{color:var(--card)}
 .card.on .meta,.card.big.seen.on .meta{border-top-color:var(--card)}
+/* peek atrás do menu: cards à esquerda do card atual de cada trilho ficam apagados (só eles, não o menu) */
+.card.peek{opacity:.25}
 .card.on .thumb::after{content:"";position:absolute;top:0;right:0;bottom:0;left:0;z-index:1;border:7px solid var(--focus);pointer-events:none}
 .card.big.on .thumb::after{border-bottom:0}
 /* esqueleto de carregamento */
@@ -664,7 +667,8 @@ sideBtns.forEach((b,i)=>b.classList.toggle('on',inSide&&i===sf));
 sideEl.classList.toggle('open',inSide);stage.classList.toggle('side-open',inSide);
 railsEl.style.transform='translate('+(inSide?SIDE_PUSH:0)+'px,'+(FIX_TOP-tops[r])+'px)';
 // cada trilho desliza até o card focado (posição calculada pela largura do card + --gap)
-tracks.forEach((t,k)=>{t.style.transform='translateX('+(-idx[k]*(RAILS[k].w+GAP))+'px)';});
+tracks.forEach((t,k)=>{t.style.transform='translateX('+(-idx[k]*(RAILS[k].w+GAP))+'px)';
+cards[k].forEach((c,i)=>c.classList.toggle('peek',i<idx[k]));});
 if(inSide||inHeader||inWx){if(prev){prev.classList.remove('on');prev=null;}try{(inSide?sideBtns[sf]:inWx?wxBar:hdItems[hf]).focus({preventScroll:true});}catch(e){}}
 else{const c=cards[r][idx[r]];if(prev&&prev!==c)prev.classList.remove('on');c.classList.add('on');prev=c;
 if(!postOpen){try{c.focus({preventScroll:true});}catch(e){}}}
