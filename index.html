@@ -108,13 +108,13 @@ background:var(--focus);color:var(--card);font-weight:700;white-space:nowrap;ove
 .rail{position:absolute;left:0;width:100%}
 .track{position:absolute;top:0;left:24px;display:flex;transition:transform var(--move)}
 .track>.card+.card{margin-left:var(--gap)}
-.card{flex:none;width:var(--w);height:var(--h);background:var(--card);display:flex;flex-direction:column;position:relative;cursor:pointer;outline:none;transition:background-color var(--tint),opacity var(--move)}
+.card{flex:none;width:var(--w);height:var(--h);background:var(--card);display:flex;flex-direction:column;position:relative;cursor:pointer;outline:none;transition:background-color var(--tint)}
 /* anel do foco é parte do card: aparece no card novo em vez de deslizar até ele */
 .card::before{content:"";position:absolute;top:calc(var(--ring) * -1);right:calc(var(--ring) * -1);bottom:calc(var(--ring) * -1);left:calc(var(--ring) * -1);border:var(--ring) solid var(--focus);z-index:2;pointer-events:none;opacity:0;transition:opacity .12s}
 .card.on::before{opacity:1}
 .card .t,.card .cat,.card .s,.card .meta,.card .c-mark svg{transition:color var(--tint),border-color var(--tint),background-color var(--tint)}
 /* card focado mantém o tamanho e não tem sombra: só ganha o anel e a superfície amarela */
-.thumb{position:relative;flex:none;height:calc(var(--w) * 9 / 16);background:var(--thumb);overflow:hidden}
+.thumb{position:relative;flex:none;height:calc(var(--w) * 9 / 16);background:var(--thumb);overflow:hidden;transition:opacity var(--move)}
 .big .thumb{height:var(--th)}
 /* enquadramento puxado para cima: em foto de notícia o rosto costuma estar no terço superior */
 .thumb img{position:absolute;top:0;right:0;bottom:0;left:0;width:100%;height:100%;object-fit:cover;object-position:50% 25%;display:block}
@@ -156,7 +156,8 @@ background:radial-gradient(circle at 100% 0,rgba(0,0,0,.87) 0,rgba(0,0,0,.7) 120
 .card.on .cat,.card.on .s{color:var(--card)}
 .card.on .meta,.card.big.seen.on .meta{border-top-color:var(--card)}
 /* peek atrás do menu: cards à esquerda do card atual de cada trilho ficam apagados (só eles, não o menu) */
-.card.peek{opacity:.25}
+/* só a foto do peek fica apagada; o fundo do card (body e margem abaixo da foto) mantém a cor --card */
+.card.peek .thumb{opacity:.25}
 /* no peek: foto e a área do body com a cor --card, mas sem conteúdo (sem placa do título, editoria/hora e olho com a máscara dele).
    visibility (e não display) para não mexer no layout nem no corte do título feito por fitTitle */
 .card.peek .t .hl,.card.peek .body,.card.peek .c-mark{visibility:hidden}
