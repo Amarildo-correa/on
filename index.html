@@ -288,10 +288,11 @@ background:radial-gradient(circle at 100% 0,rgba(0,0,0,.87) 0,rgba(0,0,0,.7) 120
 <div class="hd-bar">
 <button class="hd-search" type="button" tabindex="-1" data-hd="search" data-soon><svg viewBox="0 0 24 24" aria-hidden="true" data-ico="search"></svg>Buscar notícias</button>
 <nav class="hd-nav" aria-label="Seções">
-<button class="hd-link" type="button" tabindex="-1" data-hd="home" aria-current="page">Home</button>
-<button class="hd-link" type="button" tabindex="-1" data-hd="topic" data-soon>Fim 6x1</button>
-<button class="hd-link" type="button" tabindex="-1" data-hd="topic" data-soon>Eleições 2026</button>
-<button class="hd-link" type="button" tabindex="-1" data-hd="topic" data-soon>Previsão do tempo</button>
+<button class="hd-link" type="button" tabindex="-1" data-hd="cat">Política</button>
+<button class="hd-link" type="button" tabindex="-1" data-hd="cat">Economia</button>
+<button class="hd-link" type="button" tabindex="-1" data-hd="cat">Saúde</button>
+<button class="hd-link" type="button" tabindex="-1" data-hd="cat">Educação</button>
+<button class="hd-link" type="button" tabindex="-1" data-hd="cat">Internacional</button>
 <button class="hd-ico" type="button" tabindex="-1" data-hd="add" data-soon aria-label="Adicionar tema" title="Adicionar tema"><svg viewBox="0 0 24 24" aria-hidden="true" data-ico="plus"></svg></button>
 </nav>
 </div>
@@ -570,7 +571,7 @@ const post=$('post'),pHero=$('pHero'),pHead=$('pHead'),pAgo=$('pAgo'),pBy=$('pBy
 const navBtns=[...post.querySelectorAll('.p-btn')];const NB={back:0,next:1,listen:2};let pf=NB.next,words=0;
 const SHOW_SOON=true; // false oculta busca, temas e perfil enquanto não têm tela própria
 document.querySelectorAll('[data-soon]').forEach(b=>{b.hidden=!SHOW_SOON;});
-const hdItems=[...document.querySelectorAll('.top [data-hd]')].filter(b=>!b.hidden),HD_HOME=hdItems.findIndex(b=>b.dataset.hd==='home');
+const hdItems=[...document.querySelectorAll('.top [data-hd]')].filter(b=>!b.hidden),HD_HOME=Math.max(0,hdItems.findIndex(b=>b.dataset.hd==='cat')); // entrada no cabeçalho: 1ª categoria
 let hf=HD_HOME;
 /* barra lateral (menu): recebe foco à esquerda dos cards (← no 1º card) */
 const sideEl=$('side'),sideBtns=[...sideEl.querySelectorAll('.side-btn')],SIDE_HOME=sideBtns.findIndex(b=>b.dataset.side==='home'),SIDE_PUSH=436;
@@ -913,7 +914,12 @@ else if(a==='add')showToast('Adicionar tema: disponível em breve');
 else if(a==='user')showToast('Perfil: disponível em breve');
 else if(a==='remote')rmOpen();
 else if(a==='clear')clearData();
+else if(a==='cat')railGo(b.textContent.trim());
 else showToast(b.textContent.trim()+': disponível em breve');}
+/* categoria do cabeçalho: leva ao trilho de mesmo nome (as editorias da Agência Brasil carregam logo depois dos destaques) */
+function railGo(title){const k=RAILS.findIndex(R=>R.title===title);
+if(k<0){showToast(title+': carregando…');return;}
+inHeader=false;inWx=false;r=k;idx[k]=0;render();}
 hdItems.forEach((b,i)=>b.addEventListener('click',e=>{e.stopPropagation();if(postOpen)return;inWx=false;inHeader=true;hf=i;render();hdAct(i);}));
 /* ===== Ações da barra lateral ===== */
 function sideAct(i){const a=sideBtns[i].dataset.side;sfx.enter();
