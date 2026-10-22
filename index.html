@@ -73,9 +73,7 @@ background:var(--focus);color:var(--card);font-weight:700;white-space:nowrap;ove
 .card .t,.card .cat,.card .s,.card .meta,.card .c-mark svg{transition:color var(--tint),border-color var(--tint),background-color var(--tint)}
 /* card focado mantém o tamanho: só ganha o anel, a superfície amarela e a sombra */
 .card.on{box-shadow:0 18px 44px rgba(0,0,0,.55)}
-.card.row{flex-direction:row}
 .thumb{position:relative;flex:none;height:calc(var(--w) * 9 / 16);background:var(--thumb);overflow:hidden}
-.row .thumb{width:var(--tw);height:100%}
 .big .thumb{height:var(--th)}
 .thumb img{position:absolute;top:0;right:0;bottom:0;left:0;width:100%;height:100%;object-fit:cover;display:block}
 /* sem foto: ícone Lucide que representa a editoria, centralizado sobre o fundo da miniatura */
@@ -84,14 +82,11 @@ background:var(--focus);color:var(--card);font-weight:700;white-space:nowrap;ove
 .p-hero .ph-ico{width:190px;height:190px;margin-top:-30px}
 .thumb.noimg .ph-ico,.p-hero.noimg .ph-ico{display:block}
 /* ===== Cards da Home =====
-   grande: foto no topo, título em placa escura sobre a base da foto, fio claro e linha "EDITORIA ... relógio 1h"
-   linha: foto à esquerda; título, fio e linha "EDITORIA ... relógio 1h" à direita
+   todos os trilhos: foto no topo, título em placa escura sobre a base da foto, fio claro e linha "EDITORIA ... relógio há 1h"
    lido (.seen): título mais escuro e olho no canto da foto; focado (.on): superfície amarela, textos escuros */
 .body{flex:1;min-width:0;box-sizing:border-box;display:flex;flex-direction:column}
 .big .body{padding:33px 48px 34px 40px}
-.row .body{padding:23px 32px 26px 39px}
 .t{margin:0;font-size:41px;font-weight:700;line-height:48px;color:#EEE;overflow-wrap:anywhere}
-.row .t{flex:none;height:147px;line-height:49px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;text-overflow:ellipsis}
 /* card grande: o corte em 2 linhas é feito em JS (fitTitles) para o "…" ficar dentro da placa escura/amarela; max-height é só a rede de segurança */
 .big .t{position:absolute;left:29px;right:52px;bottom:calc(100% - var(--th) - 10px);z-index:2;max-height:99px;overflow:hidden;padding-top:3px}
 .big .t .hl{background:var(--card);padding:3px 25px 3px 12px;-webkit-box-decoration-break:clone;box-decoration-break:clone;transition:background-color var(--tint)}
@@ -99,7 +94,6 @@ background:var(--focus);color:var(--card);font-weight:700;white-space:nowrap;ove
 .cat{min-width:0}
 .meta{flex:none;display:flex;align-items:center;min-width:0;border-top:4px solid #EEE;white-space:nowrap}
 .big .meta{height:57px;padding-top:12px}
-.row .meta{height:42px;margin-top:18px;padding-top:20px}
 .meta .s{margin-left:auto;padding-left:24px}
 .s{flex:none;display:flex;align-items:center;font-size:35px;font-weight:700;line-height:1;color:#B8B8B8}
 .s svg,.c-mark svg{display:block;flex:none;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round}
@@ -109,7 +103,6 @@ background:var(--focus);color:var(--card);font-weight:700;white-space:nowrap;ove
 background:radial-gradient(circle at 100% 0,rgba(0,0,0,.87) 0,rgba(0,0,0,.7) 120px,rgba(0,0,0,.45) 240px,rgba(0,0,0,.22) 300px,rgba(0,0,0,0) 345px)}
 .c-mark svg{position:absolute;width:80px;height:80px;stroke-width:2.2;color:#fff;filter:drop-shadow(0 2px 6px rgba(0,0,0,.45))}
 .big .c-mark svg{top:35px;right:68px}
-.row .c-mark svg{top:22px;right:27px}
 .card.seen .c-mark{display:block}
 .card.on .c-mark svg{color:var(--focus)}
 .card.seen .t{color:#ADADAD}
@@ -122,7 +115,6 @@ background:radial-gradient(circle at 100% 0,rgba(0,0,0,.87) 0,rgba(0,0,0,.7) 120
 .card.on .meta,.card.big.seen.on .meta{border-top-color:var(--card)}
 .card.on .thumb::after{content:"";position:absolute;top:0;right:0;bottom:0;left:0;z-index:1;border:7px solid var(--focus);pointer-events:none}
 .card.big.on .thumb::after{border-bottom:0}
-.card.row.on .thumb::after{border-right:0}
 /* esqueleto de carregamento */
 .card.sk{cursor:default}
 .sk .thumb{animation:pulse 1.4s ease-in-out infinite}
@@ -457,7 +449,7 @@ const DEMO=[
 ['Educação','Inscrições para o vestibular terminam nesta sexta','há 4 horas'],
 ['Transporte','Metrô amplia horário de funcionamento aos sábados','há 6 horas']]}
 ].map((R,k)=>({title:R.title,big:R.big,items:R.items.map((a,i)=>({id:'demo-'+k+'-'+i,cat:a[0],title:a[1],ago:a[2],link:'',author:'',date:null,html:'',
-img:'https://picsum.photos/seed/readontv-'+k+'-'+i+'/'+(R.big?776:268)+'/'+(R.big?344:280)}))}));
+img:'https://picsum.photos/seed/readontv-'+k+'-'+i+'/776/293'}))}));
 const SKELETON=[{title:'Destaques',big:true,items:[0,1,2].map(i=>({id:'sk'+i,sk:true}))},{title:'Últimas notícias',items:[0,1,2].map(i=>({id:'skr'+i,sk:true}))}];
 
 /* ================= Sons da interface (Web Audio API) ================= */
@@ -500,7 +492,9 @@ function cue(moved,e){if(moved)sfx.nav(e.repeat);}
 /* ================= Layout dos trilhos ================= */
 // espaçamento e anel vêm dos tokens do CSS: o mesmo --gap separa cards (horizontal) e trilhos (vertical)
 const cssPx=n=>parseFloat(getComputedStyle(document.documentElement).getPropertyValue(n))||0;
-const GAP=cssPx('--gap'),FIX_TOP=252,BIG={w:776,h:484,th:344},ROW={w:776,h:280,tw:268};
+/* todos os trilhos usam o card grande. Altura escolhida para o 2º trilho aparecer até a metade da linha editoria/hora:
+   252 (topo) + 433 (card) + 32 (gap) + 293 (foto) + 33 + 73/2 (meio da .meta) ≈ 1080 */
+const GAP=cssPx('--gap'),FIX_TOP=252,BIG={w:776,h:433,th:293};
 /* matérias já abertas: o card mostra o olho e o título fica mais escuro (localStorage) */
 const SEEN_KEY='readontv-on:seen',SEEN_MAX=600;
 const seen=(()=>{let list=[];try{const v=JSON.parse(store.get(SEEN_KEY)||'[]');if(Array.isArray(v))list=v.filter(x=>typeof x==='string');}catch(e){}return new Set(list);})();
@@ -555,24 +549,23 @@ if(want&&!th._on){th._on=true;setImg(th,th._src,th._cat,th._w,th._h);}
 else if(!want&&th._on){th._on=false;dropImg(th);}});});}
 
 function makeCard(R,it,k,i){
-const c=document.createElement('article');c.className='card'+(R.big?' big':' row')+(it.sk?' sk':'');c.tabIndex=-1;c._it=it;
+const c=document.createElement('article');c.className='card big'+(it.sk?' sk':'');c.tabIndex=-1;c._it=it;
 const th=document.createElement('div');th.className='thumb';
 const b=document.createElement('div');b.className='body';
 if(it.sk){c.setAttribute('aria-hidden','true');b.innerHTML='<span class="skl c"></span><span class="skl a"></span><span class="skl b"></span><span class="skl d"></span>';}
 else{c.setAttribute('role','link');
 th.dataset.cat=it.cat;c._th=th;
-if(it.img){th._src=it.img;th._cat=it.cat;th._w=R.big?R.w:R.tw;th._h=R.big?R.th:R.h;}else th.classList.add('noimg');
+if(it.img){th._src=it.img;th._cat=it.cat;th._w=R.w;th._h=R.th;}else th.classList.add('noimg');
 setPh(th,it.cat);
 if(isSeen(it))c.classList.add('seen');
 const cat=document.createElement('span');cat.className='cat';cat.textContent=it.cat;
 const t=document.createElement('h3');t.className='t';
-if(R.big){const hl=document.createElement('span');hl.className='hl';hl.textContent=it.title;t.appendChild(hl);c._hl=hl;}else t.textContent=it.title;
+const hl=document.createElement('span');hl.className='hl';hl.textContent=it.title;t.appendChild(hl);c._hl=hl;
 const meta=document.createElement('div');meta.className='meta';
 const s=document.createElement('span');s.className='s';s.innerHTML=ICO_CLOCK;const st=document.createElement('span');s.appendChild(st);
 meta.append(cat,s);
 const mark=document.createElement('div');mark.className='c-mark';mark.innerHTML=ICO_EYE;th.appendChild(mark);
-if(R.big)b.append(meta);else b.append(t,meta);
-if(R.big)c.appendChild(t);
+b.append(meta);c.appendChild(t);
 c._s=st;setAge(c,ago(it));}
 c.append(th,b);
 c.addEventListener('click',()=>{if(postOpen)return;if(!inHeader&&r===k&&idx[k]===i)open();else{inHeader=false;inWx=false;r=k;idx[k]=i;render();sfx.nav();}});
@@ -596,12 +589,12 @@ function build(data){
 if(postOpen){pending=data;return;}
 const keepTitle=RAILS[r]&&RAILS[r].title,keepId=RAILS[r]&&RAILS[r].items[idx[r]]&&RAILS[r].items[idx[r]].id;
 const oldIdx={};RAILS.forEach((R,k)=>{const it=R.items[idx[k]];if(it)oldIdx[R.title]=it.id;});
-RAILS=data.filter(R=>R.items&&R.items.length).map(R=>Object.assign({},R,R.big?BIG:ROW));
+RAILS=data.filter(R=>R.items&&R.items.length).map(R=>Object.assign({},R,BIG));
 railsEl.textContent='';tops=[];tracks=[];cards=[];prev=null;let y=FIX_TOP;
 RAILS.forEach((R,k)=>{
 const rail=document.createElement('section');rail.className='rail';rail.style.top=y+'px';rail.setAttribute('aria-label',R.title);
 const tr=document.createElement('div');tr.className='track';
-tr.style.setProperty('--w',R.w+'px');tr.style.setProperty('--h',R.h+'px');if(R.tw)tr.style.setProperty('--tw',R.tw+'px');if(R.th)tr.style.setProperty('--th',R.th+'px');
+tr.style.setProperty('--w',R.w+'px');tr.style.setProperty('--h',R.h+'px');tr.style.setProperty('--th',R.th+'px');
 cards[k]=R.items.map((it,i)=>{const c=makeCard(R,it,k,i);tr.appendChild(c);return c;});
 rail.appendChild(tr);railsEl.appendChild(rail);tops.push(y);tracks.push(tr);y+=R.h+GAP;});
 fitTitles();
