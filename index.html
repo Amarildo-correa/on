@@ -25,10 +25,13 @@ html,body{height:100%;margin:0;background:var(--letterbox);overflow:hidden}
 .top::before{content:"";position:absolute;top:0;bottom:0;right:100%;width:24px;background:var(--bg)}
 .top button{flex:none;border:0;margin:0;outline:none;cursor:pointer;font-family:var(--font);transition:background-color .12s,color .12s}
 .top svg{display:block;flex:none;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round}
-.hd-bar{position:absolute;top:0;left:0;right:0;height:118px;box-sizing:border-box;padding:0 var(--safe-x) 0 0;border-bottom:3px solid #444;display:flex;align-items:center}
+/* hd-bar com a mesma margem direita da hd-info: a nav termina na borda direita do 2º card */
+.hd-bar{position:absolute;top:0;left:0;right:0;height:118px;box-sizing:border-box;padding:0 calc(100% - 1584px) 0 0;border-bottom:3px solid #444;display:flex;align-items:center}
 .hd-search{align-self:flex-end;margin-bottom:-3px!important;width:431px;height:85px;box-sizing:border-box;display:flex;align-items:center;padding:0 28px;background:#474747;border-bottom:4px solid #9A9A9A!important;color:#fff;font-size:33px;font-weight:500;text-align:left;white-space:nowrap}
 .hd-search svg{width:34px;height:34px;stroke-width:2.6;margin-right:20px}
-.hd-nav{display:flex;align-items:center;margin-left:64px}
+.hd-nav{display:flex;align-items:center;margin-left:auto}
+/* o desenho do + encosta na borda direita (compensa o espaço interno do botão) */
+.hd-nav .hd-ico:last-child{margin-right:-8px}
 .hd-nav>*+*{margin-left:26px}
 .hd-link{height:64px;padding:0 20px;display:flex;align-items:center;background:transparent;color:#fff;font-size:34px;font-weight:500;white-space:nowrap}
 .hd-link[aria-current="page"]{color:var(--brand)}
@@ -40,7 +43,6 @@ html,body{height:100%;margin:0;background:var(--letterbox);overflow:hidden}
 /* item da seção atual continua distinguível quando focado */
 .top .hd-link.on[aria-current="page"]{box-shadow:inset 0 -6px 0 var(--card)}
 .top [hidden]{display:none!important}
-.hd-search[hidden]+.hd-nav{margin-left:0}
 .hd-search.on{border-bottom-color:var(--card)!important}
 /* hd-info alinhada aos cards: termina na borda direita do 2º card (2 × 776 + 32 = 1584px a partir de --rail-x) */
 .hd-info{position:absolute;top:118px;left:0;right:0;height:126px;box-sizing:border-box;padding:8px calc(100% - 1584px) 0 0;display:flex;align-items:center;white-space:nowrap}
