@@ -127,7 +127,7 @@ background:var(--focus);color:var(--card);font-weight:700;white-space:nowrap;ove
    todos os trilhos: foto no topo, título em placa escura sobre a base da foto, fio claro e linha "EDITORIA ... relógio há 1h"
    lido (.seen): título mais escuro e olho no canto da foto; focado (.on): superfície amarela, textos escuros */
 .body{flex:1;min-width:0;box-sizing:border-box;display:flex;flex-direction:column}
-.big .body{padding:33px 48px 34px 40px}
+.big .body{padding:33px 48px 14px 40px}
 .t{margin:0;font-size:41px;font-weight:700;line-height:48px;color:#EEE;overflow-wrap:anywhere}
 /* card grande: o corte em 2 linhas é feito em JS (fitTitles) para o "…" ficar dentro da placa escura/amarela; max-height é só a rede de segurança */
 .big .t{position:absolute;left:29px;right:52px;bottom:calc(100% - var(--th) - 10px);z-index:2;max-height:99px;overflow:hidden;padding-top:3px}
@@ -514,7 +514,7 @@ const DEMO=[
 ['Educação','Inscrições para o vestibular terminam nesta sexta','há 4 horas'],
 ['Transporte','Metrô amplia horário de funcionamento aos sábados','há 6 horas']]}
 ].map((R,k)=>({title:R.title,big:R.big,items:R.items.map((a,i)=>({id:'demo-'+k+'-'+i,cat:a[0],title:a[1],ago:a[2],link:'',author:'',date:null,html:'',
-img:'https://picsum.photos/seed/readontv-'+k+'-'+i+'/776/293'}))}));
+img:'https://picsum.photos/seed/readontv-'+k+'-'+i+'/776/313'}))}));
 const SKELETON=[{title:'Destaques',big:true,items:[0,1,2].map(i=>({id:'sk'+i,sk:true}))},{title:'Últimas notícias',items:[0,1,2].map(i=>({id:'skr'+i,sk:true}))}];
 
 /* ================= Sons da interface (Web Audio API) ================= */
@@ -557,9 +557,10 @@ function cue(moved,e){if(moved)sfx.nav(e.repeat);}
 /* ================= Layout dos trilhos ================= */
 // espaçamento e anel vêm dos tokens do CSS: o mesmo --gap separa cards (horizontal) e trilhos (vertical)
 const cssPx=n=>parseFloat(getComputedStyle(document.documentElement).getPropertyValue(n))||0;
-/* todos os trilhos usam o card grande. Altura escolhida para o 2º trilho aparecer até a metade da linha editoria/hora:
-   252 (topo) + 433 (card) + 32 (gap) + 293 (foto) + 33 + 73/2 (meio da .meta) ≈ 1080 */
-const GAP=cssPx('--gap'),FIX_TOP=252,BIG={w:776,h:433,th:293};
+/* todos os trilhos usam o card grande (776x433). Na tela de 1080px:
+   252 (topo) + 433 (card) + 32 (gap) + 313 (foto) + 33 + 4 (fio) ≈ 1067: o 2º trilho aparece até o fio, logo acima da linha editoria/hora.
+   Foto 313 = 293 + os 20px tirados do espaço inferior do card (padding-bottom 34 → 14) */
+const GAP=cssPx('--gap'),FIX_TOP=252,BIG={w:776,h:433,th:313};
 /* matérias já abertas: o card mostra o olho e o título fica mais escuro (localStorage) */
 const SEEN_KEY='readontv-on:seen',SEEN_MAX=600;
 const seen=(()=>{let list=[];try{const v=JSON.parse(store.get(SEEN_KEY)||'[]');if(Array.isArray(v))list=v.filter(x=>typeof x==='string');}catch(e){}return new Set(list);})();
