@@ -30,6 +30,8 @@ Formato de cada item: `title`, `summary`, `body` (lista de parágrafos), `cat`, 
 
 ## Menu lateral
 
+O palco tem três blocos: `nav.side` (coluna do menu, à esquerda), `header.top` e `main.main` (coluna do conteúdo). Cabeçalho e trilhos começam no mesmo x (`--rail-x`), alinhados com o primeiro card; o que desliza para a esquerda fica cortado na borda do `main`, sem passar por baixo do menu.
+
 Uma barra lateral à esquerda, dentro da margem de segurança. Recolhida, mostra só os ícones (Início, Histórico, Minha lista, Excluir localstorage, Controle, API Fullscreen e, no rodapé, Conta); os cards ficam deslocados para a direita. Com ← no primeiro card (ou o mouse), ela abre: ganha os rótulos ao lado dos ícones, o logo "read on TV" aumentado no topo, empurra os trilhos para a direita (sem sobrepô-los) e cobre a faixa de informações; no cabeçalho, o campo de busca some, surge o item "Buscar notícias" na lista e os links ficam escurecidos. → ou Voltar fecha o menu.
 
 ## Limpar dados salvos

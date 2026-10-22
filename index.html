@@ -17,10 +17,15 @@ html,body{height:100%;margin:0;background:var(--letterbox);overflow:hidden}
 .viewport{position:fixed;top:0;right:0;bottom:0;left:0;overflow:hidden;background:var(--letterbox)}
 .stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;overflow:hidden;background:var(--bg);color:var(--title);font-family:var(--font);transform-origin:center}
 /* ===== Cabeçalho: barra (busca, menu, ações) + faixa de informações ===== */
-.top{position:absolute;top:0;left:0;right:0;height:244px;background:var(--bg);z-index:6}
+/* ===== Layout do palco: três blocos =====
+   nav.side (coluna do menu, 0 → --rail-x) | header.top e main.main (coluna do conteúdo, a partir de --rail-x).
+   Cabeçalho e trilhos começam no mesmo x, alinhados com o 1º card. */
+.top{position:absolute;top:0;left:var(--rail-x);right:0;height:244px;background:var(--bg);z-index:6}
+/* fundo do cabeçalho cobre também a folga de 24px do main (trilhos subindo não aparecem ali durante a animação) */
+.top::before{content:"";position:absolute;top:0;bottom:0;right:100%;width:24px;background:var(--bg)}
 .top button{flex:none;border:0;margin:0;outline:none;cursor:pointer;font-family:var(--font);transition:background-color .12s,color .12s}
 .top svg{display:block;flex:none;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round}
-.hd-bar{position:absolute;top:0;left:0;right:0;height:118px;box-sizing:border-box;padding:0 var(--safe-x);border-bottom:3px solid #444;display:flex;align-items:center}
+.hd-bar{position:absolute;top:0;left:0;right:0;height:118px;box-sizing:border-box;padding:0 var(--safe-x) 0 0;border-bottom:3px solid #444;display:flex;align-items:center}
 .hd-search{align-self:flex-end;margin-bottom:-3px!important;width:431px;height:85px;box-sizing:border-box;display:flex;align-items:center;padding:0 28px;background:#474747;border-bottom:4px solid #9A9A9A!important;color:#fff;font-size:33px;font-weight:500;text-align:left;white-space:nowrap}
 .hd-search svg{width:34px;height:34px;stroke-width:2.6;margin-right:20px}
 .hd-nav{display:flex;align-items:center;margin-left:64px}
@@ -37,7 +42,7 @@ html,body{height:100%;margin:0;background:var(--letterbox);overflow:hidden}
 .top [hidden]{display:none!important}
 .hd-search[hidden]+.hd-nav{margin-left:0}
 .hd-search.on{border-bottom-color:var(--card)!important}
-.hd-info{position:absolute;top:118px;left:0;right:0;height:126px;box-sizing:border-box;padding:8px var(--safe-x) 0;display:flex;align-items:center;white-space:nowrap}
+.hd-info{position:absolute;top:118px;left:0;right:0;height:126px;box-sizing:border-box;padding:8px var(--safe-x) 0 0;display:flex;align-items:center;white-space:nowrap}
 .hd-logo{flex:none;display:flex;align-items:center;font-family:"Raleway",var(--font);font-size:40px;font-weight:800;line-height:1;color:#fff}
 .hd-logo b{font-weight:800;color:var(--brand);margin-left:.26em}
 .hd-logo svg{width:36px;height:36px;margin-left:4px;color:var(--brand);fill:currentColor;stroke:none;transition:color .2s}
@@ -51,14 +56,14 @@ html,body{height:100%;margin:0;background:var(--letterbox);overflow:hidden}
 .hd-wx svg{width:46px;height:46px;stroke-width:1.9;color:#fff;margin-right:10px}
 /* foco da previsão do tempo: faixa amarela sobre o título (h1) e a data, do separador do logo até a margem direita */
 .hd-meta{cursor:pointer}
-.top .hd-wxbar{position:absolute;top:20px;right:74px;left:var(--wb-left,480px);height:92px;box-sizing:border-box;padding:0 36px 0 48px;display:flex;align-items:center;justify-content:flex-end;
+.top .hd-wxbar{position:absolute;top:20px;right:74px;left:var(--wb-left,480px);height:92px;box-sizing:border-box;padding:0 36px 0 36px;display:flex;align-items:center;justify-content:flex-end;
 background:var(--focus);color:var(--card);font-weight:700;white-space:nowrap;overflow:hidden;visibility:hidden;z-index:1}
 .top .hd-wxbar.on{visibility:visible}
-.wb-txt{min-width:0;font-size:44px;line-height:1.1;overflow:hidden;text-overflow:ellipsis}
-.top .hd-wxbar .wb-go{width:38px;height:38px;stroke-width:3;margin:0 28px 0 30px}
-.wb-city{flex:none;font-size:40px;line-height:1}
-.wb-sep{flex:none;width:4px;height:56px;margin:0 30px;background:currentColor}
-.wb-wx{flex:none;display:flex;align-items:center;font-size:40px;line-height:1;font-variant-numeric:tabular-nums}
+.wb-txt{min-width:0;font-size:40px;line-height:1.1;overflow:hidden;text-overflow:ellipsis}
+.top .hd-wxbar .wb-go{width:36px;height:36px;stroke-width:3;margin:0 22px 0 24px}
+.wb-city{flex:none;font-size:38px;line-height:1}
+.wb-sep{flex:none;width:4px;height:56px;margin:0 24px;background:currentColor}
+.wb-wx{flex:none;display:flex;align-items:center;font-size:38px;line-height:1;font-variant-numeric:tabular-nums}
 .top .hd-wxbar .wb-wx svg{width:48px;height:48px;stroke-width:2.4;margin-right:10px}
 /* ===== Barra lateral (menu) =====
    recolhida: só ícones, na margem de segurança à esquerda; aberta: ícones + rótulos, cobre a faixa de informações e empurra os trilhos */
@@ -90,9 +95,11 @@ background:var(--focus);color:var(--card);font-weight:700;white-space:nowrap;ove
 .stage.side-open .hd-info .hd-logo,.stage.side-open .hd-info .hd-sep,.stage.side-open #railTitle{visibility:hidden}
 .stage.side-open .hd-nav .hd-link,.stage.side-open .hd-nav .hd-ico{color:#5E5E5E}
 .stage.side-open .hd-nav .hd-link[aria-current="page"]{color:#5E5E5E}
+/* main: começa 24px antes de --rail-x (folga para o anel de foco e o toque de borda) e corta o que passa por baixo do menu */
+.main{position:absolute;top:0;bottom:0;left:calc(var(--rail-x) - 24px);right:0;overflow:hidden}
 .rails{position:absolute;left:0;top:0;width:100%;z-index:1;transition:transform var(--move)}
 .rail{position:absolute;left:0;width:100%}
-.track{position:absolute;top:0;left:var(--rail-x);display:flex;transition:transform var(--move)}
+.track{position:absolute;top:0;left:24px;display:flex;transition:transform var(--move)}
 .track>.card+.card{margin-left:var(--gap)}
 .card{flex:none;width:var(--w);height:var(--h);background:var(--card);display:flex;flex-direction:column;position:relative;cursor:pointer;outline:none;transition:background-color var(--tint),box-shadow var(--move)}
 /* anel do foco é parte do card: aparece no card novo em vez de deslizar até ele */
@@ -290,7 +297,7 @@ background:radial-gradient(circle at 100% 0,rgba(0,0,0,.87) 0,rgba(0,0,0,.7) 120
 <button class="hd-wxbar" id="wxBar" type="button" tabindex="-1"><span class="wb-txt">Veja a previsão do tempo completa</span><svg class="wb-go" viewBox="0 0 24 24" aria-hidden="true" data-ico="chevron-right"></svg><span class="wb-city" id="wbCity"></span><span class="wb-sep" aria-hidden="true"></span><span class="wb-wx"><svg viewBox="0 0 24 24" aria-hidden="true" id="wbIcon" data-ico="cloud"></svg><span id="wbTemp">--°</span></span></button>
 </div>
 </header>
-<div class="rails" id="rails"></div>
+<main class="main" id="main"><div class="rails" id="rails"></div></main>
 
 <nav class="side" id="side" aria-label="Menu">
 <div class="side-logo" aria-hidden="true">read on<b>TV</b></div>
