@@ -28,6 +28,10 @@ A faixa "Novo Hamburgo" lê `data/novo-hamburgo.json`, servido pelo próprio Pag
 
 Formato de cada item: `title`, `summary`, `body` (lista de parágrafos), `cat`, `source`, `link`, `img` (URL ou vazio), `date` (ISO 8601 com fuso). Máximo de 12 itens, mais recentes primeiro.
 
+## Menu lateral
+
+Uma barra lateral à esquerda, dentro da margem de segurança. Recolhida, mostra só os ícones (Início, Histórico, Minha lista, Excluir localstorage, Controle, API Fullscreen e, no rodapé, Conta); os cards ficam deslocados para a direita. Com ← no primeiro card (ou o mouse), ela abre: ganha os rótulos ao lado dos ícones, o logo "read on TV" aumentado no topo, empurra os trilhos para a direita (sem sobrepô-los) e cobre a faixa de informações; no cabeçalho, o campo de busca some, surge o item "Buscar notícias" na lista e os links ficam escurecidos. → ou Voltar fecha o menu.
+
 ## Limpar dados salvos
 
 O ícone de lixeira no cabeçalho (à esquerda do celular) apaga, após um segundo OK em até 3 s, os dados deste app: notícias salvas, matérias lidas, clima, preferências (sons, abertura, proxy) e o código do celular pareado. Também limpa o `sessionStorage`, os cookies visíveis ao JavaScript no caminho do app e caches do Cache Storage com nome do app, e recarrega a página. Não usa `localStorage.clear()` porque o `github.io` é uma origem compartilhada com outros apps. O cache HTTP do navegador não pode ser apagado por JavaScript.

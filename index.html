@@ -12,7 +12,7 @@
 /* ícones Lucide (CDN): traço na cor do texto; tamanhos e espessuras específicos vêm das regras abaixo */
 svg[data-ico]{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 :root{--letterbox:#0E0E0E;--bg:#2A2A2A;--card:#141414;--thumb:#1F1F1F;--rule:#3A3A3A;--title:#E0E0E0;--sub:#B3B3B3;--focus:#FFD60A;--brand:#4FB8FF;
---font:"Roboto",system-ui,-apple-system,"Segoe UI",sans-serif;--safe-x:96px;--safe-y:54px;--gap:32px;--ring:5px;--move:.6s cubic-bezier(.33,0,.2,1);--tint:.14s ease;color-scheme:dark}
+--font:"Roboto",system-ui,-apple-system,"Segoe UI",sans-serif;--safe-x:96px;--safe-y:54px;--rail-x:180px;--gap:32px;--ring:5px;--move:.6s cubic-bezier(.33,0,.2,1);--tint:.14s ease;color-scheme:dark}
 html,body{height:100%;margin:0;background:var(--letterbox);overflow:hidden}
 .viewport{position:fixed;top:0;right:0;bottom:0;left:0;overflow:hidden;background:var(--letterbox)}
 .stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;overflow:hidden;background:var(--bg);color:var(--title);font-family:var(--font);transform-origin:center}
@@ -30,9 +30,7 @@ html,body{height:100%;margin:0;background:var(--letterbox);overflow:hidden}
 .hd-ico{width:64px;height:64px;padding:0;display:flex;align-items:center;justify-content:center;background:transparent;color:#fff}
 .hd-ico svg{width:44px;height:44px;stroke-width:2}
 .hd-nav .hd-ico svg{width:48px;height:48px;stroke-width:2.2}
-.hd-end{margin-left:auto;display:flex;align-items:center}
-.hd-nav,.hd-end{margin-top:18px}
-.hd-end>*+*{margin-left:10px}
+.hd-nav{margin-top:18px}
 .top button.on,.top .hd-link.on[aria-current="page"]{background:var(--focus);color:var(--card)}
 /* item da seção atual continua distinguível quando focado */
 .top .hd-link.on[aria-current="page"]{box-shadow:inset 0 -6px 0 var(--card)}
@@ -62,9 +60,39 @@ background:var(--focus);color:var(--card);font-weight:700;white-space:nowrap;ove
 .wb-sep{flex:none;width:4px;height:56px;margin:0 30px;background:currentColor}
 .wb-wx{flex:none;display:flex;align-items:center;font-size:40px;line-height:1;font-variant-numeric:tabular-nums}
 .top .hd-wxbar .wb-wx svg{width:48px;height:48px;stroke-width:2.4;margin-right:10px}
+/* ===== Barra lateral (menu) =====
+   recolhida: só ícones, na margem de segurança à esquerda; aberta: ícones + rótulos, cobre a faixa de informações e empurra os trilhos */
+.side{position:absolute;top:0;left:0;bottom:0;width:var(--rail-x);box-sizing:border-box;z-index:7;background:transparent;font-family:var(--font);pointer-events:none;transition:width var(--move),background-color .2s}
+.side button{pointer-events:auto}
+.side.open{pointer-events:auto}
+.side.open{width:600px;background:var(--bg)}
+.side button{border:0;margin:0;outline:none;cursor:pointer;font-family:var(--font);background:transparent}
+.side svg{display:block;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.side-logo{position:absolute;left:72px;top:128px;display:flex;align-items:center;font-family:"Raleway",var(--font);font-size:58px;font-weight:800;line-height:1;color:#fff;white-space:nowrap;opacity:0;visibility:hidden;transition:opacity .2s}
+.side-logo b{font-weight:800;color:var(--brand);margin-left:.26em}
+.side.open .side-logo{opacity:1;visibility:visible}
+.side-list{position:absolute;left:72px;right:0;top:264px}
+.side.open .side-list{right:88px}
+.side-btn{display:flex;align-items:center;width:100%;height:66px;box-sizing:border-box;padding:0 20px 0 12px;color:#fff;transition:background-color .12s,color .12s}
+.side-ic{flex:none;width:52px;height:52px;display:flex;align-items:center;justify-content:center}
+.side-ic svg{width:44px;height:44px}
+.side-tx{margin-left:26px;font-size:36px;font-weight:500;white-space:nowrap;overflow:hidden;max-width:0;opacity:0;transition:max-width var(--move),opacity .18s}
+.side.open .side-tx{max-width:460px;opacity:1}
+.side-btn.on{background:var(--focus);color:var(--card)}
+.side-account{position:absolute;left:72px;right:0;bottom:var(--safe-y)}
+.side.open .side-account{right:88px}
+.side-search{visibility:hidden}
+.side.open .side-search{visibility:visible}
+/* ícone em azul: celular pareado (aria-pressed) e seção atual (Início), quando não focados */
+.side [aria-pressed="true"]:not(.on) .side-ic,.side [aria-current="page"]:not(.on) .side-ic{color:var(--brand)}
+/* estado aberto: esconde logo/sep/título e o campo de busca do cabeçalho; escurece os links */
+.stage.side-open .hd-search{visibility:hidden}
+.stage.side-open .hd-info .hd-logo,.stage.side-open .hd-info .hd-sep,.stage.side-open #railTitle{visibility:hidden}
+.stage.side-open .hd-nav .hd-link,.stage.side-open .hd-nav .hd-ico{color:#5E5E5E}
+.stage.side-open .hd-nav .hd-link[aria-current="page"]{color:#5E5E5E}
 .rails{position:absolute;left:0;top:0;width:100%;z-index:1;transition:transform var(--move)}
 .rail{position:absolute;left:0;width:100%}
-.track{position:absolute;top:0;left:var(--safe-x);display:flex;transition:transform var(--move)}
+.track{position:absolute;top:0;left:var(--rail-x);display:flex;transition:transform var(--move)}
 .track>.card+.card{margin-left:var(--gap)}
 .card{flex:none;width:var(--w);height:var(--h);background:var(--card);display:flex;flex-direction:column;position:relative;cursor:pointer;outline:none;transition:background-color var(--tint),box-shadow var(--move)}
 /* anel do foco é parte do card: aparece no card novo em vez de deslizar até ele */
@@ -247,12 +275,6 @@ background:radial-gradient(circle at 100% 0,rgba(0,0,0,.87) 0,rgba(0,0,0,.7) 120
 <button class="hd-link" type="button" tabindex="-1" data-hd="topic" data-soon>Previsão do tempo</button>
 <button class="hd-ico" type="button" tabindex="-1" data-hd="add" data-soon aria-label="Adicionar tema" title="Adicionar tema"><svg viewBox="0 0 24 24" aria-hidden="true" data-ico="plus"></svg></button>
 </nav>
-<div class="hd-end">
-<button class="hd-ico" id="clearBtn" type="button" tabindex="-1" data-hd="clear" aria-label="Limpar dados salvos" title="Limpar dados salvos"><svg viewBox="0 0 24 24" aria-hidden="true" data-ico="trash-2"></svg></button>
-<button class="hd-ico" id="rmBtn" type="button" tabindex="-1" data-hd="remote" aria-label="Controle pelo celular" title="Controle pelo celular" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true" data-ico="smartphone"></svg></button>
-<button class="hd-ico" id="fsBtn" type="button" tabindex="-1" data-hd="fs" aria-label="Tela cheia" title="Tela cheia"><svg viewBox="0 0 24 24" aria-hidden="true" data-ico="maximize-2"></svg></button>
-<button class="hd-ico" type="button" tabindex="-1" data-hd="user" data-soon aria-label="Perfil" title="Perfil"><svg viewBox="0 0 24 24" aria-hidden="true" data-ico="user"></svg></button>
-</div>
 </div>
 <div class="hd-info">
 <div class="hd-logo" role="img" aria-label="Read on TV">read on<b>TV</b><svg id="liveIcon" class="off" viewBox="0 0 24 24" aria-hidden="true"><title>Conectando à Agência Brasil</title><circle cx="6.2" cy="17.8" r="2.2"/><path d="M4 4.4v2.9c7 0 12.7 5.7 12.7 12.7h2.9C19.6 11.4 12.6 4.4 4 4.4zm0 5.7V13c3.9 0 7.1 3.2 7.1 7.1H14c0-5.5-4.5-10-10-10z"/></svg></div>
@@ -269,6 +291,20 @@ background:radial-gradient(circle at 100% 0,rgba(0,0,0,.87) 0,rgba(0,0,0,.7) 120
 </div>
 </header>
 <div class="rails" id="rails"></div>
+
+<nav class="side" id="side" aria-label="Menu">
+<div class="side-logo" aria-hidden="true">read on<b>TV</b></div>
+<div class="side-list">
+<button class="side-btn side-search" id="sideSearch" type="button" tabindex="-1" data-side="search"><span class="side-ic"><svg viewBox="0 0 24 24" aria-hidden="true" data-ico="search"></svg></span><span class="side-tx">Buscar notícias</span></button>
+<button class="side-btn" type="button" tabindex="-1" data-side="home" aria-current="page"><span class="side-ic"><svg viewBox="0 0 24 24" aria-hidden="true" data-ico="house"></svg></span><span class="side-tx">Início</span></button>
+<button class="side-btn" type="button" tabindex="-1" data-side="history"><span class="side-ic"><svg viewBox="0 0 24 24" aria-hidden="true" data-ico="history"></svg></span><span class="side-tx">Histórico</span></button>
+<button class="side-btn" type="button" tabindex="-1" data-side="list"><span class="side-ic"><svg viewBox="0 0 24 24" aria-hidden="true" data-ico="bookmark"></svg></span><span class="side-tx">Minha lista</span></button>
+<button class="side-btn" id="clearBtn" type="button" tabindex="-1" data-side="clear"><span class="side-ic"><svg viewBox="0 0 24 24" aria-hidden="true" data-ico="trash-2"></svg></span><span class="side-tx">Excluir localstorage</span></button>
+<button class="side-btn" id="rmBtn" type="button" tabindex="-1" data-side="remote" aria-pressed="false"><span class="side-ic"><svg viewBox="0 0 24 24" aria-hidden="true" data-ico="smartphone"></svg></span><span class="side-tx">Controle</span></button>
+<button class="side-btn" id="fsBtn" type="button" tabindex="-1" data-side="fs"><span class="side-ic"><svg viewBox="0 0 24 24" aria-hidden="true" data-ico="maximize-2"></svg></span><span class="side-tx">API Fullscreen</span></button>
+</div>
+<button class="side-btn side-account" type="button" tabindex="-1" data-side="user"><span class="side-ic"><svg viewBox="0 0 24 24" aria-hidden="true" data-ico="user"></svg></span><span class="side-tx">Conta</span></button>
+</nav>
 
 <section class="post" id="post" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="pHead">
 <div class="p-side">
@@ -517,6 +553,9 @@ const SHOW_SOON=true; // false oculta busca, temas e perfil enquanto não têm t
 document.querySelectorAll('[data-soon]').forEach(b=>{b.hidden=!SHOW_SOON;});
 const hdItems=[...document.querySelectorAll('.top [data-hd]')].filter(b=>!b.hidden),HD_HOME=hdItems.findIndex(b=>b.dataset.hd==='home');
 let hf=HD_HOME;
+/* barra lateral (menu): recebe foco à esquerda dos cards (← no 1º card) */
+const sideEl=$('side'),sideBtns=[...sideEl.querySelectorAll('.side-btn')],SIDE_HOME=sideBtns.findIndex(b=>b.dataset.side==='home'),SIDE_PUSH=436;
+let inSide=false,sf=SIDE_HOME;
 let RAILS=[],tops=[],tracks=[],cards=[],idx=[],r=0,inHeader=false,inWx=false,prev=null,postOpen=false,cur=null,pending=null,source='skeleton';
 const cleanCache=new Map();
 
@@ -612,10 +651,12 @@ const R=RAILS[r];
 titleEl.textContent=R.title;
 hdItems.forEach((b,i)=>b.classList.toggle('on',inHeader&&i===hf));
 wxBar.classList.toggle('on',inWx);
-railsEl.style.transform='translateY('+(FIX_TOP-tops[r])+'px)';
+sideBtns.forEach((b,i)=>b.classList.toggle('on',inSide&&i===sf));
+sideEl.classList.toggle('open',inSide);stage.classList.toggle('side-open',inSide);
+railsEl.style.transform='translate('+(inSide?SIDE_PUSH:0)+'px,'+(FIX_TOP-tops[r])+'px)';
 // cada trilho desliza até o card focado (posição calculada pela largura do card + --gap)
 tracks.forEach((t,k)=>{t.style.transform='translateX('+(-idx[k]*(RAILS[k].w+GAP))+'px)';});
-if(inHeader||inWx){if(prev){prev.classList.remove('on');prev=null;}try{(inWx?wxBar:hdItems[hf]).focus({preventScroll:true});}catch(e){}}
+if(inSide||inHeader||inWx){if(prev){prev.classList.remove('on');prev=null;}try{(inSide?sideBtns[sf]:inWx?wxBar:hdItems[hf]).focus({preventScroll:true});}catch(e){}}
 else{const c=cards[r][idx[r]];if(prev&&prev!==c)prev.classList.remove('on');c.classList.add('on');prev=c;
 if(!postOpen){try{c.focus({preventScroll:true});}catch(e){}}}
 syncImgs();
@@ -638,7 +679,7 @@ const focusEl=el=>{if(el)try{el.focus({preventScroll:true});}catch(e){}};
 const smooth=()=>reduced.matches?'auto':'smooth';
 const reduced=matchMedia('(prefers-reduced-motion: reduce)');
 /* fundo inerte enquanto a matéria está aberta */
-const bgEls=[document.querySelector('.top'),railsEl];
+const bgEls=[document.querySelector('.top'),railsEl,sideEl];
 function setBgInert(on){bgEls.forEach(el=>{if(on){el.setAttribute('inert','');el.setAttribute('aria-hidden','true');}else{el.removeAttribute('inert');el.removeAttribute('aria-hidden');}});}
 /* blocos de leitura: cada um recebe foco para que o leitor de tela da TV leia o texto */
 let blocks=[],rb=-1;
@@ -647,7 +688,7 @@ const foot=pScroll.querySelector('.p-foot');if(foot.textContent.trim())blocks.pu
 blocks.forEach(b=>{b.tabIndex=-1;});if(rb>=blocks.length)rb=blocks.length-1;}
 function open(){const it=RAILS[r].items[idx[r]];if(!it||it.sk)return;openPost(r,idx[r]);}
 function openPost(k,i){
-const it=RAILS[k].items[i],wasOpen=postOpen;cur={k,i};postOpen=true;sfx.enter();markSeen(it);
+const it=RAILS[k].items[i],wasOpen=postOpen;cur={k,i};postOpen=true;inSide=false;sfx.enter();markSeen(it);
 setImg(pHero,it.img,it.cat,694,470);
 pHead.textContent='';const hl=document.createElement('span');hl.className='hl';const pc=document.createElement('span');pc.className='pc';pc.textContent=it.cat;hl.append(pc,document.createTextNode(it.title));pHead.append(hl);
 renderMeta(it);
@@ -722,7 +763,7 @@ try{if(window.webOS&&typeof webOS.platformBack==='function'){webOS.platformBack(
 try{window.close();}catch(e){}}
 // Voltar na raiz pede confirmação para evitar saída acidental
 let exitArm=0;
-function back(){sfx.back();if(inHeader||inWx){inHeader=false;inWx=false;r=0;}else if(idx[r]>0)idx[r]=0;else if(r>0)r=0;
+function back(){sfx.back();if(inSide){inSide=false;render();return;}if(inHeader||inWx){inHeader=false;inWx=false;r=0;}else if(idx[r]>0)idx[r]=0;else if(r>0)r=0;
 else{const now=Date.now();if(now-exitArm<2500){exitApp();return;}exitArm=now;showToast('Pressione Voltar novamente para sair',2500);return;}
 exitArm=0;render();}
 // botões da matéria: pula os desabilitados (aria-disabled)
@@ -752,6 +793,15 @@ else return;
 e.preventDefault();return;}
 let used=true;const sig0=focusSig();
 /* faixa da previsão do tempo: entre o cabeçalho (acima) e os trilhos (abaixo) */
+/* barra lateral em foco */
+if(inSide&&!isBack(k,code)){
+if(k==='ArrowDown'){if(sf<sideBtns.length-1)sf++;}
+else if(k==='ArrowUp'){if(sf>0)sf--;}
+else if(k==='ArrowRight'){inSide=false;}
+else if(k==='Enter'||code===13){sideAct(sf);return;}
+else if(!k.startsWith('Arrow'))return;
+render();if(k.startsWith('Arrow'))cue(focusSig()!==sig0,e,k);
+e.preventDefault();return;}
 if(inWx&&!isBack(k,code)){
 if(k==='ArrowDown'){inWx=false;r=0;render();}
 else if(k==='ArrowUp'){inWx=false;inHeader=true;hf=HD_HOME;render();}
@@ -769,7 +819,7 @@ if(k.startsWith('Arrow'))cue(focusSig()!==sig0,e,k);
 e.preventDefault();return;}
 if(!RAILS.length)return;
 if(k==='ArrowRight'){if(idx[r]<RAILS[r].items.length-1)idx[r]++;}
-else if(k==='ArrowLeft'){if(idx[r]>0)idx[r]--;}
+else if(k==='ArrowLeft'){if(idx[r]>0)idx[r]--;else{inSide=true;sf=SIDE_HOME;}}
 else if(k==='ArrowDown'){if(r<RAILS.length-1)r++;}
 else if(k==='ArrowUp'){if(r>0)r--;else inWx=true;}
 else if(k==='Enter'||code===13){open();used='open';}
@@ -782,7 +832,7 @@ function bump(k){const d=BUMP[k],c=prev;if(!d||!c||reduced.matches||!c.animate)r
 if(c._bump)c._bump.cancel();const o=d[0]*14+'px '+d[1]*14+'px';
 c._bump=c.animate([{translate:'0 0'},{translate:o,offset:.35},{translate:'0 0'}],{duration:280,easing:'ease-out'});}
 // posição do foco: o som de navegação só toca quando o foco realmente muda
-function focusSig(){return (inWx?'w':inHeader?'h'+hf:'r'+r+':'+idx[r]);}
+function focusSig(){return (inSide?'s'+sf:inWx?'w':inHeader?'h'+hf:'r'+r+':'+idx[r]);}
 document.addEventListener('keydown',onKey);
 
 /* ================= Gamepad API (Xbox, PlayStation, genéricos) ================= */
@@ -845,6 +895,21 @@ else if(a==='remote')rmOpen();
 else if(a==='clear')clearData();
 else showToast(b.textContent.trim()+': disponível em breve');}
 hdItems.forEach((b,i)=>b.addEventListener('click',e=>{e.stopPropagation();if(postOpen)return;inWx=false;inHeader=true;hf=i;render();hdAct(i);}));
+/* ===== Ações da barra lateral ===== */
+function sideAct(i){const a=sideBtns[i].dataset.side;sfx.enter();
+if(a==='home'){inSide=false;inHeader=false;inWx=false;r=0;idx[0]=0;render();}
+else if(a==='fs')fsToggle();
+else if(a==='clear')clearData();
+else if(a==='remote')rmOpen();
+else if(a==='search')showToast('Busca: disponível em breve');
+else if(a==='history')showToast('Histórico: disponível em breve');
+else if(a==='list')showToast('Minha lista: disponível em breve');
+else if(a==='user')showToast('Perfil: disponível em breve');}
+sideBtns.forEach((b,i)=>{b.addEventListener('click',e=>{e.stopPropagation();if(postOpen||rmIsOpen)return;inSide=true;sf=i;render();sideAct(i);});
+b.addEventListener('mouseenter',()=>{if(postOpen||rmIsOpen||!inSide)return;sf=i;render();});});
+// mouse: entrar na área lateral abre o menu; sair fecha
+sideEl.addEventListener('mouseenter',()=>{if(postOpen||rmIsOpen||inSide)return;inSide=true;sf=SIDE_HOME;render();});
+sideEl.addEventListener('mouseleave',()=>{if(inSide){inSide=false;render();}});
 /* ===== Previsão do tempo no cabeçalho =====
    Recebe foco entre a barra do cabeçalho e os trilhos: a faixa amarela cobre o título e a data e convida a abrir a previsão completa. */
 const wxBar=$('wxBar');
@@ -949,7 +1014,7 @@ onKey({key:d[0],keyCode:d[1],repeat:rep,ctrlKey:false,metaKey:false,altKey:false
 function rmFocus(){rmBtns.forEach((b,i)=>b.classList.toggle('on',i===rf));focusEl(rmBtns[rf]);}
 function rmMove(i){if(i===rf)return false;rf=i;rmFocus();return true;}
 function rmAct(i){if(i===0)rmClose();else{sfx.enter();rmRevoke();}}
-function rmOpen(){if(rmIsOpen)return;rmIsOpen=true;rf=0;rmEl.classList.add('show');rmEl.setAttribute('aria-hidden','false');setBgInert(true);
+function rmOpen(){if(rmIsOpen)return;rmIsOpen=true;inSide=false;render();rf=0;rmEl.classList.add('show');rmEl.setAttribute('aria-hidden','false');setBgInert(true);
 rmRender();if(rm.clients.length)rmStatus(rmLive()?rmReady():'Conectando…',rmLive()&&rm.paired);rmStart();rmFocus();}
 function rmClose(){if(!rmIsOpen)return;rmIsOpen=false;sfx.back();rmEl.classList.remove('show');rmEl.setAttribute('aria-hidden','true');setBgInert(false);render();}
 rmBtns.forEach((b,i)=>{b.addEventListener('click',()=>{rf=i;rmFocus();rmAct(i);});b.addEventListener('mouseenter',()=>rmMove(i));});
