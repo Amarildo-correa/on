@@ -7,16 +7,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@700;800&family=Roboto:wght@400;500;600;700;900&family=Roboto+Mono:wght@500&display=swap">
 <script src="https://cdn.jsdelivr.net/npm/lucide@1.52.0/dist/umd/lucide.min.js"></script>
+<script src="shared.js"></script>
 <style>
-/* Palco 1920x1080 escalado; margem de segurança 96/54; cabeçalho em uma linha; foco fixo, trilhos se movem */
+/* Palco 1920x1080 escalado; margem de segurança 96/54; foco fixo, trilhos se movem */
 /* ícones Lucide (CDN): traço na cor do texto; tamanhos e espessuras específicos vêm das regras abaixo */
 svg[data-ico]{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 :root{--letterbox:#0E0E0E;--bg:#2A2A2A;--card:#141414;--thumb:#1F1F1F;--rule:#3A3A3A;--title:#E0E0E0;--sub:#B3B3B3;--focus:#FFD60A;--brand:#4FB8FF;
 --font:"Roboto",system-ui,-apple-system,"Segoe UI",sans-serif;--safe-x:96px;--safe-y:54px;--rail-x:180px;--gap:32px;--ring:5px;--move:.6s cubic-bezier(.33,0,.2,1);--tint:.14s ease;color-scheme:dark}
 html,body{height:100%;margin:0;background:var(--letterbox);overflow:hidden}
+.sprite{position:absolute;width:0;height:0}
 .viewport{position:fixed;top:0;right:0;bottom:0;left:0;overflow:hidden;background:var(--letterbox)}
 .stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;overflow:hidden;background:var(--bg);color:var(--title);font-family:var(--font);transform-origin:center}
-/* ===== Cabeçalho: barra (busca, menu, ações) + faixa de informações ===== */
 /* ===== Layout do palco: três blocos =====
    nav.side (coluna do menu, 0 → --rail-x) | header.top e main.main (coluna do conteúdo, a partir de --rail-x).
    Cabeçalho e trilhos começam no mesmo x, alinhados com o 1º card. */
@@ -29,20 +30,16 @@ html,body{height:100%;margin:0;background:var(--letterbox);overflow:hidden}
 .hd-bar{position:absolute;top:0;left:0;right:0;height:118px;box-sizing:border-box;padding:0 calc(100% - 1584px) 0 0;border-bottom:3px solid #444;display:flex;align-items:center}
 .hd-search{align-self:flex-end;margin-bottom:-3px!important;width:400px;height:85px;box-sizing:border-box;display:flex;align-items:center;padding:0 28px;background:#474747;border-bottom:4px solid #9A9A9A!important;color:#fff;font-size:33px;font-weight:500;text-align:left;white-space:nowrap}
 .hd-search svg{width:34px;height:34px;stroke-width:2.6;margin-right:20px}
-.hd-nav{display:flex;align-items:center;margin-left:auto}
+/* centro vertical dos links igual ao do texto da busca (a busca fica encostada na base da barra) */
+.hd-nav{display:flex;align-items:center;margin-left:auto;margin-top:31px}
 /* o desenho do + encosta na borda direita (compensa o espaço interno do botão) */
 .hd-nav .hd-ico:last-child{margin-right:-8px}
 .hd-nav>*+*{margin-left:26px}
 .hd-link{height:64px;padding:0 20px;display:flex;align-items:center;background:transparent;color:#fff;font-size:34px;font-weight:500;white-space:nowrap}
-.hd-link[aria-current="page"]{color:var(--brand)}
 .hd-ico{width:64px;height:64px;padding:0;display:flex;align-items:center;justify-content:center;background:transparent;color:#fff}
-.hd-ico svg{width:44px;height:44px;stroke-width:2}
-.hd-nav .hd-ico svg{width:48px;height:48px;stroke-width:2.2}
-/* centro vertical dos links igual ao do texto da busca (a busca fica encostada na base da barra) */
-.hd-nav{margin-top:31px}
-.top button.on,.top .hd-link.on[aria-current="page"]{background:var(--focus);color:var(--card)}
-/* item da seção atual continua distinguível quando focado */
-.top .hd-link.on[aria-current="page"]{box-shadow:inset 0 -6px 0 var(--card)}
+.hd-ico svg{width:48px;height:48px;stroke-width:2.2}
+/* foco: superfície amarela com texto escuro (cabeçalho, menu e botões das telas cheias) */
+.top button.on,.side-btn.on,.p-btn.on,.rm-btn.on{background:var(--focus);color:var(--card)}
 .top [hidden]{display:none!important}
 .hd-search.on{border-bottom-color:var(--card)!important}
 /* hd-info alinhada aos cards: termina na borda direita do 2º card (2 × 776 + 32 = 1584px a partir de --rail-x) */
@@ -53,13 +50,12 @@ html,body{height:100%;margin:0;background:var(--letterbox);overflow:hidden}
 .hd-logo svg.off{color:#6A6A6A}
 .hd-sep{flex:none;width:3px;height:56px;background:#4A4A4A;margin:0 32px}
 .hd-info h1{flex:0 1 auto;min-width:0;margin:0;font-size:48px;font-weight:500;line-height:1.2;color:#fff;overflow:hidden;text-overflow:ellipsis}
-.hd-meta{flex:none;margin-left:auto;padding-left:32px;display:flex;align-items:center;font-size:38px;font-weight:500;line-height:1}
+.hd-meta{flex:none;margin-left:auto;padding-left:32px;display:flex;align-items:center;font-size:38px;font-weight:500;line-height:1;cursor:pointer}
 .hd-date{color:#CFCFCF;font-variant-numeric:tabular-nums}
 .hd-city{color:#fff}
 .hd-wx{display:flex;align-items:center;color:#fff;font-weight:700;font-variant-numeric:tabular-nums}
 .hd-wx svg{width:46px;height:46px;stroke-width:1.9;color:#fff;margin-right:10px}
 /* foco da previsão do tempo: faixa amarela sobre o título (h1) e a data, do separador do logo até a margem direita */
-.hd-meta{cursor:pointer}
 .top .hd-wxbar{position:absolute;top:20px;right:calc(100% - 1584px - 22px);left:var(--wb-left,480px);height:92px;box-sizing:border-box;padding:0 36px 0 36px;display:flex;align-items:center;justify-content:flex-end;
 background:var(--focus);color:var(--card);font-weight:700;white-space:nowrap;overflow:hidden;visibility:hidden;z-index:1}
 .top .hd-wxbar.on{visibility:visible}
@@ -90,7 +86,6 @@ background:var(--focus);color:var(--card);font-weight:700;white-space:nowrap;ove
 .side-ic svg{width:44px;height:44px}
 .side-tx{margin-left:26px;font-size:36px;font-weight:500;white-space:nowrap;overflow:hidden;max-width:0;opacity:0;transition:max-width var(--move),opacity .18s}
 .side.open .side-tx{max-width:460px;opacity:1}
-.side-btn.on{background:var(--focus);color:var(--card)}
 .side-account{position:absolute;left:72px;right:0;bottom:var(--safe-y)}
 .side.open .side-account{right:104px}
 .side-search{visibility:hidden}
@@ -101,7 +96,6 @@ background:var(--focus);color:var(--card);font-weight:700;white-space:nowrap;ove
 .stage.side-open .hd-search{visibility:hidden}
 .stage.side-open .hd-info .hd-logo,.stage.side-open .hd-info .hd-sep,.stage.side-open #railTitle{visibility:hidden}
 .stage.side-open .hd-nav .hd-link,.stage.side-open .hd-nav .hd-ico{color:#5E5E5E}
-.stage.side-open .hd-nav .hd-link[aria-current="page"]{color:#5E5E5E}
 /* main: começa 24px antes de --rail-x (folga para o anel de foco). O que desliza para a esquerda continua visível atrás do menu
    (peek); o recorte só esconde a faixa do cabeçalho (y < 244), para trilhos que sobem não aparecerem no canto superior esquerdo */
 .main{position:absolute;top:0;bottom:0;left:calc(var(--rail-x) - 24px);right:0;clip-path:polygon(-4000px 244px,100% 244px,100% 100%,-4000px 100%)}
@@ -133,8 +127,7 @@ background:var(--focus);color:var(--card);font-weight:700;white-space:nowrap;ove
 /* card grande: o corte em 2 linhas é feito em JS (fitTitles) para o "…" ficar dentro da placa escura/amarela; max-height é só a rede de segurança */
 .big .t{position:absolute;left:29px;right:52px;bottom:calc(100% - var(--th) - 10px);z-index:2;max-height:99px;overflow:hidden;padding-top:3px}
 .big .t .hl{background:var(--card);padding:3px 25px 3px 12px;-webkit-box-decoration-break:clone;box-decoration-break:clone;transition:background-color var(--tint)}
-.cat{flex:none;font-size:35px;font-weight:700;line-height:35px;text-transform:uppercase;color:#B8B8B8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cat{min-width:0}
+.cat{flex:none;min-width:0;font-size:35px;font-weight:700;line-height:35px;text-transform:uppercase;color:#B8B8B8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .meta{flex:none;display:flex;align-items:center;min-width:0;border-top:4px solid #EEE;white-space:nowrap}
 .big .meta{height:57px;padding-top:12px}
 .meta .s{margin-left:auto;padding-left:24px}
@@ -189,7 +182,7 @@ background:radial-gradient(circle at 100% 0,rgba(0,0,0,.87) 0,rgba(0,0,0,.7) 120
 .p-scrim{position:absolute;left:0;right:0;bottom:0;height:130px;z-index:1;pointer-events:none;background:linear-gradient(to top,#2A2A2A 0,#2A2A2A 14px,rgba(42,42,42,0) 100%)}
 .p-brand{position:absolute;left:var(--safe-x);top:443px;z-index:3;display:flex;align-items:center;font-family:"Raleway",var(--font);font-size:37px;font-weight:800;line-height:1;color:#fff;white-space:nowrap}
 .p-brand b{font-weight:800;color:var(--brand);margin-left:.26em}
-.p-brand svg{width:36px;height:36px;color:var(--brand);margin-left:4px}
+.p-brand svg{width:36px;height:36px;color:var(--brand);fill:currentColor;margin-left:4px}
 .p-hero.noimg .p-scrim{display:none}
 .p-divider{position:absolute;left:var(--safe-x);right:42px;top:498px;height:5px;background:#fff;z-index:2}
 .p-info{position:absolute;left:var(--safe-x);right:42px;top:539px}
@@ -201,14 +194,14 @@ background:radial-gradient(circle at 100% 0,rgba(0,0,0,.87) 0,rgba(0,0,0,.7) 120
 .p-ago,.p-src{display:block;font-size:32px;font-weight:700;line-height:43px;color:#C2C2C2}
 .p-by{display:block;margin-top:4px;font-size:26px;line-height:36px;color:#ADADAD;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .p-nav{position:absolute;left:var(--safe-x);right:49px;top:923px;height:103px;display:flex;align-items:center;gap:25px}
-.p-btn{flex:none;height:87px;display:flex;align-items:center;justify-content:center;gap:14px;padding:0;border:0;background:#454545;color:#fff;font:900 38px/1 var(--font);cursor:pointer;outline:none;transition:background-color .12s,color .12s}
+/* botões das telas cheias (matéria e pareamento) */
+.p-btn,.rm-btn{flex:none;height:87px;display:flex;align-items:center;border:0;background:#454545;color:#fff;cursor:pointer;outline:none;transition:background-color .12s,color .12s}
+.p-btn{justify-content:center;gap:14px;padding:0;font:900 38px/1 var(--font)}
 .p-btn.back,.p-btn.next{width:87px}
 .p-btn svg{width:44px;height:44px;flex:none;stroke-width:1.9}
 .p-btn.listen{margin-left:auto;width:244px;height:103px;gap:16px;text-transform:uppercase}
 .p-btn.listen svg{width:48px;height:48px;stroke-width:2.3}
-.p-btn.on{background:var(--focus);color:var(--card)}
 .p-btn[aria-disabled="true"]{opacity:.35}
-.p-btn[hidden]{display:none}
 .p-read{position:absolute;left:792px;right:0;top:0;bottom:0}
 .p-time{position:absolute;top:var(--safe-y);right:var(--safe-x);height:46px;display:flex;align-items:center;gap:64px;font-size:33px;color:#CCC;white-space:nowrap}
 .p-time b{font-weight:500;color:var(--brand)}
@@ -236,16 +229,14 @@ background:radial-gradient(circle at 100% 0,rgba(0,0,0,.87) 0,rgba(0,0,0,.7) 120
 .p-body figure{margin:10px 0 44px}
 .p-body figure img{display:block;width:100%;height:auto;background:var(--thumb)}
 .p-body figcaption{margin-top:14px;font-size:24px;line-height:1.4;color:#9A9A9A}
-/* ===== Controle pelo celular: ícone azul quando há celular pareado; tela de pareamento com QR e código ===== */
-.top .hd-ico[aria-pressed="true"]:not(.on){color:var(--brand)}
+/* ===== Controle pelo celular: tela de pareamento com QR e código ===== */
 .rm{position:absolute;top:0;right:0;bottom:0;left:0;z-index:7;background:var(--bg);opacity:0;visibility:hidden;transition:opacity .2s,visibility 0s linear .2s}
 .rm.show{opacity:1;visibility:visible;transition:opacity .2s}
 .rm svg{display:block;flex:none;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 .rm-top{position:absolute;left:var(--safe-x);right:var(--safe-x);top:var(--safe-y);height:118px;display:flex;align-items:center;border-bottom:3px solid #444}
 .rm-title{margin:0 0 0 48px;font-size:48px;font-weight:500;color:#fff;white-space:nowrap}
-.rm-btn{flex:none;height:87px;display:flex;align-items:center;gap:18px;padding:0 34px;border:0;background:#454545;color:#fff;font:900 34px/1 var(--font);cursor:pointer;outline:none;transition:background-color .12s,color .12s}
+.rm-btn{gap:18px;padding:0 34px;font:900 34px/1 var(--font)}
 .rm-btn svg{width:40px;height:40px}
-.rm-btn.on{background:var(--focus);color:var(--card)}
 .rm-body{position:absolute;left:var(--safe-x);right:var(--safe-x);top:290px;bottom:var(--safe-y);display:flex;align-items:center}
 .rm-qr{flex:none;width:520px;height:520px;box-sizing:border-box;padding:32px;background:#fff}
 .rm-qr svg{width:100%;height:100%;stroke:none}
@@ -290,6 +281,8 @@ background:radial-gradient(circle at 100% 0,rgba(0,0,0,.87) 0,rgba(0,0,0,.7) 120
 </style>
 </head>
 <body>
+<!-- símbolo do logo (antena), reaproveitado no cabeçalho, no menu, na matéria e na abertura -->
+<svg class="sprite" aria-hidden="true"><symbol id="logo-mark" viewBox="0 0 24 24"><circle cx="6.2" cy="17.8" r="2.2"/><path d="M4 4.4v2.9c7 0 12.7 5.7 12.7 12.7h2.9C19.6 11.4 12.6 4.4 4 4.4zm0 5.7V13c3.9 0 7.1 3.2 7.1 7.1H14c0-5.5-4.5-10-10-10z"/></symbol></svg>
 <div class="viewport">
 <div class="stage intro-on" id="stage">
 <header class="top">
@@ -306,7 +299,7 @@ background:radial-gradient(circle at 100% 0,rgba(0,0,0,.87) 0,rgba(0,0,0,.7) 120
 </nav>
 </div>
 <div class="hd-info">
-<div class="hd-logo" role="img" aria-label="Read on TV">read on<b>TV</b><svg id="liveIcon" class="off" viewBox="0 0 24 24" aria-hidden="true"><title>Conectando à Agência Brasil</title><circle cx="6.2" cy="17.8" r="2.2"/><path d="M4 4.4v2.9c7 0 12.7 5.7 12.7 12.7h2.9C19.6 11.4 12.6 4.4 4 4.4zm0 5.7V13c3.9 0 7.1 3.2 7.1 7.1H14c0-5.5-4.5-10-10-10z"/></svg></div>
+<div class="hd-logo" role="img" aria-label="Read on TV">read on<b>TV</b><svg id="liveIcon" class="off" viewBox="0 0 24 24" aria-hidden="true"><title>Conectando à Agência Brasil</title><use xlink:href="#logo-mark"/></svg></div>
 <span class="hd-sep" aria-hidden="true"></span>
 <h1 id="railTitle" aria-live="polite">Destaques</h1>
 <div class="hd-meta">
@@ -322,7 +315,7 @@ background:radial-gradient(circle at 100% 0,rgba(0,0,0,.87) 0,rgba(0,0,0,.7) 120
 <main class="main" id="main"><div class="rails" id="rails"></div></main>
 
 <nav class="side" id="side" aria-label="Menu">
-<div class="side-logo" aria-hidden="true">read on<b>TV</b><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6.2" cy="17.8" r="2.2"/><path d="M4 4.4v2.9c7 0 12.7 5.7 12.7 12.7h2.9C19.6 11.4 12.6 4.4 4 4.4zm0 5.7V13c3.9 0 7.1 3.2 7.1 7.1H14c0-5.5-4.5-10-10-10z"/></svg></div>
+<div class="side-logo" aria-hidden="true">read on<b>TV</b><svg viewBox="0 0 24 24" aria-hidden="true"><use xlink:href="#logo-mark"/></svg></div>
 <div class="side-list">
 <button class="side-btn side-search" id="sideSearch" type="button" tabindex="-1" data-side="search"><span class="side-ic"><svg viewBox="0 0 24 24" aria-hidden="true" data-ico="search"></svg></span><span class="side-tx">Buscar notícias</span></button>
 <button class="side-btn" type="button" tabindex="-1" data-side="home" aria-current="page"><span class="side-ic"><svg viewBox="0 0 24 24" aria-hidden="true" data-ico="house"></svg></span><span class="side-tx">Início</span></button>
@@ -338,7 +331,7 @@ background:radial-gradient(circle at 100% 0,rgba(0,0,0,.87) 0,rgba(0,0,0,.7) 120
 <section class="post" id="post" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="pHead">
 <div class="p-side">
 <div class="p-hero" id="pHero"><div class="p-scrim"></div></div>
-<div class="p-brand" role="img" aria-label="Read on TV">read on<b>TV</b><svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><circle cx="6.2" cy="17.8" r="2.2"/><path d="M4 4.4v2.9c7 0 12.7 5.7 12.7 12.7h2.9C19.6 11.4 12.6 4.4 4 4.4zm0 5.7V13c3.9 0 7.1 3.2 7.1 7.1H14c0-5.5-4.5-10-10-10z"/></svg></div>
+<div class="p-brand" role="img" aria-label="Read on TV">read on<b>TV</b><svg viewBox="0 0 24 24" aria-hidden="true"><use xlink:href="#logo-mark"/></svg></div>
 <div class="p-divider" aria-hidden="true"></div>
 <div class="p-info">
 <h2 class="p-head" id="pHead"></h2>
@@ -383,24 +376,19 @@ background:radial-gradient(circle at 100% 0,rgba(0,0,0,.87) 0,rgba(0,0,0,.7) 120
 <div class="intro-wire" id="introWire"><span id="introWireTxt"></span><span class="iw-cur"></span></div>
 <div class="intro-rule" id="introRule"></div>
 <div class="intro-rows" id="introRows"></div>
-<div class="intro-mast"><div class="intro-plate" id="introPlate"></div><div class="intro-logo" id="introLogo">read on<b>TV</b><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6.2" cy="17.8" r="2.2"/><path d="M4 4.4v2.9c7 0 12.7 5.7 12.7 12.7h2.9C19.6 11.4 12.6 4.4 4 4.4zm0 5.7V13c3.9 0 7.1 3.2 7.1 7.1H14c0-5.5-4.5-10-10-10z"/></svg></div><div class="intro-bar" id="introBar"></div><div class="intro-tag" id="introTag">Seu jornal, na tela da TV</div></div>
+<div class="intro-mast"><div class="intro-plate" id="introPlate"></div><div class="intro-logo" id="introLogo">read on<b>TV</b><svg viewBox="0 0 24 24" aria-hidden="true"><use xlink:href="#logo-mark"/></svg></div><div class="intro-bar" id="introBar"></div><div class="intro-tag" id="introTag">Seu jornal, na tela da TV</div></div>
 <div class="intro-gate" id="introGate" hidden><span class="iw-cur"></span><p>Pressione<kbd>OK</kbd>para abrir a edição de hoje</p><small>ou clique em qualquer lugar</small></div>
 </div>
 </div>
 </div>
 <script>
-/* ================= Ícones: Lucide via CDN =================
+/* ================= Ícones: Lucide via CDN (desenho em shared.js) =================
    <svg data-ico="nome"> recebe o desenho do ícone; ico('nome') gera o SVG para conteúdo criado em JS.
    Sem a biblioteca (CDN fora do ar), os ícones ficam vazios e o app segue funcionando. */
-const LUCIDE=(window.lucide&&window.lucide.icons)||{};
 if(!window.lucide)console.warn('[Read on TV] Lucide indisponível: ícones desligados');
-const icoName=n=>String(n).replace(/(^|-)([a-z0-9])/g,(_,a,b)=>b.toUpperCase());
-const icoAttr=v=>String(v).replace(/&/g,'&amp;').replace(/"/g,'&quot;');
-function icoInner(n){const node=LUCIDE[icoName(n)];
-return node?node.map(([tag,at])=>'<'+tag+Object.keys(at).map(k=>' '+k+'="'+icoAttr(at[k])+'"').join('')+'/>').join(''):'';}
-function ico(n,cls){return '<svg'+(cls?' class="'+cls+'"':'')+' viewBox="0 0 24 24" aria-hidden="true" data-ico="'+n+'">'+icoInner(n)+'</svg>';}
-function setIco(el,n){if(!el)return;el.setAttribute('data-ico',n);el.innerHTML=icoInner(n);}
-document.querySelectorAll('svg[data-ico]').forEach(el=>setIco(el,el.getAttribute('data-ico')));
+const ico=(n,cls)=>'<svg'+(cls?' class="'+cls+'"':'')+' viewBox="0 0 24 24" aria-hidden="true" data-ico="'+n+'">'+ROTV.iconInner(n)+'</svg>';
+const setIco=ROTV.setIcon;
+ROTV.drawIcons();
 
 /* ================= Fonte de dados: RSS da Agência Brasil ================= */
 const FEED_BASE='https://agenciabrasil.ebc.com.br/rss/';
@@ -415,15 +403,19 @@ u=>u,
 u=>'https://api.allorigins.win/raw?url='+encodeURIComponent(u),
 u=>'https://corsproxy.io/?url='+encodeURIComponent(u),
 u=>'https://api.codetabs.com/v1/proxy?quest='+encodeURIComponent(u)];
-const REFRESH_MS=15*60*1000,CACHE_KEY='readontv:feeds:v1',PREF_KEY='readontv:proxy',MAX_PER_RAIL=12;
+const REFRESH_MS=15*60*1000,CACHE_MAX_AGE=24*3600e3,MAX_PER_RAIL=12;
+/* chaves do localStorage (limpas por clearData; as do prefixo readontv-on: também) */
+const CACHE_KEY='readontv:feeds:v1',PREF_KEY='readontv:proxy',WX_KEY='readontv:wx:v1',SFX_KEY='readontv:sfx',INTRO_KEY='readontv:intro',
+SEEN_KEY='readontv-on:seen',RM_KEY_CODE='readontv-on:remote-code',RM_KEY_PAIRED='readontv-on:remote-paired';
 const DC='http://purl.org/dc/elements/1.1/';
 /* Redimensiona as fotos do feed (originais de 1–2 MB) para o tamanho exibido: menos memória em TVs de 1–1,5 GB. Vazio = desligado. */
 const IMG_RESIZER='https://wsrv.nl/?url=';
 /* só redimensiona pela largura (proporção original): o corte fica com o CSS (object-fit + object-position),
    que puxa o enquadramento para cima. O corte do redimensionador (a=attention) pegava o centro e cortava rostos. */
-function sized(src,w){if(!IMG_RESIZER||!src||/picsum\.photos/.test(src))return src;
+function resizedSrc(src,w){if(!IMG_RESIZER||!src||/picsum\.photos/.test(src))return src;
 return IMG_RESIZER+encodeURIComponent(src)+'&w='+w+'&output=webp&q=72';}
-const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v);return true}catch(e){return false}}};
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v);return true}catch(e){return false}},
+remove(k){try{localStorage.removeItem(k);}catch(e){}}};
 let proxyPref=Math.min(PROXIES.length-1,Math.max(0,parseInt(store.get(PREF_KEY)||'0',10)||0));
 
 async function fetchText(url,ms){
@@ -503,7 +495,7 @@ return root.innerHTML;}
 
 /* ================= Dados de exemplo (fallback sem rede) ================= */
 const DEMO=[
-{title:'Destaques',big:true,items:[
+{title:'Destaques',items:[
 ['Economia','Banco Central mantém juros e sinaliza cortes no próximo trimestre','há 1 hora'],
 ['Política','Câmara aprova novo marco para o transporte urbano','há 2 horas'],
 ['Clima','Frente fria derruba temperaturas no Sul e no Sudeste','há 3 horas'],
@@ -516,9 +508,9 @@ const DEMO=[
 ['Ciência','Pesquisadores mapeiam nova espécie na Amazônia','há 1 mês'],
 ['Educação','Inscrições para o vestibular terminam nesta sexta','há 4 horas'],
 ['Transporte','Metrô amplia horário de funcionamento aos sábados','há 6 horas']]}
-].map((R,k)=>({title:R.title,big:R.big,items:R.items.map((a,i)=>({id:'demo-'+k+'-'+i,cat:a[0],title:a[1],ago:a[2],link:'',author:'',date:null,html:'',
+].map((R,k)=>({title:R.title,items:R.items.map((a,i)=>({id:'demo-'+k+'-'+i,cat:a[0],title:a[1],ago:a[2],link:'',author:'',date:null,html:'',
 img:'https://picsum.photos/seed/readontv-'+k+'-'+i+'/776/299'}))}));
-const SKELETON=[{title:'Destaques',big:true,items:[0,1,2].map(i=>({id:'sk'+i,sk:true}))},{title:'Últimas notícias',items:[0,1,2].map(i=>({id:'skr'+i,sk:true}))}];
+const SKELETON=[{title:'Destaques',items:[0,1,2].map(i=>({id:'sk'+i,sk:true}))},{title:'Últimas notícias',items:[0,1,2].map(i=>({id:'skr'+i,sk:true}))}];
 
 /* ================= Sons da interface (Web Audio API) ================= */
 /* Três sons, um único conjunto de notas: Lá3 (220 Hz) e Mi4 (330 Hz).
@@ -526,8 +518,8 @@ const SKELETON=[{title:'Destaques',big:true,items:[0,1,2].map(i=>({id:'sk'+i,sk:
    - navegar: Lá3 isolado, um toque breve;
    - entrar: Lá3 → Mi4, subindo;
    - voltar: Mi4 → Lá3, descendo.
-   localStorage 'readontv:sfx' = 'off' desliga os sons. */
-const SFX_ON=store.get('readontv:sfx')!=='off',SFX_VOLUME=.3; // volume geral (0–1)
+   localStorage SFX_KEY = 'off' desliga os sons. */
+const SFX_ON=store.get(SFX_KEY)!=='off',SFX_VOLUME=.3; // volume geral (0–1)
 const NOTE={lo:220,hi:330};
 const sfx=(()=>{
 const AC=window.AudioContext||window.webkitAudioContext;let ctx=null,out=null,lastNav=0;
@@ -553,7 +545,7 @@ nav(repeat){const now=performance.now();if(now-lastNav<50)return;lastNav=now;not
 enter(){note(NOTE.lo,0,.09,.45);note(NOTE.hi,.07,.12,.4);},
 back(){note(NOTE.hi,0,.09,.4);note(NOTE.lo,.07,.12,.45);}};})();
 // só toca quando o foco realmente muda (silêncio nas bordas)
-function cue(moved,e){if(moved)sfx.nav(e.repeat);}
+function cue(moved,e){if(moved)sfx.nav(e.repeat);return moved;}
 // política de autoplay: o contexto só pode iniciar após um gesto do usuário (tecla, clique, toque)
 ['keydown','pointerdown','touchstart'].forEach(ev=>addEventListener(ev,()=>sfx.unlock(),{capture:true,passive:true}));
 
@@ -564,7 +556,7 @@ const cssPx=n=>parseFloat(getComputedStyle(document.documentElement).getProperty
    252 (topo) + 419 (card) + 32 (gap) + 299 (foto) + 33 + 4 (fio) + 12 + 57/2 (meio do texto) ≈ 1080 */
 const GAP=cssPx('--gap'),FIX_TOP=252,BIG={w:776,h:419,th:299};
 /* matérias já abertas: o card mostra o olho e o título fica mais escuro (localStorage) */
-const SEEN_KEY='readontv-on:seen',SEEN_MAX=600;
+const SEEN_MAX=600;
 const seen=(()=>{let list=[];try{const v=JSON.parse(store.get(SEEN_KEY)||'[]');if(Array.isArray(v))list=v.filter(x=>typeof x==='string');}catch(e){}return new Set(list);})();
 const isSeen=it=>!!(it&&it.id&&seen.has(String(it.id)));
 function markSeen(it){if(!it||it.sk||!it.id)return;const id=String(it.id);
@@ -575,6 +567,7 @@ cards.forEach(row=>row.forEach(c=>{if(c._it&&String(c._it.id)===id){c.classList.
 const ICO_CLOCK=ico('clock');
 const ICO_EYE=ico('eye');
 const $=id=>document.getElementById(id);
+const focusEl=el=>{if(el)try{el.focus({preventScroll:true});}catch(e){}};
 const fsBtn=$('fsBtn'),railsEl=$('rails'),stage=$('stage'),toast=$('toast'),toastMsg=$('toastMsg'),titleEl=$('railTitle'),liveIcon=$('liveIcon');
 const post=$('post'),pHero=$('pHero'),pHead=$('pHead'),pAgo=$('pAgo'),pBy=$('pBy'),pSrc=$('pSrc'),pTimeTxt=$('pTimeTxt'),pScroll=$('pScroll'),pBody=$('pBody'),pProg=$('pProg');
 const navBtns=[...post.querySelectorAll('.p-btn')];const NB={back:0,next:1,listen:2};let pf=NB.next,words=0;
@@ -588,13 +581,13 @@ let inSide=false,sf=SIDE_HOME;
 let RAILS=[],tops=[],tracks=[],cards=[],idx=[],r=0,inHeader=false,inWx=false,prev=null,postOpen=false,cur=null,pending=null,source='skeleton';
 const cleanCache=new Map();
 
-function rel(ms){const s=Math.max(0,(Date.now()-ms)/1000);
+function relTime(ms){const s=Math.max(0,(Date.now()-ms)/1000);
 if(s<60)return 'agora';const m=Math.floor(s/60);if(m<60)return 'há '+m+(m===1?' minuto':' minutos');
 const h=Math.floor(m/60);if(h<24)return 'há '+h+(h===1?' hora':' horas');
 const d=Math.floor(h/24);if(d<7)return 'há '+d+(d===1?' dia':' dias');
 const w=Math.floor(d/7);if(w<5)return 'há '+w+(w===1?' semana':' semanas');
 return new Date(ms).toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric',timeZone:'America/Sao_Paulo'});}
-const ago=it=>it.date?rel(it.date):(it.ago||'');
+const ago=it=>it.date?relTime(it.date):(it.ago||'');
 function dropImg(box){box.querySelectorAll('img').forEach(i=>{i._dead=true;i.remove();i.removeAttribute('src');});}
 /* ícone da editoria para quando não há foto (busca por palavra-chave, sem acento; padrão: jornal) */
 const CAT_ICO=[[/alert|defesa civil|tempestade/,'triangle-alert'],[/clima|tempo|meteorolog/,'cloud-sun-rain'],[/politic|eleic|governo/,'landmark'],
@@ -608,15 +601,15 @@ for(const [re,n] of CAT_ICO)if(re.test(c))return n;return 'newspaper';}
 function setPh(box,cat){let el=box.querySelector('.ph-ico');
 if(!el){box.insertAdjacentHTML('beforeend',ico('newspaper','ph-ico'));el=box.lastElementChild;}
 setIco(el,catIcon(cat));}
-function setImg(box,src,cat,w,h){
+function setImg(box,src,cat,w){
 box.dataset.cat=cat||'';box.classList.remove('noimg');dropImg(box);setPh(box,cat);
 if(!src){box.classList.add('noimg');return;}
-const im=new Image(),small=sized(src,w);let tried=small===src;im.alt='';im.decoding='async';
+const im=new Image(),small=resizedSrc(src,w);let tried=small===src;im.alt='';im.decoding='async';
 im.addEventListener('error',()=>{if(im._dead)return;if(!tried){tried=true;im.src=src;return;}im.remove();box.classList.add('noimg');});
 im.src=small;box.prepend(im);}
 /* só os trilhos perto do foco mantêm imagens decodificadas */
 function syncImgs(){cards.forEach((row,k)=>{const want=k>=r-1&&k<=r+2;row.forEach(c=>{const th=c._th;if(!th||!th._src)return;
-if(want&&!th._on){th._on=true;setImg(th,th._src,th._cat,th._w,th._h);}
+if(want&&!th._on){th._on=true;setImg(th,th._src,th._cat,th._w);}
 else if(!want&&th._on){th._on=false;dropImg(th);}});});}
 
 function makeCard(R,it,k,i){
@@ -626,7 +619,7 @@ const b=document.createElement('div');b.className='body';
 if(it.sk){c.setAttribute('aria-hidden','true');b.innerHTML='<span class="skl c"></span><span class="skl a"></span><span class="skl b"></span><span class="skl d"></span>';}
 else{c.setAttribute('role','link');
 th.dataset.cat=it.cat;c._th=th;
-if(it.img){th._src=it.img;th._cat=it.cat;th._w=R.w;th._h=R.th;}else th.classList.add('noimg');
+if(it.img){th._src=it.img;th._cat=it.cat;th._w=R.w;}else th.classList.add('noimg');
 setPh(th,it.cat);
 if(isSeen(it))c.classList.add('seen');
 const cat=document.createElement('span');cat.className='cat';cat.textContent=it.cat;
@@ -639,7 +632,7 @@ const mark=document.createElement('div');mark.className='c-mark';mark.innerHTML=
 b.append(meta);c.appendChild(t);
 c._s=st;setAge(c,ago(it));}
 c.append(th,b);
-c.addEventListener('click',()=>{if(postOpen)return;if(!inHeader&&r===k&&idx[k]===i)open();else{inHeader=false;inWx=false;r=k;idx[k]=i;render();sfx.nav();}});
+c.addEventListener('click',()=>{if(postOpen)return;if(!inHeader&&r===k&&idx[k]===i)openFocused();else{inHeader=false;inWx=false;r=k;idx[k]=i;render();sfx.nav();}});
 return c;}
 
 /* título do card grande: no máximo 2 linhas; corta na palavra e põe o "…" dentro do span (assim ele recebe o fundo da placa) */
@@ -686,28 +679,28 @@ railsEl.style.transform='translate('+(inSide?SIDE_PUSH:0)+'px,'+(FIX_TOP-tops[r]
 // cada trilho desliza até o card focado (posição calculada pela largura do card + --gap)
 tracks.forEach((t,k)=>{t.style.transform='translateX('+(-idx[k]*(RAILS[k].w+GAP))+'px)';
 cards[k].forEach((c,i)=>c.classList.toggle('peek',i<idx[k]));});
-if(inSide||inHeader||inWx){if(prev){prev.classList.remove('on');prev=null;}try{(inSide?sideBtns[sf]:inWx?wxBar:hdItems[hf]).focus({preventScroll:true});}catch(e){}}
+if(inSide||inHeader||inWx){if(prev){prev.classList.remove('on');prev=null;}focusEl(inSide?sideBtns[sf]:inWx?wxBar:hdItems[hf]);}
 else{const c=cards[r][idx[r]];if(prev&&prev!==c)prev.classList.remove('on');c.classList.add('on');prev=c;
-if(!postOpen){try{c.focus({preventScroll:true});}catch(e){}}}
+if(!postOpen)focusEl(c);}
 syncImgs();
 stage.scrollLeft=0;stage.scrollTop=0;}
 
+const soon=label=>showToast(label+': disponível em breve');
 function showToast(msg,ms){if(INTRO.hold(msg,ms))return;toastMsg.textContent=msg;toast.classList.add('show');clearTimeout(showToast.t);showToast.t=setTimeout(()=>toast.classList.remove('show'),ms||1800);}
 /* hora curta nos cards ("há 1 hora" → "há 1h", "há 39 minutos" → "há 39min") */
 const SHORT={minuto:'min',hora:'h',dia:'d',semana:'sem'};
 const shortAgo=a=>{const m=/^há (\d+) (minuto|hora|dia|semana)s?$/.exec(a||'');return m?'há '+m[1]+SHORT[m[2]]:a;};
 function setAge(c,a){c._s.textContent=shortAgo(a);c.setAttribute('aria-label',c._it.cat+'. '+c._it.title+'. '+a+(isSeen(c._it)?'. Lida':''));}
-function updateAges(){cards.forEach(row=>row.forEach(c=>{if(c._s&&c._it.date)setAge(c,rel(c._it.date));}));
+function updateAges(){cards.forEach(row=>row.forEach(c=>{if(c._s&&c._it.date)setAge(c,relTime(c._it.date));}));
 if(postOpen&&cur)renderMeta(RAILS[cur.k].items[cur.i]);}
 
 /* ================= Tela da matéria ================= */
-const cap=t=>t?t.charAt(0).toUpperCase()+t.slice(1):'';
-function renderMeta(it){pAgo.textContent=cap(ago(it));
+const capitalize=t=>t?t.charAt(0).toUpperCase()+t.slice(1):'';
+function renderMeta(it){pAgo.textContent=capitalize(ago(it));
 pBy.textContent=it.author?'Por '+it.author:'';
 pSrc.textContent=it.src?'Com informações de '+it.src:'Fonte: Agência Brasil';pSrc.style.display=it.link?'block':'none';}
-const focusEl=el=>{if(el)try{el.focus({preventScroll:true});}catch(e){}};
-const smooth=()=>reduced.matches?'auto':'smooth';
 const reduced=matchMedia('(prefers-reduced-motion: reduce)');
+const smooth=()=>reduced.matches?'auto':'smooth';
 /* fundo inerte enquanto a matéria está aberta */
 const bgEls=[document.querySelector('.top'),railsEl,sideEl];
 function setBgInert(on){bgEls.forEach(el=>{if(on){el.setAttribute('inert','');el.setAttribute('aria-hidden','true');}else{el.removeAttribute('inert');el.removeAttribute('aria-hidden');}});}
@@ -716,10 +709,10 @@ let blocks=[],rb=-1;
 function collectBlocks(){blocks=[...pBody.querySelectorAll(':scope>p,:scope>h2,:scope>h3,:scope>h4,:scope>ul>li,:scope>ol>li,:scope>blockquote,:scope>figure')];
 const foot=pScroll.querySelector('.p-foot');if(foot.textContent.trim())blocks.push(foot);
 blocks.forEach(b=>{b.tabIndex=-1;});if(rb>=blocks.length)rb=blocks.length-1;}
-function open(){const it=RAILS[r].items[idx[r]];if(!it||it.sk)return;openPost(r,idx[r]);}
+function openFocused(){const it=RAILS[r].items[idx[r]];if(!it||it.sk)return;openPost(r,idx[r]);}
 function openPost(k,i){
 const it=RAILS[k].items[i],wasOpen=postOpen;cur={k,i};postOpen=true;inSide=false;sfx.enter();markSeen(it);
-setImg(pHero,it.img,it.cat,694,470);
+setImg(pHero,it.img,it.cat,694);
 pHead.textContent='';const hl=document.createElement('span');hl.className='hl';const pc=document.createElement('span');pc.className='pc';pc.textContent=it.cat;hl.append(pc,document.createTextNode(it.title));pHead.append(hl);
 renderMeta(it);
 let html='';
@@ -727,7 +720,7 @@ if(it.html){if(!cleanCache.has(it.id))cleanCache.set(it.id,cleanHtml(it.html));h
 // template: as imagens não começam a baixar no tamanho original antes de trocarmos o src
 const tpl=document.createElement('template');
 tpl.innerHTML=html||'<p><strong>Notícia de exemplo.</strong> O conteúdo completo aparece quando o feed da Agência Brasil está disponível.</p>';
-tpl.content.querySelectorAll('img').forEach(im=>{const orig=im.getAttribute('src'),small=sized(orig,984);let tried=small===orig;
+tpl.content.querySelectorAll('img').forEach(im=>{const orig=im.getAttribute('src'),small=resizedSrc(orig,984);let tried=small===orig;
 im.loading='lazy';im.decoding='async';
 im.addEventListener('error',()=>{if(!tried&&orig){tried=true;im.src=orig;return;}const f=im.closest('figure');(f||im).remove();collectBlocks();updateProg();});
 im.addEventListener('load',updateProg);im.setAttribute('src',small);});
@@ -754,8 +747,8 @@ function nextPost(){if(!cur)return;const n=cur.i+1;
 if(n>=RAILS[cur.k].items.length){showToast('Fim de '+RAILS[cur.k].title);return;}
 openPost(cur.k,n);}
 function setNav(focus){navBtns.forEach((b,i)=>b.classList.toggle('on',i===pf));if(postOpen&&focus!==false)focusEl(navBtns[pf]);}
-function act(i){if(i===NB.back)closePost();else if(i===NB.listen){sfx.enter();showToast('Ouvir notícia: disponível em breve');}else nextPost();}
-navBtns.forEach((b,i)=>{b.addEventListener('click',()=>{pf=i;setNav();act(i);});b.addEventListener('mouseenter',()=>{pf=i;setNav();});});
+function postAct(i){if(i===NB.back)closePost();else if(i===NB.listen){sfx.enter();soon('Ouvir notícia');}else nextPost();}
+navBtns.forEach((b,i)=>{b.addEventListener('click',()=>{pf=i;setNav();postAct(i);});b.addEventListener('mouseenter',()=>{pf=i;setNav();});});
 /* ↓/↑: avança bloco a bloco; bloco maior que a tela rola por página antes de passar ao próximo */
 function readTo(i){rb=i;const b=i<0?null:blocks[i];
 pScroll.scrollTo({top:b?Math.max(0,b.offsetTop-16):0,behavior:smooth()});focusEl(b||pScroll);}
@@ -793,69 +786,70 @@ try{if(window.webOS&&typeof webOS.platformBack==='function'){webOS.platformBack(
 try{window.close();}catch(e){}}
 // Voltar na raiz pede confirmação para evitar saída acidental
 let exitArm=0;
-function back(){sfx.back();if(inSide){inSide=false;render();return;}if(inHeader||inWx){inHeader=false;inWx=false;r=0;}else if(idx[r]>0)idx[r]=0;else if(r>0)r=0;
+function goBack(){sfx.back();if(inSide){inSide=false;render();return;}if(inHeader||inWx){inHeader=false;inWx=false;r=0;}else if(idx[r]>0)idx[r]=0;else if(r>0)r=0;
 else{const now=Date.now();if(now-exitArm<2500){exitApp();return;}exitArm=now;showToast('Pressione Voltar novamente para sair',2500);return;}
 exitArm=0;render();}
 // botões da matéria: pula os desabilitados (aria-disabled)
-function moveNav(d){let i=pf+d;while(navBtns[i]&&(navBtns[i].hidden||navBtns[i].getAttribute('aria-disabled')==='true'))i+=d;if(navBtns[i]){pf=i;setNav();return true;}return false;}
+function moveNav(d){let i=pf+d;while(navBtns[i]&&navBtns[i].getAttribute('aria-disabled')==='true')i+=d;if(navBtns[i]){pf=i;setNav();return true;}return false;}
 function onKey(e){
 if(INTRO.key(e))return;
-const k=keyOf(e),code=e.keyCode;
+const k=keyOf(e),code=e.keyCode,ok=k==='Enter'||code===13,bk=isBack(k,code);
 // segurar OK/Voltar não pode disparar ações em cascata (abrir → próxima → próxima…)
-if(e.repeat&&(k==='Enter'||code===13||isBack(k,code))){e.preventDefault();return;}
-if(rmIsOpen){
-if(isBack(k,code))rmClose();
-else if(k==='ArrowLeft'||k==='ArrowUp')cue(rmMove(0),e,k);
-else if(k==='ArrowRight'||k==='ArrowDown')cue(rmMove(1),e,k);
-else if(k==='Enter'||code===13)rmAct(rf);
-else return;
-e.preventDefault();return;}
-if(postOpen){
-if(isBack(k,code))closePost();
-else if(k==='ArrowDown'){cue(readStep(1),e,k);}
-else if(k==='ArrowUp'){cue(readStep(-1),e,k);}
-else if(k==='PageDown'){cue(pagePost(1),e,k);}
-else if(k==='PageUp'){cue(pagePost(-1),e,k);}
-else if(k==='ArrowRight'){cue(moveNav(1),e,k);}
-else if(k==='ArrowLeft'){cue(moveNav(-1),e,k);}
-else if(k==='Enter'||code===13)act(pf);
-else return;
-e.preventDefault();return;}
-let used=true;const sig0=focusSig();
+if(e.repeat&&(ok||bk)){e.preventDefault();return;}
+// Voltar no menu, na previsão ou no cabeçalho é tratado por goBack (via railsKey)
+const handler=rmIsOpen?rmKey:postOpen?postKey:bk?railsKey:inSide?sideKey:inWx?wxKey:inHeader?headerKey:railsKey;
+if(handler({k,ok,bk,e}))e.preventDefault();}
+/* cada tela devolve true quando usou a tecla */
+const isArrow=k=>k.startsWith('Arrow');
+function rmKey({k,ok,bk,e}){
+if(bk)rmClose();
+else if(k==='ArrowLeft'||k==='ArrowUp')cue(rmMove(0),e);
+else if(k==='ArrowRight'||k==='ArrowDown')cue(rmMove(1),e);
+else if(ok)rmAct(rf);
+else return false;
+return true;}
+const POST_KEYS={ArrowDown:()=>readStep(1),ArrowUp:()=>readStep(-1),PageDown:()=>pagePost(1),PageUp:()=>pagePost(-1),ArrowRight:()=>moveNav(1),ArrowLeft:()=>moveNav(-1)};
+function postKey({k,ok,bk,e}){
+if(bk)closePost();
+else if(POST_KEYS[k])cue(POST_KEYS[k](),e);
+else if(ok)postAct(pf);
+else return false;
+return true;}
+function sideKey({k,ok,e}){
+if(ok){sideAct(sf);return true;}
+if(!isArrow(k))return false;
+const before=focusSig();
+if(k==='ArrowDown')sf=Math.min(sf+1,sideBtns.length-1);
+else if(k==='ArrowUp')sf=Math.max(sf-1,0);
+else if(k==='ArrowRight')inSide=false;
+render();cue(focusSig()!==before,e);return true;}
 /* faixa da previsão do tempo: entre o cabeçalho (acima) e os trilhos (abaixo) */
-/* barra lateral em foco */
-if(inSide&&!isBack(k,code)){
-if(k==='ArrowDown'){if(sf<sideBtns.length-1)sf++;}
-else if(k==='ArrowUp'){if(sf>0)sf--;}
-else if(k==='ArrowRight'){inSide=false;}
-else if(k==='Enter'||code===13){sideAct(sf);return;}
-else if(!k.startsWith('Arrow'))return;
-render();if(k.startsWith('Arrow'))cue(focusSig()!==sig0,e,k);
-e.preventDefault();return;}
-if(inWx&&!isBack(k,code)){
+function wxKey({k,ok,e}){
+if(ok){wxAct();return true;}
+if(!isArrow(k))return false;
+const before=focusSig();
 if(k==='ArrowDown'){inWx=false;r=0;render();}
 else if(k==='ArrowUp'){inWx=false;inHeader=true;hf=HD_HOME;render();}
-else if(k==='Enter'||code===13)wxAct();
-else if(!k.startsWith('Arrow'))return;
-if(k.startsWith('Arrow'))cue(focusSig()!==sig0,e,k);
-e.preventDefault();return;}
-if(inHeader&&!isBack(k,code)){
-if(k==='ArrowDown'){inHeader=false;inWx=true;render();}
-else if(k==='ArrowRight'){if(hf<hdItems.length-1){hf++;render();}}
-else if(k==='ArrowLeft'){if(hf>0){hf--;render();}}
-else if(k==='Enter'||code===13)hdAct(hf);
-else if(!k.startsWith('Arrow'))return;
-if(k.startsWith('Arrow'))cue(focusSig()!==sig0,e,k);
-e.preventDefault();return;}
-if(!RAILS.length)return;
-if(k==='ArrowRight'){if(idx[r]<RAILS[r].items.length-1)idx[r]++;}
+cue(focusSig()!==before,e);return true;}
+function headerKey({k,ok,e}){
+if(ok){hdAct(hf);return true;}
+if(!isArrow(k))return false;
+const before=focusSig();
+if(k==='ArrowDown'){inHeader=false;inWx=true;}
+else if(k==='ArrowRight')hf=Math.min(hf+1,hdItems.length-1);
+else if(k==='ArrowLeft')hf=Math.max(hf-1,0);
+render();cue(focusSig()!==before,e);return true;}
+function railsKey({k,ok,bk,e}){
+if(!RAILS.length)return false;
+if(ok){openFocused();return true;}
+if(bk){goBack();return true;}
+const before=focusSig();
+if(k==='ArrowRight')idx[r]=Math.min(idx[r]+1,RAILS[r].items.length-1);
 else if(k==='ArrowLeft'){if(idx[r]>0)idx[r]--;else{inSide=true;sf=SIDE_HOME;}}
-else if(k==='ArrowDown'){if(r<RAILS.length-1)r++;}
+else if(k==='ArrowDown')r=Math.min(r+1,RAILS.length-1);
 else if(k==='ArrowUp'){if(r>0)r--;else inWx=true;}
-else if(k==='Enter'||code===13){open();used='open';}
-else if(isBack(k,code)){back();used='back';}
-else used=false;
-if(used){e.preventDefault();if(used===true){render();const moved=focusSig()!==sig0;cue(moved,e,k);if(!moved)bump(k);}}}
+else return false;
+render();if(!cue(focusSig()!==before,e))bump(k);return true;}
 // feedback de D-pad na borda: o card focado dá um toque curto na direção pressionada e volta
 const BUMP={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]};
 function bump(k){const d=BUMP[k],c=prev;if(!d||!c||reduced.matches||!c.animate)return;
@@ -864,6 +858,8 @@ c._bump=c.animate([{translate:'0 0'},{translate:o,offset:.35},{translate:'0 0'}]
 // posição do foco: o som de navegação só toca quando o foco realmente muda
 function focusSig(){return (inSide?'s'+sf:inWx?'w':inHeader?'h'+hf:'r'+r+':'+idx[r]);}
 document.addEventListener('keydown',onKey);
+/* tecla sintética (gamepad, celular): passa pelo mesmo onKey do controle remoto */
+function sendKey(key,keyCode,repeat){onKey({key,keyCode,repeat,preventDefault(){}});}
 
 /* ================= Gamepad API (Xbox, PlayStation, genéricos) ================= */
 // Usa o mesmo onKey do controle remoto: o controle vira setas, OK e Voltar.
@@ -872,7 +868,7 @@ const GP_BTN={0:'Enter',1:'Escape',8:'Escape',4:'PageUp',5:'PageDown',6:'PageUp'
 const GP_REPEAT=['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','PageUp','PageDown'];
 const GP_DEAD=.5,GP_DELAY=400,GP_RATE=130; // zona morta do analógico; atraso e ritmo da repetição ao segurar
 const gpHeld={};let gpRaf=0;
-function gpSend(key,repeat){onKey({key,keyCode:0,repeat,preventDefault(){}});}
+
 function gpKeys(gp){const on=new Set(),std=gp.mapping==='standard';
 gp.buttons.forEach((b,i)=>{if(!b||!(b.pressed||b.value>.5))return;
 // layout desconhecido: só A/B são previsíveis; a navegação vem do analógico
@@ -886,60 +882,47 @@ if(!pads.length){for(const k in gpHeld)delete gpHeld[k];return;} // sem controle
 const on=new Set();pads.forEach(gp=>gpKeys(gp).forEach(k=>on.add(k)));
 for(const k in gpHeld)if(!on.has(k))delete gpHeld[k];
 on.forEach(k=>{const h=gpHeld[k];
-if(!h){gpHeld[k]={next:t+GP_DELAY};gpSend(k,false);}
-else if(GP_REPEAT.indexOf(k)>=0&&t>=h.next){h.next=t+GP_RATE;gpSend(k,true);}});
+if(!h){gpHeld[k]={next:t+GP_DELAY};sendKey(k,0,false);}
+else if(GP_REPEAT.indexOf(k)>=0&&t>=h.next){h.next=t+GP_RATE;sendKey(k,0,true);}});
 gpRaf=requestAnimationFrame(gpLoop);}
 function gpStart(){if(!gpRaf)gpRaf=requestAnimationFrame(gpLoop);}
 addEventListener('gamepadconnected',()=>{gpStart();showToast('Controle conectado: direcional para navegar, A abre, B volta',3000);});
 addEventListener('gamepaddisconnected',()=>showToast('Controle desconectado',2000));
 gpStart(); // controle que já estava conectado antes da página abrir
 
-function fit(){const s=Math.min(innerWidth/1920,innerHeight/1080);stage.style.transform='translate(-50%,-50%) scale('+s+')';}
-addEventListener('resize',fit);fit();
+function fitStage(){const s=Math.min(innerWidth/1920,innerHeight/1080);stage.style.transform='translate(-50%,-50%) scale('+s+')';}
+addEventListener('resize',fitStage);fitStage();
 /* ===== Cabeçalho: data, cidade, clima e ações ===== */
 const TZ='America/Sao_Paulo',CITY={name:'Novo Hamburgo/RS',lat:-29.68,lon:-51.13};
-function clock(){$('hdDate').textContent=new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',timeZone:TZ});}
-clock();setInterval(clock,30000);
+function updateDate(){$('hdDate').textContent=new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',timeZone:TZ});}
+updateDate();setInterval(updateDate,30000);
 $('hdCity').textContent=CITY.name;
 const WX={sun:'sun',partly:'cloud-sun',cloud:'cloud',fog:'cloud-fog',rain:'cloud-rain',snow:'cloud-snow',storm:'cloud-lightning'};
 const WX_LABEL={sun:'Céu limpo',partly:'Parcialmente nublado',cloud:'Nublado',fog:'Neblina',rain:'Chuva',snow:'Neve',storm:'Tempestade'};
 function wxKind(c){return c===0?'sun':c<=2?'partly':c===3?'cloud':c<=48?'fog':(c>=71&&c<=77)||c===85||c===86?'snow':c>=95?'storm':'rain';}
 function setWx(t,code){const k=code==null?'cloud':wxKind(code);setIco($('wxIcon'),WX[k]);setTimeout(wxBarSync); // depois do script: a faixa da previsão é criada mais abaixo
 $('wxTemp').textContent=t==null?'--°':Math.round(t)+'°';$('hdWx').title=t==null?'Clima indisponível':WX_LABEL[k]+' em '+CITY.name;}
-const WX_KEY='readontv:wx:v1',WX_MS=30*60*1000;
+const WX_MS=30*60*1000;
 async function loadWx(){
 try{const c=JSON.parse(store.get(WX_KEY)||'null');if(c&&Date.now()-c.t<WX_MS){setWx(c.temp,c.code);return;}if(c)setWx(c.temp,c.code);}catch(e){}
 try{const j=JSON.parse(await fetchText('https://api.open-meteo.com/v1/forecast?latitude='+CITY.lat+'&longitude='+CITY.lon+'&current=temperature_2m,weather_code&timezone='+encodeURIComponent(TZ),8000));
-const cur=j.current;setWx(cur.temperature_2m,cur.weather_code);store.set(WX_KEY,JSON.stringify({t:Date.now(),temp:cur.temperature_2m,code:cur.weather_code}));}
+const now=j.current;setWx(now.temperature_2m,now.weather_code);store.set(WX_KEY,JSON.stringify({t:Date.now(),temp:now.temperature_2m,code:now.weather_code}));}
 catch(e){if(!store.get(WX_KEY))setWx(null,null);}}
 setWx(null,null);loadWx();setInterval(loadWx,WX_MS);
 function fsSync(){const on=!!document.fullscreenElement;setIco(fsBtn.querySelector('svg'),on?'minimize-2':'maximize-2');const l=on?'Sair da tela cheia':'Tela cheia';fsBtn.setAttribute('aria-label',l);fsBtn.title=l;}
-// ações do cabeçalho (busca, temas e perfil ainda sem tela própria)
-function hdAct(i){const b=hdItems[i],a=b.dataset.hd;sfx.enter();
-if(a==='home'){inHeader=false;r=0;idx[0]=0;render();}
-else if(a==='fs')fsToggle();
-else if(a==='search')showToast('Busca: disponível em breve');
-else if(a==='add')showToast('Adicionar tema: disponível em breve');
-else if(a==='user')showToast('Perfil: disponível em breve');
-else if(a==='remote')rmOpen();
-else if(a==='clear')clearData();
-else if(a==='cat')railGo(b.textContent.trim());
-else showToast(b.textContent.trim()+': disponível em breve');}
+// ações do cabeçalho (busca e temas ainda sem tela própria)
+const HD_ACTIONS={search:()=>soon('Busca'),add:()=>soon('Adicionar tema'),cat:b=>railGo(b.textContent.trim())};
+function hdAct(i){const b=hdItems[i];sfx.enter();HD_ACTIONS[b.dataset.hd](b);}
 /* categoria do cabeçalho: leva ao trilho de mesmo nome (as editorias da Agência Brasil carregam logo depois dos destaques) */
 function railGo(title){const k=RAILS.findIndex(R=>R.title===title);
-if(k<0){const known=EDITORIAS.some(e=>e[1]===title)||title===NH_TITLE;showToast(title+(known?': carregando…':': disponível em breve'));return;}
+if(k<0){const known=EDITORIAS.some(e=>e[1]===title)||title===NH_TITLE;if(known)showToast(title+': carregando…');else soon(title);return;}
 inHeader=false;inWx=false;r=k;idx[k]=0;render();}
 hdItems.forEach((b,i)=>b.addEventListener('click',e=>{e.stopPropagation();if(postOpen)return;inWx=false;inHeader=true;hf=i;render();hdAct(i);}));
 /* ===== Ações da barra lateral ===== */
-function sideAct(i){const a=sideBtns[i].dataset.side;sfx.enter();
-if(a==='home'){inSide=false;inHeader=false;inWx=false;r=0;idx[0]=0;render();}
-else if(a==='fs')fsToggle();
-else if(a==='clear')clearData();
-else if(a==='remote')rmOpen();
-else if(a==='search')showToast('Busca: disponível em breve');
-else if(a==='history')showToast('Histórico: disponível em breve');
-else if(a==='list')showToast('Minha lista: disponível em breve');
-else if(a==='user')showToast('Perfil: disponível em breve');}
+function goHome(){inSide=false;inHeader=false;inWx=false;r=0;idx[0]=0;render();}
+const SIDE_ACTIONS={home:goHome,fs:fsToggle,clear:clearData,remote:rmOpen,search:()=>soon('Busca'),
+history:()=>soon('Histórico'),list:()=>soon('Minha lista'),user:()=>soon('Perfil')};
+function sideAct(i){sfx.enter();SIDE_ACTIONS[sideBtns[i].dataset.side]();}
 sideBtns.forEach((b,i)=>{b.addEventListener('click',e=>{e.stopPropagation();if(postOpen||rmIsOpen)return;inSide=true;sf=i;render();sideAct(i);});
 b.addEventListener('mouseenter',()=>{if(postOpen||rmIsOpen||!inSide)return;sf=i;render();});});
 // mouse: entrar na área lateral abre o menu; sair fecha
@@ -953,22 +936,22 @@ setIco($('wbIcon'),$('wxIcon').getAttribute('data-ico'));
 wxBar.setAttribute('aria-label','Veja a previsão do tempo completa. '+$('hdCity').textContent+', '+$('wxTemp').textContent);}
 // a faixa começa logo depois do separador do logo (largura do logo depende da fonte carregada)
 function wxBarPlace(){const sep=document.querySelector('.hd-info>.hd-sep');if(sep)wxBar.style.setProperty('--wb-left',(sep.offsetLeft+sep.offsetWidth+7)+'px');}
-function wxAct(){sfx.enter();showToast('Previsão do tempo completa: disponível em breve');}
+function wxAct(){sfx.enter();soon('Previsão do tempo completa');}
 wxBarSync();wxBarPlace();if(document.fonts)document.fonts.ready.then(wxBarPlace);
 document.querySelector('.hd-meta').addEventListener('click',e=>{e.stopPropagation();if(postOpen)return;inHeader=false;inWx=true;render();wxAct();});
 wxBar.addEventListener('click',e=>{e.stopPropagation();if(postOpen)return;wxAct();});
-/* ===== Limpar dados salvos (ícone de lixeira no cabeçalho) =====
+/* ===== Limpar dados salvos (item "Excluir localstorage" do menu lateral) =====
    Pede confirmação com um segundo OK em até 3 s (sem diálogos do navegador, que travam o controle remoto da TV).
    Apaga só o que é deste app: o github.io é uma origem compartilhada por outros apps (ex.: o Read on TV clássico),
    então localStorage.clear() apagaria os dados deles também. Depois recarrega a página do zero. */
-const APP_KEYS=()=>[CACHE_KEY,PREF_KEY,WX_KEY,SEEN_KEY,RM_KEY_CODE,RM_KEY_PAIRED,'readontv:sfx','readontv:intro'];
+const APP_KEYS=[CACHE_KEY,PREF_KEY,WX_KEY,SFX_KEY,INTRO_KEY,SEEN_KEY,RM_KEY_CODE,RM_KEY_PAIRED],APP_PREFIX='readontv-on:';
 let clearArm=0;
 async function clearData(){const now=Date.now();
 if(now-clearArm>3000){clearArm=now;showToast('Pressione OK de novo para apagar notícias salvas, lidas e preferências',3000);return;}
 clearArm=0;
-// localStorage: chaves do app (e as do prefixo próprio readontv-on:)
-try{const ks=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.indexOf('readontv-on:')===0)ks.push(k);}
-APP_KEYS().concat(ks).forEach(k=>{try{localStorage.removeItem(k);}catch(e){}});}catch(e){}
+// localStorage: chaves do app e as do prefixo próprio
+const keys=APP_KEYS.slice();try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith(APP_PREFIX))keys.push(k);}}catch(e){}
+keys.forEach(store.remove);
 try{sessionStorage.clear();}catch(e){}
 // Cache Storage: só caches com nome do app (o app não usa service worker; os de outros apps da origem ficam)
 try{if(window.caches){const names=await caches.keys();await Promise.all(names.filter(n=>/readontv/i.test(n)).map(n=>caches.delete(n)));}}catch(e){}
@@ -976,12 +959,12 @@ try{if(window.caches){const names=await caches.keys();await Promise.all(names.fi
 try{const dir=location.pathname.replace(/[^\/]*$/,'');document.cookie.split(';').forEach(c=>{const n=c.split('=')[0].trim();if(!n)return;
 [dir,dir.replace(/\/$/,'')].forEach(path=>{document.cookie=n+'=;expires=Thu, 01 Jan 1970 00:00:00 GMT;max-age=0;path='+(path||'/');});});}catch(e){}
 // o controle do celular pareado deixa de valer: o código salvo foi apagado
-try{rm.clients.forEach(c=>{try{c.end(true);}catch(e){}});}catch(e){}
+rm.clients.forEach(c=>{try{c.end(true);}catch(e){}});
 showToast('Dados apagados. Recarregando…',1500);
 // recarrega ignorando o que estiver em memória (o cache HTTP do navegador não pode ser apagado por JavaScript)
 setTimeout(()=>location.reload(),1200);}
 async function fsToggle(){try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen({navigationUI:'hide'});}catch(err){showToast('Tela cheia indisponível neste navegador');}render();}
-document.addEventListener('fullscreenchange',()=>{fsSync();fit();render();});
+document.addEventListener('fullscreenchange',()=>{fsSync();fitStage();render();});
 
 /* ================= Controle pelo celular (MQTT) ================= */
 /* Mesma estratégia do Read on TV clássico: a TV assina um canal num broker MQTT público (código de 5 letras guardado
@@ -991,14 +974,16 @@ document.addEventListener('fullscreenchange',()=>{fsSync();fit();render();});
    A TV escuta em TODOS os brokers ao mesmo tempo: o celular usa qualquer um e troca sozinho se um não responder.
    Prefixo e chaves próprios deste app: o Read on TV clássico mora na mesma origem (github.io) e não pode se misturar.
    As bibliotecas só carregam quando a tela de pareamento abre ou quando já houve um celular pareado. */
-var RM_BROKERS=['wss://broker.emqx.io:8084/mqtt','wss://broker.hivemq.com:8884/mqtt'];
-var RM_PREFIX='readontv/on/',RM_KEY_CODE='readontv-on:remote-code',RM_KEY_PAIRED='readontv-on:remote-paired';
-var RM_LIBS=['https://cdn.jsdelivr.net/npm/mqtt@5.16.0/dist/mqtt.min.js','https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js'];
-var RM_KEYS={up:['ArrowUp',38],down:['ArrowDown',40],left:['ArrowLeft',37],right:['ArrowRight',39],ok:['Enter',13],back:['Escape',27],pgup:['PageUp',33],pgdn:['PageDown',34]};
-var rmEl=$('rm'),rmBtn=$('rmBtn'),rmBtns=[$('rmBack'),$('rmNew')],rmIsOpen=false,rf=0,rmToasted=false,rmLast={k:'',t:0};
-var rmSeen={n:null,t:0},rm={code:null,bi:0,clients:[],live:[],starting:false,paired:false};
-function rmNewCode(avoid){var A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',c;
-do{c='';for(var i=0;i<5;i++)c+=A[Math.floor(Math.random()*A.length)];}while(c===avoid);store.set(RM_KEY_CODE,c);return c;}
+const RM_LIBS=['https://cdn.jsdelivr.net/npm/mqtt@5.16.0/dist/mqtt.min.js','https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js'];
+const RM_KEYS={up:['ArrowUp',38],down:['ArrowDown',40],left:['ArrowLeft',37],right:['ArrowRight',39],ok:['Enter',13],back:['Escape',27],pgup:['PageUp',33],pgdn:['PageDown',34]};
+const RM_REPEAT=/^(up|down|left|right|pgup|pgdn)$/;
+const rmEl=$('rm'),rmBtn=$('rmBtn'),rmBtns=[$('rmBack'),$('rmNew')];
+const rm={code:null,bi:0,clients:[],live:[],starting:false,paired:false};
+let rmIsOpen=false,rf=0,rmToasted=false,rmLast={k:'',t:0},rmSeen={n:null,t:0};
+const rmTopic=(code,kind)=>ROTV.TOPIC_PREFIX+code+'/'+kind;
+const rmPublish=(c,code,kind,msg)=>c.publish(rmTopic(code,kind),JSON.stringify(msg),{qos:0});
+function rmNewCode(avoid){const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let c;
+do{c='';for(let i=0;i<5;i++)c+=A[Math.floor(Math.random()*A.length)];}while(c===avoid);store.set(RM_KEY_CODE,c);return c;}
 rm.code=/^[A-Z0-9]{5}$/.test(store.get(RM_KEY_CODE)||'')?store.get(RM_KEY_CODE):rmNewCode();
 rm.paired=store.get(RM_KEY_PAIRED)==='1';
 function rmPhoneUrl(){return location.href.split('#')[0].split('?')[0].replace(/[^\/]*$/,'')+'c?c='+rm.code+'&b='+rm.bi;}
@@ -1014,25 +999,26 @@ const s=document.createElement('script');s.src=RM_LIBS[i++];s.onload=next;s.oner
 function rmStart(){if(rm.clients.length||rm.starting)return;rm.starting=true;rmStatus('Conectando…',false);
 rmLoadLibs(ok=>{rm.starting=false;if(!ok||typeof mqtt==='undefined'){rmStatus('Não foi possível carregar o controle. Verifique a internet.',false);return;}rmRender();rmConnect();});}
 function rmConnect(){rm.clients=[];rm.live=[];
-RM_BROKERS.forEach((url,i)=>{const c=mqtt.connect(url,{clientId:'rotv-on-tv-'+Math.random().toString(36).slice(2,10),clean:true,connectTimeout:10000,reconnectPeriod:3000,keepalive:30,timerVariant:'native'});
+ROTV.BROKERS.forEach((url,i)=>{const c=mqtt.connect(url,ROTV.mqttOptions('tv'));
 rm.clients[i]=c;rm.live[i]=false;
-c.on('connect',()=>{const first=!rmLive();rm.live[i]=true;c.subscribe(RM_PREFIX+rm.code+'/cmd',{qos:0});
+c.on('connect',()=>{const first=!rmLive();rm.live[i]=true;c.subscribe(rmTopic(rm.code,'cmd'),{qos:0});
 if(first){rm.bi=i;rmRender();}rmStatus(rmReady(),rm.paired);});
 c.on('close',()=>{rm.live[i]=false;if(!rmLive())rmStatus('Reconectando…',false);});
 c.on('offline',()=>{if(!rmLive())rmStatus('Sem conexão com a internet',false);});
 c.on('error',()=>{}); // o mqtt.js segue tentando; o outro broker cobre enquanto isso
-c.on('message',(topic,payload)=>{let m;try{m=JSON.parse(String(payload));}catch(e){return;}
-if(!m||!RM_KEYS[m.k]||topic!==RM_PREFIX+rm.code+'/cmd')return;
+c.on('message',(topic,payload)=>rmOnMessage(c,topic,payload));});}
+function rmOnMessage(c,topic,payload){let m;try{m=JSON.parse(String(payload));}catch(e){return;}
+if(!m||!RM_KEYS[m.k]||topic!==rmTopic(rm.code,'cmd'))return;
 // mesmo comando chegando por dois caminhos (reconexão, dois brokers): executa uma vez só
 const now=Date.now();if(m.n===rmSeen.n&&now-rmSeen.t<1500)return;rmSeen={n:m.n,t:now};
 // confirmação pelo mesmo broker que trouxe o comando
-c.publish(RM_PREFIX+rm.code+'/ack',JSON.stringify({n:m.n}),{qos:0});
-remoteCommand(m.k);});});}
+rmPublish(c,rm.code,'ack',{n:m.n});
+remoteCommand(m.k);}
 /* Revoga o código: avisa o celular pareado, troca o código e passa a escutar só o novo */
 function rmRevoke(){const old=rm.code;rm.code=rmNewCode(old);rm.paired=false;rmToasted=false;
-try{localStorage.removeItem(RM_KEY_PAIRED);}catch(e){}
-rm.clients.forEach((c,i)=>{if(!rm.live[i])return;c.publish(RM_PREFIX+old+'/ack',JSON.stringify({revoked:true}),{qos:0});
-c.unsubscribe(RM_PREFIX+old+'/cmd');c.subscribe(RM_PREFIX+rm.code+'/cmd',{qos:0});});
+store.remove(RM_KEY_PAIRED);
+rm.clients.forEach((c,i)=>{if(!rm.live[i])return;rmPublish(c,old,'ack',{revoked:true});
+c.unsubscribe(rmTopic(old,'cmd'));c.subscribe(rmTopic(rm.code,'cmd'),{qos:0});});
 rmRender();rmSync();if(!rm.clients.length)rmStart();else rmStatus(rmLive()?'Novo código pronto. Aguardando o celular…':'Conectando…',false);}
 function remoteCommand(k){
 if(!rm.paired){rm.paired=true;store.set(RM_KEY_PAIRED,'1');rmSync();}
@@ -1042,10 +1028,10 @@ if(!rmToasted&&!rmIsOpen){rmToasted=true;showToast('Controle do celular conectad
 if(rmIsOpen){rmClose();return;}
 remoteKey(k);}
 /* Converte o comando numa tecla e passa pelo mesmo onKey do controle remoto (setas, OK, Voltar, páginas) */
-function remoteKey(k){const d=RM_KEYS[k],now=performance.now();
+function remoteKey(k){const [key,keyCode]=RM_KEYS[k],now=performance.now();
 // celular segurando a seta manda comandos a cada ~160 ms: trata como tecla repetida (som mais baixo)
-const rep=k===rmLast.k&&now-rmLast.t<260&&/^(up|down|left|right|pgup|pgdn)$/.test(k);rmLast={k,t:now};
-onKey({key:d[0],keyCode:d[1],repeat:rep,ctrlKey:false,metaKey:false,altKey:false,preventDefault(){}});}
+const repeat=k===rmLast.k&&now-rmLast.t<260&&RM_REPEAT.test(k);rmLast={k,t:now};
+sendKey(key,keyCode,repeat);}
 function rmFocus(){rmBtns.forEach((b,i)=>b.classList.toggle('on',i===rf));focusEl(rmBtns[rf]);}
 function rmMove(i){if(i===rf)return false;rf=i;rmFocus();return true;}
 function rmAct(i){if(i===0)rmClose();else{sfx.enter();rmRevoke();}}
@@ -1066,10 +1052,10 @@ if(rm.paired)addEventListener('load',()=>setTimeout(rmStart,1500));
    4. O logo voa até o cabeçalho enquanto a Home aparece.
    Trilha 100% sintetizada; notas Lá3/Mi4 iguais aos sons de navegação. Áudio agendado no relógio do AudioContext;
    imagem com o mesmo atraso + latência de saída.
-   Autoplay bloqueado → "Pressione OK"; qualquer tecla/clique pula. Desligar: ?intro=0 ou localStorage 'readontv:intro'='off'.
-   Com 'readontv:sfx'='off' roda sem som. */
+   Autoplay bloqueado → "Pressione OK"; qualquer tecla/clique pula. Desligar: ?intro=0 ou localStorage INTRO_KEY='off'.
+   Com SFX_KEY='off' roda sem som. */
 const INTRO=(()=>{
-const ON=store.get('readontv:intro')!=='off'&&!/[?&]intro=0(&|$)/.test(location.search);
+const ON=store.get(INTRO_KEY)!=='off'&&!/[?&]intro=0(&|$)/.test(location.search);
 const el=$('intro'),bg=el.querySelector('.intro-bg'),wire=$('introWire'),wireTxt=$('introWireTxt'),rule=$('introRule'),rowsEl=$('introRows'),
 plate=$('introPlate'),bar=$('introBar'),logo=$('introLogo'),tag=$('introTag'),gate=$('introGate');
 const hdLogo=document.querySelector('.top .hd-logo');
@@ -1142,15 +1128,17 @@ function closeAudio(){if(ctx){const c=ctx;ctx=null;try{c.close();}catch(e){}}}
 function headlines(){let list=[];
 RAILS.forEach(R=>R.items.forEach(it=>{if(!it.sk&&it.title)list.push(it);}));
 if(list.length<6)DEMO.forEach(R=>R.items.forEach(it=>list.push(it)));
-const seen=new Set();list=list.filter(it=>!seen.has(it.title)&&seen.add(it.title)).slice(0,15);
+const titles=new Set();list=list.filter(it=>!titles.has(it.title)&&titles.add(it.title)).slice(0,15);
 return [0,1,2].map(i=>list.filter((_,k)=>k%3===i));}
 function buildRows(){rowsEl.textContent='';
 return headlines().map((items,i)=>{const r=document.createElement('div');r.className='ir';r.style.top=[340,540,800][i]+'px';
 for(let rep=0;rep<4;rep++)items.forEach(it=>{const c=document.createElement('span');c.className='c';c.textContent=it.cat;
 const t=document.createElement('span');t.textContent=it.title;const q=document.createElement('i');q.className='q';r.append(c,t,q);});
 rowsEl.appendChild(r);return r;});}
+// um caractere do teletipo; o separador "·" sai na cor da marca
+function wireChar(c){if(c==='·'){const b=document.createElement('b');b.textContent=c;wireTxt.appendChild(b);}else wireTxt.append(c);}
 function typeOn(lead){// teletipo: um caractere por vez, no mesmo tempo das teclas
-[...DL].forEach((c,i)=>later(()=>{if(c==='·'){const b=document.createElement('b');b.textContent=c;wireTxt.appendChild(b);}else wireTxt.append(c);},(lead+T.type+i*T.cps)*1000));}
+[...DL].forEach((c,i)=>later(()=>wireChar(c),(lead+T.type+i*T.cps)*1000));}
 function visuals(lead){const ms=s=>lead*1000+s*1000;
 anim(rule,[{transform:'scaleX(0)'},{transform:'scaleX(1)'}],ms(0),340,'cubic-bezier(.6,0,.2,1)');
 anim(wire,[{opacity:0},{opacity:1}],ms(.18),160,'linear');
@@ -1176,7 +1164,7 @@ visuals(lead+lat);t0=performance.now()+(lead+lat)*1000;
 later(()=>fly(false),(lead+lat+T.fly)*1000);}
 // o logo voa até o lugar exato do logo do cabeçalho (FLIP pelo centro) enquanto a Home aparece
 function fly(fast){if(state!=='playing')return;state='flying';
-timers.forEach(clearTimeout);timers=[];wireTxt.textContent='';[...DL].forEach(c=>{if(c==='·'){const b=document.createElement('b');b.textContent=c;wireTxt.appendChild(b);}else wireTxt.append(c);});
+timers.forEach(clearTimeout);timers=[];wireTxt.textContent='';[...DL].forEach(wireChar);
 el.getAnimations({subtree:true}).forEach(a=>{if(moves.indexOf(a)<0)try{a.finish();}catch(e){}});
 const dur=RM?400:fast?420:760;
 if(RM)anim(logo,[{opacity:1},{opacity:0}],0,dur,'ease','forwards');
@@ -1218,11 +1206,11 @@ INTRO.boot();
 
 /* ================= Carregamento ================= */
 function setLive(ok,msg){liveIcon.classList.toggle('off',!ok);liveIcon.title=msg;}
-function saveCache(data){const slim=data.map(R=>({title:R.title,big:!!R.big,items:R.items}));
+function saveCache(data){const slim=data.map(R=>({title:R.title,items:R.items}));
 if(!store.set(CACHE_KEY,JSON.stringify({t:Date.now(),rails:slim}))){
 // sem espaço: guarda só os trilhos principais
 store.set(CACHE_KEY,JSON.stringify({t:Date.now(),rails:slim.slice(0,2)}));}}
-function readCache(){try{const c=JSON.parse(store.get(CACHE_KEY)||'null');if(c&&Array.isArray(c.rails)&&Date.now()-c.t<24*3600e3)return c;}catch(e){}return null;}
+function readCache(){try{const c=JSON.parse(store.get(CACHE_KEY)||'null');if(c&&Array.isArray(c.rails)&&Date.now()-c.t<CACHE_MAX_AGE)return c;}catch(e){}return null;}
 let loading=false;
 async function loadAll(){
 if(loading)return;loading=true;
@@ -1231,7 +1219,7 @@ try{
 const latest=parseFeed(await getFeed(FEED_BASE+'ultimasnoticias/feed.xml'));
 if(!latest.length)throw new Error('Feed vazio');
 const nh=await nhP;
-const base=[{title:'Destaques',big:true,items:latest.slice(0,5)}];
+const base=[{title:'Destaques',items:latest.slice(0,5)}];
 if(nh)base.push(nh);
 base.push({title:'Últimas notícias',items:latest.slice(5,5+MAX_PER_RAIL)});
 const previous=source==='live'||source==='cache'?RAILS.filter(R=>R.title!=='Destaques'&&R.title!=='Últimas notícias'&&R.title!==NH_TITLE):[];
