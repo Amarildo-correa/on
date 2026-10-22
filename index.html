@@ -42,7 +42,8 @@ html,body{height:100%;margin:0;background:var(--letterbox);overflow:hidden}
 .top [hidden]{display:none!important}
 .hd-search[hidden]+.hd-nav{margin-left:0}
 .hd-search.on{border-bottom-color:var(--card)!important}
-.hd-info{position:absolute;top:118px;left:0;right:0;height:126px;box-sizing:border-box;padding:8px var(--safe-x) 0 0;display:flex;align-items:center;white-space:nowrap}
+/* hd-info alinhada aos cards: termina na borda direita do 2º card (2 × 776 + 32 = 1584px a partir de --rail-x) */
+.hd-info{position:absolute;top:118px;left:0;right:0;height:126px;box-sizing:border-box;padding:8px calc(100% - 1584px) 0 0;display:flex;align-items:center;white-space:nowrap}
 .hd-logo{flex:none;display:flex;align-items:center;font-family:"Raleway",var(--font);font-size:40px;font-weight:800;line-height:1;color:#fff}
 .hd-logo b{font-weight:800;color:var(--brand);margin-left:.26em}
 .hd-logo svg{width:36px;height:36px;margin-left:4px;color:var(--brand);fill:currentColor;stroke:none;transition:color .2s}
@@ -56,7 +57,7 @@ html,body{height:100%;margin:0;background:var(--letterbox);overflow:hidden}
 .hd-wx svg{width:46px;height:46px;stroke-width:1.9;color:#fff;margin-right:10px}
 /* foco da previsão do tempo: faixa amarela sobre o título (h1) e a data, do separador do logo até a margem direita */
 .hd-meta{cursor:pointer}
-.top .hd-wxbar{position:absolute;top:20px;right:74px;left:var(--wb-left,480px);height:92px;box-sizing:border-box;padding:0 36px 0 36px;display:flex;align-items:center;justify-content:flex-end;
+.top .hd-wxbar{position:absolute;top:20px;right:calc(100% - 1584px - 22px);left:var(--wb-left,480px);height:92px;box-sizing:border-box;padding:0 36px 0 36px;display:flex;align-items:center;justify-content:flex-end;
 background:var(--focus);color:var(--card);font-weight:700;white-space:nowrap;overflow:hidden;visibility:hidden;z-index:1}
 .top .hd-wxbar.on{visibility:visible}
 .wb-txt{min-width:0;font-size:40px;line-height:1.1;overflow:hidden;text-overflow:ellipsis}
