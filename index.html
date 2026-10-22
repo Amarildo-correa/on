@@ -27,7 +27,7 @@ html,body{height:100%;margin:0;background:var(--letterbox);overflow:hidden}
 .top svg{display:block;flex:none;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round}
 /* hd-bar com a mesma margem direita da hd-info: a nav termina na borda direita do 2º card */
 .hd-bar{position:absolute;top:0;left:0;right:0;height:118px;box-sizing:border-box;padding:0 calc(100% - 1584px) 0 0;border-bottom:3px solid #444;display:flex;align-items:center}
-.hd-search{align-self:flex-end;margin-bottom:-3px!important;width:380px;height:85px;box-sizing:border-box;display:flex;align-items:center;padding:0 28px;background:#474747;border-bottom:4px solid #9A9A9A!important;color:#fff;font-size:33px;font-weight:500;text-align:left;white-space:nowrap}
+.hd-search{align-self:flex-end;margin-bottom:-3px!important;width:350px;height:85px;box-sizing:border-box;display:flex;align-items:center;padding:0 28px;background:#474747;border-bottom:4px solid #9A9A9A!important;color:#fff;font-size:33px;font-weight:500;text-align:left;white-space:nowrap}
 .hd-search svg{width:34px;height:34px;stroke-width:2.6;margin-right:20px}
 .hd-nav{display:flex;align-items:center;margin-left:auto}
 /* o desenho do + encosta na borda direita (compensa o espaço interno do botão) */
@@ -295,7 +295,7 @@ background:radial-gradient(circle at 100% 0,rgba(0,0,0,.87) 0,rgba(0,0,0,.7) 120
 <button class="hd-link" type="button" tabindex="-1" data-hd="cat">Saúde</button>
 <button class="hd-link" type="button" tabindex="-1" data-hd="cat">Educação</button>
 <button class="hd-link" type="button" tabindex="-1" data-hd="cat">Internacional</button>
-<button class="hd-link" type="button" tabindex="-1" data-hd="cat">Geral</button>
+<button class="hd-link" type="button" tabindex="-1" data-hd="cat">Brasileirão</button>
 <button class="hd-ico" type="button" tabindex="-1" data-hd="add" data-soon aria-label="Adicionar tema" title="Adicionar tema"><svg viewBox="0 0 24 24" aria-hidden="true" data-ico="plus"></svg></button>
 </nav>
 </div>
@@ -921,7 +921,7 @@ else if(a==='cat')railGo(b.textContent.trim());
 else showToast(b.textContent.trim()+': disponível em breve');}
 /* categoria do cabeçalho: leva ao trilho de mesmo nome (as editorias da Agência Brasil carregam logo depois dos destaques) */
 function railGo(title){const k=RAILS.findIndex(R=>R.title===title);
-if(k<0){showToast(title+': carregando…');return;}
+if(k<0){const known=EDITORIAS.some(e=>e[1]===title)||title===NH_TITLE;showToast(title+(known?': carregando…':': disponível em breve'));return;}
 inHeader=false;inWx=false;r=k;idx[k]=0;render();}
 hdItems.forEach((b,i)=>b.addEventListener('click',e=>{e.stopPropagation();if(postOpen)return;inWx=false;inHeader=true;hf=i;render();hdAct(i);}));
 /* ===== Ações da barra lateral ===== */
