@@ -514,7 +514,7 @@ const DEMO=[
 ['Educação','Inscrições para o vestibular terminam nesta sexta','há 4 horas'],
 ['Transporte','Metrô amplia horário de funcionamento aos sábados','há 6 horas']]}
 ].map((R,k)=>({title:R.title,big:R.big,items:R.items.map((a,i)=>({id:'demo-'+k+'-'+i,cat:a[0],title:a[1],ago:a[2],link:'',author:'',date:null,html:'',
-img:'https://picsum.photos/seed/readontv-'+k+'-'+i+'/776/313'}))}));
+img:'https://picsum.photos/seed/readontv-'+k+'-'+i+'/776/299'}))}));
 const SKELETON=[{title:'Destaques',big:true,items:[0,1,2].map(i=>({id:'sk'+i,sk:true}))},{title:'Últimas notícias',items:[0,1,2].map(i=>({id:'skr'+i,sk:true}))}];
 
 /* ================= Sons da interface (Web Audio API) ================= */
@@ -557,10 +557,9 @@ function cue(moved,e){if(moved)sfx.nav(e.repeat);}
 /* ================= Layout dos trilhos ================= */
 // espaçamento e anel vêm dos tokens do CSS: o mesmo --gap separa cards (horizontal) e trilhos (vertical)
 const cssPx=n=>parseFloat(getComputedStyle(document.documentElement).getPropertyValue(n))||0;
-/* todos os trilhos usam o card grande (776x433). Na tela de 1080px:
-   252 (topo) + 433 (card) + 32 (gap) + 313 (foto) + 33 + 4 (fio) ≈ 1067: o 2º trilho aparece até o fio, logo acima da linha editoria/hora.
-   Foto 313 = 293 + os 20px tirados do espaço inferior do card (padding-bottom 34 → 14) */
-const GAP=cssPx('--gap'),FIX_TOP=252,BIG={w:776,h:433,th:313};
+/* todos os trilhos usam o card grande (776x419: foto 299 + body 120). O 2º trilho aparece até a metade do texto da .meta:
+   252 (topo) + 419 (card) + 32 (gap) + 299 (foto) + 33 + 4 (fio) + 12 + 57/2 (meio do texto) ≈ 1080 */
+const GAP=cssPx('--gap'),FIX_TOP=252,BIG={w:776,h:419,th:299};
 /* matérias já abertas: o card mostra o olho e o título fica mais escuro (localStorage) */
 const SEEN_KEY='readontv-on:seen',SEEN_MAX=600;
 const seen=(()=>{let list=[];try{const v=JSON.parse(store.get(SEEN_KEY)||'[]');if(Array.isArray(v))list=v.filter(x=>typeof x==='string');}catch(e){}return new Set(list);})();
