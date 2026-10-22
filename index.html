@@ -154,6 +154,8 @@ background:radial-gradient(circle at 100% 0,rgba(0,0,0,.87) 0,rgba(0,0,0,.7) 120
 .card.on .meta,.card.big.seen.on .meta{border-top-color:var(--card)}
 /* peek atrás do menu: cards à esquerda do card atual de cada trilho ficam apagados (só eles, não o menu) */
 .card.peek{opacity:.25}
+/* gradiente escuro no lado direito do peek (a parte que fica sob os ícones do menu), para dar contraste aos ícones */
+.card.peek::after{content:"";position:absolute;top:0;right:0;bottom:0;left:0;z-index:3;pointer-events:none;background:linear-gradient(to right,rgba(0,0,0,0) 0,rgba(0,0,0,0) calc(100% - 300px),rgba(0,0,0,.92) 100%)}
 .card.on .thumb::after{content:"";position:absolute;top:0;right:0;bottom:0;left:0;z-index:1;border:7px solid var(--focus);pointer-events:none}
 .card.big.on .thumb::after{border-bottom:0}
 /* esqueleto de carregamento */
