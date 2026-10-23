@@ -13,15 +13,15 @@
   /* tokens: mesmos nomes e valores do app da TV (index.html) quando existem lá */
   :root {
     /* superfícies */
-    --bg: #2A2D35; --card: #141414; --control: #454545; --input: #1C1C1C; --input-line: #333333;
+    --bg: #2A2D35; --card: #121418; --control: #41454E; --input: #1A1C22; --input-line: #2F333C;
     /* texto e ícones */
-    --white: #FFFFFF; --sub: #B3B3B3; --dim: #9A9A9A; --key-label: #D0D0D0; --key-icon: #C8C8C8;
+    --white: #FFFFFF; --sub: #B0B3B9; --dim: #979AA2; --key-label: #CED0D4; --key-icon: #C6C8CD;
     /* marca e foco */
     --brand: #357DED; --brand-press: #102547; --brand-glow: rgba(53, 125, 237, .28); --focus: #FFD60A;
     /* estados da conexão */
     --ok: #7BE495; --bad: #FF8A80; --warn: #FFD54F;
     /* botões redondos (relevo) e sombras */
-    --key-top: #2E2E2E; --key-bottom: #111111; --key-edge: #3A3A3A; --shadow: rgba(0, 0, 0, .5); --shadow-ring: rgba(0, 0, 0, .55);
+    --key-top: #2B2E36; --key-bottom: #101115; --key-edge: #373A42; --shadow: rgba(0, 0, 0, .5); --shadow-ring: rgba(0, 0, 0, .55);
     color-scheme: dark;
   }
   html, body { margin: 0; background: var(--bg); color: var(--white); font-family: Roboto, system-ui, sans-serif; }
@@ -83,20 +83,20 @@
     <svg class="ring" viewBox="0 0 210 210" role="group" aria-label="Direcional">
       <defs>
         <radialGradient id="gRing" cx="50%" cy="42%" r="60%">
-          <stop offset="0" stop-color="#262626"/><stop offset=".75" stop-color="#121212"/><stop offset="1" stop-color="#060606"/>
+          <stop offset="0" stop-color="#23262E"/><stop offset=".75" stop-color="#101216"/><stop offset="1" stop-color="#050607"/>
         </radialGradient>
         <linearGradient id="gSheen" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0" stop-color="#FFFFFF" stop-opacity=".10"/><stop offset=".5" stop-color="#FFFFFF" stop-opacity="0"/><stop offset="1" stop-color="#FFFFFF" stop-opacity=".05"/>
         </linearGradient>
         <radialGradient id="gOk" cx="50%" cy="38%" r="65%">
-          <stop offset="0" stop-color="#2C2C2C"/><stop offset="1" stop-color="#161616"/>
+          <stop offset="0" stop-color="#292C34"/><stop offset="1" stop-color="#14161B"/>
         </radialGradient>
       </defs>
       <!-- Corpo do anel com bisel, como a referência -->
-      <circle cx="105" cy="105" r="103" fill="url(#gRing)" stroke="#3A3A3A" stroke-width="1.5"/>
+      <circle cx="105" cy="105" r="103" fill="url(#gRing)" stroke="#373A42" stroke-width="1.5"/>
       <circle cx="105" cy="105" r="96" fill="none" stroke="url(#gSheen)" stroke-width="10"/>
       <circle cx="105" cy="105" r="89" fill="none" stroke="#000" stroke-opacity=".6" stroke-width="1"/>
-      <circle cx="105" cy="105" r="47" fill="#050505" stroke="#2E2E2E" stroke-width="1"/>
+      <circle cx="105" cy="105" r="47" fill="#050506" stroke="#2B2E36" stroke-width="1"/>
       <!-- Setores em arco: cada um é a área de toque de uma direção -->
       <path class="seg" data-k="up" role="button" aria-label="Cima" d="M32.17 32.17A103 103 0 0 1 177.83 32.17L137.53 72.47A46 46 0 0 0 72.47 72.47Z"/>
       <path class="chev" d="M110.4 33.5L105 24.5L99.6 33.5"/>

@@ -13,12 +13,12 @@
 /* ícones Lucide (CDN): traço na cor do texto; tamanhos e espessuras específicos vêm das regras abaixo */
 svg[data-ico]{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 :root{
-/* superfícies */
---letterbox:#0E0E0E;--bg:#2A2D35;--bg-clear:rgba(42,45,53,0);--card:#141414;--thumb:#1F1F1F;--control:#454545;--field:#3C4049;--track:#585858;
+/* superfícies (cinzas levemente azulados, mesma luminância dos neutros anteriores) */
+--letterbox:#0D0E11;--bg:#2A2D35;--bg-clear:rgba(42,45,53,0);--card:#121418;--thumb:#1C1F25;--control:#41454E;--field:#3C4049;--track:#545861;
 /* linhas e divisores */
---rule:#3A3A3A;--line:#555555;--field-line:#9A9A9A;
-/* texto e ícones (do mais claro ao mais apagado) */
---white:#FFFFFF;--text:#EEEEEE;--title:#E0E0E0;--meta:#CFCFCF;--sub:#B3B3B3;--seen:#ADADAD;--dim:#9A9A9A;--faint:#949494;--off:#5E5E5E;--placeholder:#464646;--ink:#000000;
+--rule:#373A42;--line:#51555E;--field-line:#979AA2;
+/* texto e ícones (do mais claro ao mais apagado); cinzas com o matiz do --bg (222°) */
+--white:#FFFFFF;--text:#EDEEEF;--title:#DFE0E3;--meta:#CDCFD3;--sub:#B0B3B9;--dim:#979AA2;--off:#5A5E68;--placeholder:#42464F;--ink:#000000;
 /* marca e foco */
 --brand:#357DED;--focus:#FFD60A;
 /* sombras */
@@ -153,8 +153,8 @@ background:radial-gradient(circle at 100% 0,rgba(0,0,0,.87) 0,rgba(0,0,0,.7) 120
 .big .c-mark svg{top:49px;right:82px}
 .card.seen .c-mark{display:block}
 .card.on .c-mark svg{color:var(--focus)}
-.card.seen .t{color:var(--seen)}
-.card.big.seen .meta{border-top-color:var(--seen)}
+.card.seen .t{color:var(--sub)}
+.card.big.seen .meta{border-top-color:var(--sub)}
 /* card focado: superfície amarela com textos escuros */
 .card.on{background:var(--focus)}
 .card.on .t,.card.on.seen .t{color:var(--ink)}
@@ -203,7 +203,7 @@ background:radial-gradient(circle at 100% 0,rgba(0,0,0,.87) 0,rgba(0,0,0,.7) 120
 .p-head .pc::after{content:"";display:inline-block;width:5px;height:58px;margin:0 15px 0 19px;background:var(--brand);vertical-align:-11px}
 .p-meta{margin:32px 0 0}
 .p-ago,.p-src{display:block;font-size:32px;font-weight:700;line-height:43px;color:var(--meta)}
-.p-by{display:block;margin-top:4px;font-size:26px;line-height:36px;color:var(--seen);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p-by{display:block;margin-top:4px;font-size:26px;line-height:36px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .p-nav{position:absolute;left:var(--safe-x);right:49px;top:923px;height:103px;display:flex;align-items:center;gap:25px}
 /* botões das telas cheias (matéria e pareamento) */
 .p-btn,.rm-btn{flex:none;height:87px;display:flex;align-items:center;border:0;background:var(--control);color:var(--white);cursor:pointer;outline:none;transition:background-color .12s,color .12s}
@@ -286,7 +286,7 @@ background:radial-gradient(circle at 100% 0,rgba(0,0,0,.87) 0,rgba(0,0,0,.7) 120
 .intro-gate[hidden]{display:none}
 .intro-gate p{margin:0}
 .intro-gate kbd{font:inherit;font-weight:900;color:var(--card);background:var(--focus);padding:6px 22px;margin:0 6px}
-.intro-gate small{font-size:24px;color:var(--faint)}
+.intro-gate small{font-size:24px;color:var(--dim)}
 .intro-gate .iw-cur{width:28px;height:44px;margin:0}
 @media (prefers-reduced-motion:reduce){.rails,.rail,.card,.card::before,.card .t,.card .cat,.card .s,.track,.toast,.post,.rm,.rm-btn,.p-prog,.p-btn{transition:none}.sk .thumb,.skl,.iw-cur{animation:none}}
 </style>

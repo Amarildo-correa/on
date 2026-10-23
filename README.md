@@ -46,9 +46,11 @@ Todas as cores ficam em variáveis CSS no `:root` de cada página, agrupadas por
 - `--bg` `#2A2D35` (cinza-azulado, matiz 224°): fundo do palco, do cabeçalho, do menu aberto, da matéria e da abertura; também é o `theme-color` do celular.
 - `--brand` `#357DED`: azul da marca (logo, seção atual, capitular, barra de progresso, status do pareamento, botões do celular).
 - `--focus` `#FFD60A`: superfície amarela do foco.
-- `--card` `#141414`, `--thumb` `#1F1F1F`, `--control` `#454545`: superfícies dos cards, miniaturas e botões.
+- `--card` `#121418`, `--thumb` `#1C1F25`, `--control` `#41454E`: superfícies dos cards, miniaturas e botões.
 - `--field` `#3C4049`: fundo do campo "Buscar notícias" no cabeçalho.
-- Texto, do mais claro ao mais apagado: `--white`, `--text`, `--title`, `--meta`, `--sub`, `--seen`, `--dim`, `--faint`, `--off`.
+- Texto, do mais claro ao mais apagado: `--white`, `--text`, `--title`, `--meta`, `--sub`, `--dim`, `--off`.
+
+Harmonia: todos os cinzas (superfícies, linhas, textos e o desenho do direcional no celular) levam o matiz do `--bg` (222°), com mais saturação nos tons escuros e quase nenhuma nos claros; a luminância é a mesma dos cinzas neutros de antes, então os contrastes não mudam. O azul da marca (217°) é análogo ao fundo e o amarelo do foco (50°) é o complementar, o que faz o foco saltar na TV.
 
 `c.html` usa os mesmos nomes e valores quando o token existe nos dois (`--bg`, `--brand`, `--focus`, `--card`, `--control`, `--sub`, `--dim`, `--white`). Só ficam fixas as cores do desenho do direcional no SVG do celular e as máscaras de transparência (`mask-image`).
 
