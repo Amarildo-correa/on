@@ -223,23 +223,24 @@ background:radial-gradient(circle at 100% 0,rgba(0,0,0,.87) 0,rgba(0,0,0,.7) 120
 .p-foot{padding-bottom:94px}
 .p-track{position:absolute;right:var(--safe-x);top:129px;bottom:var(--safe-y);width:8px;background:var(--track)}
 .p-prog{position:absolute;left:0;right:0;top:0;height:100%;background:var(--brand);transition:top .2s,height .2s}
-.p-body{font-size:38px;line-height:64px;font-weight:600;color:var(--title);overflow-wrap:break-word}
+/* matéria em letra grande para leitura a 3 m (inclusive baixa visão): corpo 46px, entrelinha 1,6 */
+.p-body{font-size:46px;line-height:74px;font-weight:600;color:var(--title);overflow-wrap:break-word}
 .p-body>:first-child{margin-top:0}
 /* blocos recebem foco para leitores de tela; sem contorno visual */
 .p-body [tabindex],.p-scroll,.p-foot{outline:none}
-.p-body p{margin:0 0 35px}
+.p-body p{margin:0 0 42px}
 .p-body strong,.p-body b{font-weight:700;color:var(--white)}
-.p-body .lead{margin:0 0 35px}
-.p-body .lead::first-letter{float:left;font-weight:900;font-size:138px;line-height:.78;color:var(--brand);margin:20px 16px 0 -2px}
-.p-body h2{font-size:44px;line-height:1.3;font-weight:700;margin:56px 0 24px;color:var(--white)}
-.p-body h3,.p-body h4{font-size:40px;line-height:1.3;font-weight:700;margin:48px 0 18px;color:var(--white)}
-.p-body ul,.p-body ol{margin:0 0 35px;padding-left:44px}
-.p-body li{margin:0 0 12px}
-.p-body blockquote{margin:6px 0 40px;padding:2px 0 2px 32px;border-left:5px solid var(--brand);font-style:italic;font-size:38px;line-height:1.5;color:var(--title)}
+.p-body .lead{margin:0 0 42px}
+.p-body .lead::first-letter{float:left;font-weight:900;font-size:166px;line-height:.78;color:var(--brand);margin:24px 18px 0 -2px}
+.p-body h2{font-size:54px;line-height:1.3;font-weight:700;margin:64px 0 28px;color:var(--white)}
+.p-body h3,.p-body h4{font-size:50px;line-height:1.3;font-weight:700;margin:56px 0 22px;color:var(--white)}
+.p-body ul,.p-body ol{margin:0 0 42px;padding-left:54px}
+.p-body li{margin:0 0 16px}
+.p-body blockquote{margin:6px 0 40px;padding:2px 0 2px 32px;border-left:5px solid var(--brand);font-style:italic;font-size:46px;line-height:1.55;color:var(--title)}
 .p-body blockquote p:last-child{margin-bottom:0}
 .p-body figure{margin:10px 0 44px}
 .p-body figure img{display:block;width:100%;height:auto;background:var(--thumb)}
-.p-body figcaption{margin-top:14px;font-size:24px;line-height:1.4;color:var(--dim)}
+.p-body figcaption{margin-top:16px;font-size:32px;line-height:1.4;color:var(--dim)}
 /* ===== Controle pelo celular: tela de pareamento com QR e código ===== */
 .rm{position:absolute;top:0;right:0;bottom:0;left:0;z-index:7;background:var(--bg);opacity:0;visibility:hidden;transition:opacity .2s,visibility 0s linear .2s}
 .rm.show{opacity:1;visibility:visible;transition:opacity .2s}
@@ -305,7 +306,7 @@ background:radial-gradient(circle at 100% 0,rgba(0,0,0,.87) 0,rgba(0,0,0,.7) 120
 <button class="hd-link" type="button" tabindex="-1" data-hd="cat">Saúde</button>
 <button class="hd-link" type="button" tabindex="-1" data-hd="cat">Educação</button>
 <button class="hd-link" type="button" tabindex="-1" data-hd="cat">Internacional</button>
-<button class="hd-link" type="button" tabindex="-1" data-hd="cat">Brasileirão</button>
+<button class="hd-link" type="button" tabindex="-1" data-hd="cat">Esportes</button>
 <button class="hd-ico" type="button" tabindex="-1" data-hd="add" data-soon aria-label="Adicionar tema" title="Adicionar tema"><svg viewBox="0 0 24 24" aria-hidden="true" data-ico="plus"></svg></button>
 </nav>
 </div>
@@ -403,7 +404,7 @@ ROTV.drawIcons();
 
 /* ================= Fonte de dados: RSS da Agência Brasil ================= */
 const FEED_BASE='https://agenciabrasil.ebc.com.br/rss/';
-const EDITORIAS=[['politica','Política'],['economia','Economia'],['geral','Geral'],['internacional','Internacional'],['educacao','Educação'],['saude','Saúde'],['direitos-humanos','Direitos Humanos']];
+const EDITORIAS=[['politica','Política'],['economia','Economia'],['geral','Geral'],['internacional','Internacional'],['educacao','Educação'],['saude','Saúde'],['esportes','Esportes'],['direitos-humanos','Direitos Humanos']];
 /* O site não libera CORS para outras origens; tenta direto e depois proxies públicos. O que funcionar fica como preferido. */
 /* Proxy próprio (recomendado em produção), ex.: 'https://seu-proxy.exemplo/rss?url='. Vazio = desligado.
    Empacotado como app Tizen (config.xml <access origin="*" subdomains="true"/>) ou webOS, o fetch direto funciona sem proxy. */
