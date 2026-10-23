@@ -483,7 +483,7 @@
 
   /* Envio pelo Google Apps Script (apps-script/v-email.gs) publicado na conta Google do dono: grátis, sai pelo próprio Gmail,
      com o JSON completo no corpo e anexo. O destinatário fica fixo no script. Cole aqui a URL /exec da implantação. */
-  var GAS_URL = '';
+  var GAS_URL = 'https://script.google.com/macros/s/AKfycbx9YCy3CN1BTc5WNnuOgXLVIu2FOQRkrK7ZnAvfzfKCv5A-jlQ4uBBCbNWj7FOZUwY87g/exec';
   function pick(o, keys) { var r = {}; if (!o || typeof o !== 'object') return o; keys.forEach(function (k) { if (o[k] !== undefined) r[k] = o[k]; }); return r; }
   function resumo() {
     var d = R.drm && typeof R.drm === 'object' ? R.drm : {}, drm = {};
