@@ -43,7 +43,7 @@ O item "Excluir localstorage" do menu lateral apaga, após um segundo OK em até
 
 Todas as cores ficam em variáveis CSS no `:root` de cada página, agrupadas por papel (superfícies, linhas, texto, marca e foco, sombras); as regras usam só `var(--…)`. Os principais:
 
-- `--bg` `#202124`: fundo do palco, do cabeçalho, do menu aberto, da matéria e da abertura; também é o `theme-color` do celular.
+- `--bg` `#2A2D35` (cinza-azulado, matiz 224°): fundo do palco, do cabeçalho, do menu aberto, da matéria e da abertura; também é o `theme-color` do celular.
 - `--brand` `#357DED`: azul da marca (logo, seção atual, capitular, barra de progresso, status do pareamento, botões do celular).
 - `--focus` `#FFD60A`: superfície amarela do foco.
 - `--card` `#141414`, `--thumb` `#1F1F1F`, `--control` `#454545`: superfícies dos cards, miniaturas e botões.
