@@ -481,10 +481,9 @@
 
   function title() { var d = R.deteccao || {}; return 'Diagnóstico /v · ' + [d.tv, d.navegador, d.sistema].filter(Boolean).join(' · '); }
 
-  /* Envio pelo ntfy.sh: grátis, sem conta nem ativação. O ntfy repassa a notificação para o e-mail.
-     O corpo do e-mail leva um resumo (o ntfy aceita até 4 KB de texto); o JSON completo vai como anexo,
-     que fica hospedado no ntfy.sh por 3 horas. Se falhar, abre o app de e-mail. */
-  var NTFY = 'https://ntfy.sh/readontv-on-v-k7q2m9x4';
+  /* Envio pelo Google Apps Script (apps-script/v-email.gs) publicado na conta Google do dono: grátis, sai pelo próprio Gmail,
+     com o JSON completo no corpo e anexo. O destinatário fica fixo no script. Cole aqui a URL /exec da implantação. */
+  var GAS_URL = '';
   function pick(o, keys) { var r = {}; if (!o || typeof o !== 'object') return o; keys.forEach(function (k) { if (o[k] !== undefined) r[k] = o[k]; }); return r; }
   function resumo() {
     var d = R.drm && typeof R.drm === 'object' ? R.drm : {}, drm = {};
@@ -503,23 +502,20 @@
     };
     var t = JSON.stringify(r, null, 1);
     while (new Blob([t]).size > 3800 && t.length > 100) t = t.slice(0, -200);
-    return t + '\n\nJSON completo no anexo diagnostico.json (o link vale por 3 horas).';
+    return t + '';
   }
   btnSend.onclick = function () {
+    if (!GAS_URL) { status('Envio não configurado: falta a URL do Apps Script (GAS_URL em v.html).', 'bad'); return; }
     btnSend.disabled = true;
     status('Enviando para ' + EMAIL + '…');
-    var q = '?filename=diagnostico.json&email=' + encodeURIComponent(EMAIL) + '&title=' + encodeURIComponent(title()) + '&message=' + encodeURIComponent(resumo()) + '&tags=computer';
-    /* POST com texto puro e sem cabeçalhos próprios: requisição simples, sem preflight de CORS */
-    fetch(NTFY + q, { method: 'POST', body: json })
-      .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j && j.error || ('HTTP ' + r.status)); return j; }); })
+    /* text/plain: requisição simples, sem preflight de CORS (o Apps Script não responde a OPTIONS) */
+    fetch(GAS_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ subject: title(), resumo: resumo(), json: json }) })
+      .then(function (r) { return r.json(); })
       .then(function (j) {
-        R.envio = { servico: 'ntfy.sh', id: j.id, anexo: j.attachment ? j.attachment.url : null, expiraEm: j.attachment && j.attachment.expires ? new Date(j.attachment.expires * 1000).toISOString() : null };
-        status('Enviado para ' + EMAIL + ' (pode levar 1 ou 2 minutos para chegar).', 'ok');
+        if (!j || !j.ok) throw new Error(j && j.error || 'resposta inesperada');
+        status('Enviado para ' + EMAIL + '.', 'ok');
       })
-      .catch(function (e) {
-        status('Falha no envio (' + e.message + '). Abrindo o app de e-mail…', 'bad');
-        location.href = 'mailto:' + EMAIL + '?subject=' + encodeURIComponent(title()) + '&body=' + encodeURIComponent(resumo().slice(0, 1800));
-      })
+      .catch(function (e) { status('Falha no envio (' + e.message + '). Use Copiar JSON e tente de novo.', 'bad'); })
       .then(function () { btnSend.disabled = false; });
   };
 
