@@ -23,6 +23,9 @@
   #st.ok { color: var(--ok); } #st.bad { color: var(--bad); }
   .mic { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 12px; }
   .mic input { flex: 1 1 320px; min-width: 0; border: 2px solid var(--control); border-radius: 10px; background: var(--card); color: var(--white); font: inherit; font-size: 20px; padding: 10px 14px; }
+  .mic input.as-btn { flex: 0 0 auto; width: 260px; background: var(--control); text-align: center; font-weight: 700; caret-color: transparent; }
+  .mic input.as-btn::placeholder { color: var(--white); opacity: 1; }
+  .mic label { font-size: 15px; color: var(--sub); flex-basis: 100%; }
   .mic input:focus { outline: 4px solid var(--focus); outline-offset: 2px; border-color: var(--brand); }
   [hidden] { display: none !important; }
   pre { margin: 0; padding: 12px; background: var(--card); border-radius: 10px; font: 13px/1.45 "Roboto Mono", ui-monospace, monospace; white-space: pre-wrap; word-break: break-word; }
@@ -35,11 +38,20 @@
     <button id="heard" class="alt" hidden>Ouvi a voz</button>
     <button id="notHeard" class="alt" hidden>Não ouvi</button>
     <button id="mic" class="alt" disabled>Testar microfone</button>
+    <button id="kbd" class="alt" disabled>Testar botão 🎤</button>
     <span id="st">Lendo informações do navegador…</span>
   </div>
   <div class="mic" id="micBox" hidden>
     <input id="dictado" type="text" inputmode="text" enterkeyhint="done" autocomplete="off" placeholder="Foque aqui, segure o microfone do controle e fale">
     <button id="micDone">Concluir teste</button>
+  </div>
+  <div class="mic" id="kbdBox" hidden>
+    <label>Teste cada 🎤: aperte OK nele, veja se o teclado do Fire TV abre e, se abrir, segure o microfone do controle e fale.</label>
+    <button id="kA">🎤 A: botão que foca o campo</button>
+    <button id="kB">🎤 B: botão + API VirtualKeyboard</button>
+    <input id="kC" class="as-btn" type="text" placeholder="🎤 C: campo com cara de botão" autocomplete="off">
+    <input id="kCampo" type="text" placeholder="campo da busca (A e B)" autocomplete="off" virtualkeyboardpolicy="auto">
+    <button id="kDone">Concluir teste do 🎤</button>
   </div>
   <pre id="out"></pre>
 </main>
@@ -502,8 +514,9 @@
     R.leituraMs = Math.round(performance.now());
     R.falaTeste = 'não executado (use o botão Testar fala)';
     R.microfoneTeste = 'não executado (use o botão Testar microfone)';
+    R.botaoMicTeste = 'não executado (use o botão Testar botão 🎤)';
     render();
-    btnSend.disabled = btnCopy.disabled = btnSpeak.disabled = btnMic.disabled = false;
+    btnSend.disabled = btnCopy.disabled = btnSpeak.disabled = btnMic.disabled = btnKbd.disabled = false;
     btnSend.focus();
     status('Leitura concluída (' + Math.round(json.length / 1024) + ' KB).', 'ok');
   });
@@ -661,6 +674,67 @@
     status('Teste do microfone concluído: ' + M.resultado.caminhoRecomendado, 'ok');
   };
 
+  /* Teste do botão 🎤: o ditado do Fire TV só funciona com o teclado nativo aberto. Três jeitos de abrir o teclado a partir de um 🎤:
+     A) botão que chama focus() no campo; B) idem + navigator.virtualKeyboard.show(); C) o próprio 🎤 é um campo de texto estilizado.
+     Detecta o teclado pela redução do visualViewport e o ditado pelo texto que chega de uma vez. */
+  var btnKbd = document.getElementById('kbd'), kbdBox = document.getElementById('kbdBox'), kCampo = document.getElementById('kCampo'), kC = document.getElementById('kC');
+  var K = null, kT0 = 0, kAtual = null, vvBase = 0;
+  function kMs() { return Date.now() - kT0; }
+  function kNovo() { return { tentou: false, focou: false, tecladoAbriuViewport: false, menorAlturaViewport: null, eventosInput: 0, maiorBloco: 0, texto: '', ditado: false, eventos: [] }; }
+  function kLog(m) { if (K && kAtual && K[kAtual].eventos.length < 20) K[kAtual].eventos.push(m + ' @' + kMs()); }
+  function kViewport() {
+    if (!K || !kAtual || !window.visualViewport) return;
+    var h = visualViewport.height, o = K[kAtual];
+    if (o.menorAlturaViewport === null || h < o.menorAlturaViewport) o.menorAlturaViewport = Math.round(h);
+    if (h < vvBase * 0.85) { if (!o.tecladoAbriuViewport) kLog('viewport encolheu para ' + Math.round(h)); o.tecladoAbriuViewport = true; }
+  }
+  if (window.visualViewport) visualViewport.addEventListener('resize', kViewport);
+  if (n.virtualKeyboard && n.virtualKeyboard.addEventListener) n.virtualKeyboard.addEventListener('geometrychange', function (e) {
+    var r = e.target.boundingRect; kLog('virtualKeyboard ' + Math.round(r.width) + 'x' + Math.round(r.height));
+    if (K && kAtual && r.height > 0) K[kAtual].tecladoAbriuVirtualKeyboard = true;
+  });
+  function kInput(el, chave) {
+    var antes = '';
+    el.addEventListener('input', function () {
+      if (!K) return;
+      var o = K[chave] || K[kAtual], bloco = Math.max(0, el.value.length - antes.length); antes = el.value;
+      if (!o) return;
+      o.eventosInput++; o.maiorBloco = Math.max(o.maiorBloco, bloco); o.texto = el.value; if (bloco >= 3) o.ditado = true;
+      if (o.eventos.length < 20) o.eventos.push('input +' + bloco + ' @' + kMs());
+    });
+    el.addEventListener('focus', function () { if (!K) return; if (chave && kAtual !== chave) kInicio(chave); if (kAtual) { K[kAtual].focou = true; kLog('focus'); } });
+  }
+  kInput(kCampo, null); kInput(kC, 'C');
+  function kInicio(chave) { kAtual = chave; K[chave].tentou = true; vvBase = window.visualViewport ? visualViewport.height : innerHeight; kCampo.value = ''; status('Teste ' + chave + ': o teclado abriu? Se sim, segure o microfone e fale.'); }
+
+  btnKbd.onclick = function () {
+    kT0 = Date.now();
+    K = R.botaoMicTeste = { apiVirtualKeyboard: !!(n.virtualKeyboard && n.virtualKeyboard.show), A: kNovo(), B: kNovo(), C: kNovo() };
+    kbdBox.hidden = false; document.getElementById('kA').focus(); render();
+    status('Teste cada 🎤 (A, B e C) e depois aperte Concluir teste do 🎤.');
+  };
+  document.getElementById('kA').onclick = function () { kInicio('A'); kCampo.setAttribute('virtualkeyboardpolicy', 'auto'); kCampo.focus(); kCampo.click(); };
+  document.getElementById('kB').onclick = function () {
+    kInicio('B'); kCampo.setAttribute('virtualkeyboardpolicy', 'manual'); kCampo.focus();
+    if (n.virtualKeyboard && n.virtualKeyboard.show) { try { n.virtualKeyboard.show(); kLog('show() chamado'); } catch (e) { K.B.erro = e.message; } }
+    else K.B.erro = 'navigator.virtualKeyboard não existe';
+  };
+  kC.addEventListener('click', function () { if (K) { if (kAtual !== 'C') kInicio('C'); kLog('OK no campo'); } });
+
+  document.getElementById('kDone').onclick = function () {
+    if (!K) return;
+    var ok = ['A', 'B', 'C'].filter(function (k) { return K[k].ditado; }), abriu = ['A', 'B', 'C'].filter(function (k) { return K[k].tecladoAbriuViewport || K[k].tecladoAbriuVirtualKeyboard; });
+    K.resultado = {
+      ditadoFuncionouEm: ok, tecladoDetectadoEm: abriu,
+      recomendacao: ok.indexOf('A') > -1 ? 'A: um botão 🎤 comum que foca o campo já abre o teclado'
+        : ok.indexOf('B') > -1 ? 'B: botão 🎤 com navigator.virtualKeyboard.show()'
+        : ok.indexOf('C') > -1 ? 'C: o 🎤 precisa ser o próprio campo de texto, estilizado como botão'
+        : 'nenhum 🎤 abriu o ditado: o cliente precisa apertar OK no próprio campo de busca'
+    };
+    kAtual = null; kbdBox.hidden = true; render(); btnSend.focus();
+    status('Teste do 🎤 concluído: ' + K.resultado.recomendacao, ok.length ? 'ok' : 'bad');
+  };
+
   function title() { var d = R.deteccao || {}; return 'Diagnóstico /v · ' + [d.tv, d.navegador, d.sistema].filter(Boolean).join(' · '); }
 
   /* Envio pelo Google Apps Script (apps-script/v-email.gs) publicado na conta Google do dono: grátis, sai pelo próprio Gmail,
@@ -682,6 +756,7 @@
       fala: f && typeof f === 'object' ? (f.eventos ? { existe: f.existeSpeechSynthesis, voz: f.voz, start: f.eventos.start, end: f.eventos.end, erro: f.eventos.error,
         boundary: f.boundary.total + ' ' + JSON.stringify(f.boundary.tipos), duracaoMs: f.duracaoMs, palpite: f.palpiteSom, ouviu: f.ouvidoPeloUsuario }
         : { existe: !!f.existeSpeechSynthesis, existeUtterance: !!f.existeUtterance, info: 'speechSynthesis não existe neste navegador: não há voz nativa' }) : f,
+      botaoMic: R.botaoMicTeste && typeof R.botaoMicTeste === 'object' ? (R.botaoMicTeste.resultado || { info: 'teste não concluído' }) : R.botaoMicTeste,
       microfone: R.microfoneTeste && typeof R.microfoneTeste === 'object' ? (R.microfoneTeste.resultado || { info: 'teste não concluído', etapa: R.microfoneTeste.etapa }) : R.microfoneTeste,
       vozes: Array.isArray(R.vozes) ? R.vozes.length : R.vozes, apis: R.apis && R.apis.resumo,
       fuso: R.intl && R.intl.timeZone, ip: R.ipPublico, coletadoEm: R.coletadoEm
