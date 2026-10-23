@@ -1,0 +1,1215 @@
+
+{
+  "problemaEnvio": {
+   "causaProvavel": "nenhuma: o fetch até o Apps Script funciona neste 
+navegador",
+   "comoResolver": "nada a fazer",
+   "erro": null,
+   "ultimoEnvio": null
+  },
+  "deteccao": {
+   "sistema": "Android 7.1.2",
+   "navegador": "Amazon Silk 144.12.355919",
+   "motor": "Blink",
+   "tv": "Fire TV (AFTCL001)",
+   "mobile": false,
+   "touch": false
+  },
+  "userAgent": "Mozilla/5.0 (Linux; Android 7.1.2; AFTCL001 Build/NS6546;) 
+AppleWebKit/537.36 (KHTML, like Gecko) Silk/144.12.355919 like 
+Chrome/144.0.7559.246 Safari/537.36",
+  "versoes": {
+   "platform": "Linux armv7l",
+   "platformVersion": "",
+   "model": "",
+   "architecture": "armv7l",
+   "fullVersionList": []
+  },
+  "tela": "1920x1080 @2 (janela 960x490)",
+  "hdr": "standard",
+  "gamut": "srgb",
+  "cpu": 4,
+  "memoriaGB": 1,
+  "gpu": "Mali-G310 (Panfrost)",
+  "drm": {
+   "com.microsoft.playready.recommendation.3000": "não",
+   "com.apple.fps": "não",
+   "com.apple.fps.1_0": "não",
+   "org.w3.clearkey": "sim",
+   "com.chromecast.playready": "não",
+   "com.widevine.alpha": "sim (L1)",
+   "com.microsoft.playready": "sim",
+   "com.microsoft.playready.recommendation": "sim"
+  },
+  "fala": "não executado (use o botão Testar fala)",
+  "botaoMic": {
+   "ditadoFuncionouEm": [
+    "C"
+   ],
+   "tecladoDetectadoEm": [],
+   "recomendacao": "C: o 🎤 precisa ser o próprio campo de texto, estilizado 
+como botão"
+  },
+  "microfone": "não executado (use o botão Testar microfone)",
+  "vozes": "não suportado",
+  "apis": "212 de 257 disponíveis",
+  "fuso": "America/Sao_Paulo",
+  "ip": "erro: TypeError: Failed to fetch",
+  "coletadoEm": "2026-10-23T12:13:09.368Z"
+}
+
+----- JSON completo -----
+
+{
+   "problemaEnvio": {
+     "causaProvavel": "nenhuma: o fetch até o Apps Script funciona neste 
+navegador",
+     "comoResolver": "nada a fazer",
+     "erro": null,
+     "navegador": "Amazon Silk 144.12.355919 · Fire TV (AFTCL001)",
+     "ultimoEnvio": null,
+     "etapas": {
+       "fetchCorsGet": {
+         "ms": 1835,
+         "ok": true,
+         "status": 200,
+         "type": "cors",
+         "redirecionou": true,
+         "urlFinal": "https://script.googleusercontent.com/macros/echo",
+         "versaoScript": 2,
+         "resposta": null
+       },
+       "fetchCorsPost": {
+         "ms": 1013,
+         "ok": true,
+         "resposta": null
+       },
+       "fetchSemCors": {
+         "ms": 1812,
+         "ok": true,
+         "type": "opaque"
+       },
+       "primeiroSaltoRedirect": {
+         "ms": 1485,
+         "ok": true,
+         "type": "opaqueredirect",
+         "status": 0
+       },
+       "googleusercontent": {
+         "ms": 464,
+         "ok": true,
+         "type": "opaque"
+       },
+       "outroSiteComCors": {
+         "ok": false,
+         "erro": "erro: TypeError: Failed to fetch",
+         "ms": 94
+       }
+     }
+   },
+   "errosJs": [],
+   "coletadoEm": "2026-10-23T12:13:09.368Z",
+   "pagina": {
+     "url": "https://amarildo-correa.github.io/on/v",
+     "referrer": "",
+     "titulo": "Read on TV · Diagnóstico",
+     "protocolo": "https:",
+     "contextoSeguro": true,
+     "isolamentoCrossOrigin": false,
+     "modoDocumento": "CSS1Compat",
+     "charset": "UTF-8",
+     "visibilidade": "visible",
+     "emIframe": false
+   },
+   "navigator": {
+     "vendorSub": "",
+     "productSub": "20030107",
+     "vendor": "Google Inc.",
+     "maxTouchPoints": 0,
+     "doNotTrack": null,
+     "hardwareConcurrency": 4,
+     "cookieEnabled": true,
+     "appCodeName": "Mozilla",
+     "appName": "Netscape",
+     "appVersion": "5.0 (Linux; Android 7.1.2; AFTCL001 Build/NS6546;) 
+AppleWebKit/537.36 (KHTML, like Gecko) Silk/144.12.355919 like 
+Chrome/144.0.7559.246 Safari/537.36",
+     "platform": "Linux x86_64",
+     "product": "Gecko",
+     "userAgent": "Mozilla/5.0 (Linux; Android 7.1.2; AFTCL001 
+Build/NS6546;) AppleWebKit/537.36 (KHTML, like Gecko) Silk/144.12.355919 
+like Chrome/144.0.7559.246 Safari/537.36",
+     "language": "en-US",
+     "onLine": true,
+     "webdriver": false,
+     "pdfViewerEnabled": false,
+     "deprecatedRunAdAuctionEnforcesKAnonymity": false,
+     "deviceMemory": 1,
+     "languages": [
+       "en-US"
+     ],
+     "plugins": [],
+     "mimeTypes": [],
+     "connection": {
+       "onchange": null,
+       "effectiveType": "4g",
+       "rtt": 0,
+       "downlink": 10,
+       "saveData": false
+     },
+     "globalPrivacyControl": null,
+     "userActivation": {
+       "hasBeenActive": false,
+       "isActive": false
+     }
+   },
+   "userAgentData": {
+     "brands": [
+       {
+         "brand": "Silk",
+         "version": "144"
+       }
+     ],
+     "mobile": false,
+     "platform": "Linux armv7l"
+   },
+   "tela": {
+     "availWidth": 1920,
+     "availHeight": 1080,
+     "width": 1920,
+     "height": 1080,
+     "colorDepth": 24,
+     "pixelDepth": 24,
+     "availLeft": 0,
+     "availTop": 0,
+     "onchange": null,
+     "isExtended": false,
+     "orientation": {
+       "type": "landscape-primary",
+       "angle": 0
+     },
+     "devicePixelRatio": 2,
+     "janela": {
+       "innerWidth": 960,
+       "innerHeight": 490,
+       "outerWidth": 1920,
+       "outerHeight": 980,
+       "clientWidth": 960,
+       "clientHeight": 490,
+       "screenX": 0,
+       "screenY": 0,
+       "visualViewport": {
+         "width": 960,
+         "height": 490,
+         "scale": 1
+       }
+     }
+   },
+   "mediaQueries": {
+     "prefers-color-scheme": "light",
+     "prefers-reduced-motion": "no-preference",
+     "prefers-contrast": "no-preference",
+     "prefers-reduced-transparency": null,
+     "prefers-reduced-data": null,
+     "forced-colors": "none",
+     "inverted-colors": null,
+     "color-gamut": "srgb",
+     "dynamic-range": "standard",
+     "video-dynamic-range": null,
+     "pointer": "none",
+     "any-pointer": "none",
+     "hover": "none",
+     "any-hover": "none",
+     "display-mode": "browser",
+     "orientation": "landscape",
+     "scripting": "enabled",
+     "update": "fast",
+     "overflow-block": "scroll",
+     "scan": null,
+     "grid": "0",
+     "monochrome": "0",
+     "color": 8
+   },
+   "intl": {
+     "timeZone": "America/Sao_Paulo",
+     "locale": "pt-BR",
+     "calendar": "gregory",
+     "numberingSystem": "latn",
+     "offsetMinutos": -180,
+     "dataLocal": "Fri Oct 23 2026 09:13:09 GMT-0300 (Horário Padrão de 
+Brasília)",
+     "numero": "1.234.567,891",
+     "supportedValuesOf": true,
+     "segmenter": true,
+     "listFormat": true,
+     "relativeTime": true,
+     "displayNames": true
+   },
+   "armazenamento": {
+     "localStorage": true,
+     "sessionStorage": true,
+     "indexedDB": true,
+     "cacheStorage": true,
+     "cookieEnabled": true,
+     "cookiesVisiveis": 0
+   },
+   "performance": {
+     "memory": {
+       "jsHeapSizeLimit": 269000000,
+       "totalJSHeapSize": 10000000,
+       "usedJSHeapSize": 10000000
+     },
+     "navegacao": {
+       "tipo": "reload",
+       "protocolo": "h2",
+       "duracaoMs": 0,
+       "domInteractiveMs": 0,
+       "transferSize": 21771
+     },
+     "timeOrigin": 1792757588695.1,
+     "recursos": 0
+   },
+   "webgl": {
+     "vendor": "WebKit",
+     "renderer": "WebKit WebGL",
+     "version": "WebGL 1.0 (OpenGL ES 2.0 Chromium)",
+     "shadingLanguage": "WebGL GLSL ES 1.0 (OpenGL ES GLSL ES 1.0 Chromium)",
+     "unmaskedVendor": "Mesa",
+     "unmaskedRenderer": "Mali-G310 (Panfrost)",
+     "maxTextureSize": 8192,
+     "maxRenderbufferSize": 8192,
+     "maxViewportDims": [
+       8192,
+       8192
+     ],
+     "maxVertexAttribs": 16,
+     "maxTextureImageUnits": 32,
+     "antialias": true,
+     "extensoes": [
+       "ANGLE_instanced_arrays",
+       "EXT_blend_minmax",
+       "EXT_color_buffer_half_float",
+       "EXT_disjoint_timer_query",
+       "EXT_float_blend",
+       "EXT_frag_depth",
+       "EXT_texture_filter_anisotropic",
+       "OES_element_index_uint",
+       "OES_fbo_render_mipmap",
+       "OES_standard_derivatives",
+       "OES_texture_float",
+       "OES_texture_float_linear",
+       "OES_texture_half_float",
+       "OES_texture_half_float_linear",
+       "OES_vertex_array_object",
+       "WEBGL_color_buffer_float",
+       "WEBGL_compressed_texture_astc",
+       "WEBGL_compressed_texture_etc",
+       "WEBGL_compressed_texture_etc1",
+       "WEBGL_debug_renderer_info",
+       "WEBGL_debug_shaders",
+       "WEBGL_depth_texture",
+       "WEBGL_draw_buffers",
+       "WEBGL_lose_context",
+       "WEBGL_multi_draw"
+     ]
+   },
+   "webgl2": {
+     "vendor": "WebKit",
+     "renderer": "WebKit WebGL",
+     "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+     "shadingLanguage": "WebGL GLSL ES 3.00 (OpenGL ES GLSL ES 3.0 
+Chromium)",
+     "unmaskedVendor": "Mesa",
+     "unmaskedRenderer": "Mali-G310 (Panfrost)",
+     "maxTextureSize": 8192,
+     "maxRenderbufferSize": 8192,
+     "maxViewportDims": [
+       8192,
+       8192
+     ],
+     "maxVertexAttribs": 16,
+     "maxTextureImageUnits": 32,
+     "antialias": true,
+     "extensoes": [
+       "EXT_color_buffer_float",
+       "EXT_color_buffer_half_float",
+       "EXT_disjoint_timer_query_webgl2",
+       "EXT_float_blend",
+       "EXT_texture_filter_anisotropic",
+       "EXT_texture_norm16",
+       "OES_texture_float_linear",
+       "WEBGL_compressed_texture_astc",
+       "WEBGL_compressed_texture_etc",
+       "WEBGL_compressed_texture_etc1",
+       "WEBGL_debug_renderer_info",
+       "WEBGL_debug_shaders",
+       "WEBGL_lose_context",
+       "WEBGL_multi_draw"
+     ]
+   },
+   "canvas": {
+     "canvas2d": true,
+     "toDataURLwebp": true,
+     "offscreenCanvas": true,
+     "createImageBitmap": true
+   },
+   "midia": {
+     "mediaSource": true,
+     "managedMediaSource": false,
+     "pictureInPicture": false,
+     "remotePlayback": false,
+     "webkitPresentationMode": false,
+     "video": {
+       "video/mp4; codecs=\"avc1.42E01E\"": {
+         "canPlayType": "probably",
+         "mediaSource": true,
+         "managedMediaSource": null
+       },
+       "video/mp4; codecs=\"avc1.640028\"": {
+         "canPlayType": "probably",
+         "mediaSource": true,
+         "managedMediaSource": null
+       },
+       "video/mp4; codecs=\"hev1.1.6.L93.B0\"": {
+         "canPlayType": "não",
+         "mediaSource": false,
+         "managedMediaSource": null
+       },
+       "video/mp4; codecs=\"hvc1.1.6.L93.B0\"": {
+         "canPlayType": "não",
+         "mediaSource": false,
+         "managedMediaSource": null
+       },
+       "video/mp4; codecs=\"hvc1.2.4.L153.B0\"": {
+         "canPlayType": "não",
+         "mediaSource": false,
+         "managedMediaSource": null
+       },
+       "video/mp4; codecs=\"dvh1.05.06\"": {
+         "canPlayType": "não",
+         "mediaSource": false,
+         "managedMediaSource": null
+       },
+       "video/mp4; codecs=\"av01.0.05M.08\"": {
+         "canPlayType": "não",
+         "mediaSource": false,
+         "managedMediaSource": null
+       },
+       "video/mp4; codecs=\"av01.0.12M.10.0.110.09.16.09.0\"": {
+         "canPlayType": "não",
+         "mediaSource": false,
+         "managedMediaSource": null
+       },
+       "video/mp4; codecs=\"vp09.00.10.08\"": {
+         "canPlayType": "probably",
+         "mediaSource": true,
+         "managedMediaSource": null
+       },
+       "video/mp4; codecs=\"vp09.02.10.10.01.09.16.09.01\"": {
+         "canPlayType": "probably",
+         "mediaSource": true,
+         "managedMediaSource": null
+       },
+       "video/webm; codecs=\"vp8\"": {
+         "canPlayType": "probably",
+         "mediaSource": true,
+         "managedMediaSource": null
+       },
+       "video/webm; codecs=\"vp9\"": {
+         "canPlayType": "probably",
+         "mediaSource": true,
+         "managedMediaSource": null
+       },
+       "video/webm; codecs=\"av1\"": {
+         "canPlayType": "não",
+         "mediaSource": false,
+         "managedMediaSource": null
+       },
+       "video/ogg; codecs=\"theora\"": {
+         "canPlayType": "não",
+         "mediaSource": false,
+         "managedMediaSource": null
+       },
+       "video/mp2t; codecs=\"avc1.42E01E,mp4a.40.2\"": {
+         "canPlayType": "não",
+         "mediaSource": true,
+         "managedMediaSource": null
+       },
+       "application/vnd.apple.mpegurl": {
+         "canPlayType": "maybe",
+         "mediaSource": false,
+         "managedMediaSource": null
+       },
+       "application/x-mpegURL": {
+         "canPlayType": "maybe",
+         "mediaSource": false,
+         "managedMediaSource": null
+       },
+       "application/dash+xml": {
+         "canPlayType": "não",
+         "mediaSource": false,
+         "managedMediaSource": null
+       }
+     },
+     "audio": {
+       "audio/mp4; codecs=\"mp4a.40.2\"": {
+         "canPlayType": "probably",
+         "mediaSource": true,
+         "managedMediaSource": null
+       },
+       "audio/mp4; codecs=\"mp4a.40.5\"": {
+         "canPlayType": "probably",
+         "mediaSource": true,
+         "managedMediaSource": null
+       },
+       "audio/mp4; codecs=\"ac-3\"": {
+         "canPlayType": "não",
+         "mediaSource": false,
+         "managedMediaSource": null
+       },
+       "audio/mp4; codecs=\"ec-3\"": {
+         "canPlayType": "não",
+         "mediaSource": false,
+         "managedMediaSource": null
+       },
+       "audio/mp4; codecs=\"ac-4\"": {
+         "canPlayType": "não",
+         "mediaSource": false,
+         "managedMediaSource": null
+       },
+       "audio/mp4; codecs=\"opus\"": {
+         "canPlayType": "probably",
+         "mediaSource": true,
+         "managedMediaSource": null
+       },
+       "audio/mp4; codecs=\"flac\"": {
+         "canPlayType": "probably",
+         "mediaSource": true,
+         "managedMediaSource": null
+       },
+       "audio/mp4; codecs=\"dtsc\"": {
+         "canPlayType": "não",
+         "mediaSource": false,
+         "managedMediaSource": null
+       },
+       "audio/mpeg": {
+         "canPlayType": "probably",
+         "mediaSource": true,
+         "managedMediaSource": null
+       },
+       "audio/aac": {
+         "canPlayType": "probably",
+         "mediaSource": true,
+         "managedMediaSource": null
+       },
+       "audio/flac": {
+         "canPlayType": "probably",
+         "mediaSource": false,
+         "managedMediaSource": null
+       },
+       "audio/wav; codecs=\"1\"": {
+         "canPlayType": "probably",
+         "mediaSource": false,
+         "managedMediaSource": null
+       },
+       "audio/webm; codecs=\"opus\"": {
+         "canPlayType": "probably",
+         "mediaSource": true,
+         "managedMediaSource": null
+       },
+       "audio/webm; codecs=\"vorbis\"": {
+         "canPlayType": "probably",
+         "mediaSource": true,
+         "managedMediaSource": null
+       },
+       "audio/ogg; codecs=\"opus\"": {
+         "canPlayType": "probably",
+         "mediaSource": false,
+         "managedMediaSource": null
+       },
+       "audio/ogg; codecs=\"vorbis\"": {
+         "canPlayType": "probably",
+         "mediaSource": false,
+         "managedMediaSource": null
+       }
+     }
+   },
+   "fullscreen": {
+     "fullscreenEnabled": true,
+     "requestFullscreen": true
+   },
+   "css": {
+     "display: grid": true,
+     "display: flex": true,
+     "gap: 1px": true,
+     "display: contents": true,
+     "aspect-ratio: 1": true,
+     "position: sticky": true,
+     "backdrop-filter: blur(1px)": true,
+     "-webkit-backdrop-filter: blur(1px)": false,
+     "container-type: inline-size": true,
+     "selector(:has(a))": true,
+     "selector(:is(a))": true,
+     "selector(:where(a))": true,
+     "selector(:focus-visible)": true,
+     "color: oklch(50% 0.1 200)": true,
+     "color: color-mix(in srgb, red, blue)": true,
+     "color: color(display-p3 1 0 0)": true,
+     "inset: 0": true,
+     "scroll-snap-type: x mandatory": true,
+     "overscroll-behavior: contain": true,
+     "content-visibility: auto": true,
+     "mask-image: none": true,
+     "-webkit-mask-image: none": true,
+     "clip-path: circle(50%)": true,
+     "font-variation-settings: \"wght\" 400": true,
+     "text-wrap: balance": true,
+     "anchor-name: --a": true,
+     "view-transition-name: a": true,
+     "animation-timeline: scroll()": true,
+     "translate: 1px": true,
+     "accent-color: red": true,
+     "height: 1dvh": true,
+     "width: 1cqw": true,
+     "field-sizing: content": true,
+     "interpolate-size: allow-keywords": true,
+     "scrollbar-gutter: stable": true,
+     "zoom: 1": true,
+     "nesting": true,
+     "paintWorklet": true,
+     "registerProperty": true,
+     "highlights": true
+   },
+   "javascript": {
+     "arrowFunctions": true,
+     "classes": true,
+     "letConst": true,
+     "templateLiterals": true,
+     "destructuring": true,
+     "spread": true,
+     "asyncAwait": true,
+     "generators": true,
+     "asyncIterators": true,
+     "optionalChaining": true,
+     "nullish": true,
+     "bigint": true,
+     "classFields": true,
+     "staticBlocks": true,
+     "logicalAssignment": true,
+     "numericSeparators": true,
+     "topLevelAwaitModule": null,
+     "regexLookbehind": true,
+     "regexNamedGroups": true,
+     "regexV": true,
+     "Promise": "function",
+     "PromiseAllSettled": true,
+     "PromiseAny": true,
+     "PromiseWithResolvers": true,
+     "Proxy": "function",
+     "Reflect": "object",
+     "Symbol": "function",
+     "WeakRef": "function",
+     "FinalizationRegistry": "function",
+     "ArrayAt": true,
+     "ArrayFlat": true,
+     "ArrayFindLast": true,
+     "ArrayToSorted": true,
+     "ArrayFromAsync": true,
+     "ObjectHasOwn": true,
+     "ObjectGroupBy": true,
+     "StringReplaceAll": true,
+     "StructuredClone": "function",
+     "SetMethods": true,
+     "IteratorHelpers": true,
+     "Temporal": true,
+     "SharedArrayBuffer": "undefined",
+     "Atomics": "object",
+     "WebAssembly": "object",
+     "wasmSimd": true,
+     "wasmThreads": true,
+     "esModules": true,
+     "importMaps": true,
+     "eval": true
+   },
+   "apis": {
+     "window": {
+       "fetch": true,
+       "XMLHttpRequest": true,
+       "WebSocket": true,
+       "WebTransport": true,
+       "EventSource": true,
+       "Worker": true,
+       "SharedWorker": true,
+       "ServiceWorker": true,
+       "BroadcastChannel": true,
+       "MessageChannel": true,
+       "AbortController": true,
+       "ReadableStream": true,
+       "WritableStream": true,
+       "TransformStream": true,
+       "CompressionStream": true,
+       "DecompressionStream": true,
+       "TextEncoder": true,
+       "TextDecoder": true,
+       "URL": true,
+       "URLSearchParams": true,
+       "URLPattern": true,
+       "Blob": true,
+       "File": true,
+       "FileReader": true,
+       "FormData": true,
+       "Headers": true,
+       "Request": true,
+       "Response": true,
+       "crypto": true,
+       "Crypto": true,
+       "SubtleCrypto": true,
+       "IntersectionObserver": true,
+       "ResizeObserver": true,
+       "MutationObserver": true,
+       "PerformanceObserver": true,
+       "ReportingObserver": true,
+       "requestIdleCallback": true,
+       "requestAnimationFrame": true,
+       "queueMicrotask": true,
+       "scheduler": true,
+       "customElements": true,
+       "ShadowRoot": true,
+       "HTMLTemplateElement": true,
+       "AudioContext": true,
+       "webkitAudioContext": false,
+       "OfflineAudioContext": true,
+       "AudioWorklet": true,
+       "MediaRecorder": true,
+       "MediaStream": true,
+       "MediaStreamTrack": true,
+       "ImageCapture": true,
+       "RTCPeerConnection": true,
+       "webkitRTCPeerConnection": true,
+       "RTCDataChannel": true,
+       "MediaKeys": true,
+       "MediaKeySession": true,
+       "VideoDecoder": true,
+       "VideoEncoder": true,
+       "AudioDecoder": true,
+       "AudioEncoder": true,
+       "ImageDecoder": true,
+       "VideoFrame": true,
+       "EncodedVideoChunk": true,
+       "speechSynthesis": false,
+       "SpeechSynthesisUtterance": false,
+       "SpeechRecognition": true,
+       "webkitSpeechRecognition": true,
+       "Notification": false,
+       "PushManager": false,
+       "PaymentRequest": true,
+       "PublicKeyCredential": true,
+       "PasswordCredential": true,
+       "IdentityCredential": true,
+       "FederatedCredential": true,
+       "Gamepad": true,
+       "GamepadHapticActuator": true,
+       "DeviceOrientationEvent": true,
+       "DeviceMotionEvent": true,
+       "AbsoluteOrientationSensor": true,
+       "Accelerometer": true,
+       "Gyroscope": true,
+       "Magnetometer": false,
+       "AmbientLightSensor": false,
+       "GravitySensor": true,
+       "LinearAccelerationSensor": true,
+       "TouchEvent": true,
+       "PointerEvent": true,
+       "Touch": true,
+       "DragEvent": true,
+       "ClipboardItem": true,
+       "EyeDropper": true,
+       "showOpenFilePicker": true,
+       "showSaveFilePicker": true,
+       "showDirectoryPicker": true,
+       "FileSystemHandle": true,
+       "FileSystemFileHandle": true,
+       "documentPictureInPicture": true,
+       "launchQueue": true,
+       "getScreenDetails": true,
+       "queryLocalFonts": true,
+       "BarcodeDetector": false,
+       "FaceDetector": false,
+       "TextDetector": false,
+       "Translator": true,
+       "LanguageDetector": true,
+       "Summarizer": true,
+       "Writer": false,
+       "Rewriter": false,
+       "Proofreader": false,
+       "LanguageModel": false,
+       "ai": false,
+       "XRSystem": true,
+       "XRSession": true,
+       "PresentationRequest": false,
+       "RemotePlayback": false,
+       "MediaSession": true,
+       "MediaMetadata": true,
+       "CookieStore": true,
+       "cookieStore": true,
+       "StorageManager": true,
+       "LockManager": true,
+       "Navigation": true,
+       "navigation": true,
+       "CloseWatcher": true,
+       "ViewTransition": true,
+       "Highlight": true,
+       "Sanitizer": false,
+       "TrustedTypes": false,
+       "trustedTypes": true,
+       "SharedStorage": true,
+       "sharedStorage": true,
+       "Fence": true,
+       "FencedFrameConfig": true,
+       "PressureObserver": true,
+       "ComputePressureObserver": false,
+       "IdleDetector": true,
+       "NavigatorUAData": true,
+       "NetworkInformation": true,
+       "BatteryManager": true,
+       "WakeLock": true,
+       "WakeLockSentinel": true,
+       "VirtualKeyboard": true,
+       "EditContext": true,
+       "Profiler": true,
+       "webkit": false,
+       "chrome": false,
+       "opera": false,
+       "safari": false,
+       "netscape": false,
+       "external": true,
+       "onorientationchange": false,
+       "tizen": false,
+       "webOS": false,
+       "webOSSystem": false,
+       "PalmSystem": false,
+       "AmazonWebAppPlatform": false,
+       "Android": false,
+       "amazon": false
+     },
+     "navigator": {
+       "serviceWorker": true,
+       "storage": true,
+       "permissions": true,
+       "mediaDevices": true,
+       "mediaCapabilities": true,
+       "mediaSession": true,
+       "requestMediaKeySystemAccess": true,
+       "geolocation": true,
+       "clipboard": true,
+       "share": false,
+       "canShare": false,
+       "credentials": true,
+       "locks": true,
+       "wakeLock": true,
+       "getBattery": true,
+       "getGamepads": true,
+       "vibrate": true,
+       "bluetooth": false,
+       "usb": true,
+       "hid": true,
+       "serial": true,
+       "nfc": false,
+       "xr": true,
+       "gpu": true,
+       "ml": false,
+       "presentation": false,
+       "keyboard": true,
+       "virtualKeyboard": true,
+       "contacts": false,
+       "ink": true,
+       "scheduling": true,
+       "userActivation": true,
+       "windowControlsOverlay": true,
+       "login": true,
+       "setAppBadge": true,
+       "clearAppBadge": true,
+       "getInstalledRelatedApps": true,
+       "registerProtocolHandler": true,
+       "sendBeacon": true,
+       "pdfViewerEnabled": true,
+       "webdriver": true,
+       "deviceMemory": true,
+       "hardwareConcurrency": true,
+       "maxTouchPoints": true,
+       "connection": true,
+       "onLine": true,
+       "cookieEnabled": true,
+       "javaEnabled": true,
+       "globalPrivacyControl": false,
+       "managed": true,
+       "devicePosture": true,
+       "protectedAudience": true,
+       "joinAdInterestGroup": true,
+       "runAdAuction": true,
+       "brave": false,
+       "standalone": false
+     },
+     "document": {
+       "fonts": true,
+       "startViewTransition": true,
+       "requestStorageAccess": true,
+       "hasStorageAccess": true,
+       "browsingTopics": true,
+       "interestCohort": false,
+       "featurePolicy": true,
+       "permissionsPolicy": false,
+       "exitPictureInPicture": true,
+       "pictureInPictureEnabled": true,
+       "exitPointerLock": true,
+       "adoptedStyleSheets": true,
+       "timeline": true,
+       "prerendering": true,
+       "activeViewTransition": true,
+       "caretPositionFromPoint": true,
+       "caretRangeFromPoint": true
+     },
+     "elemento": {
+       "requestFullscreen": true,
+       "webkitRequestFullscreen": true,
+       "requestPointerLock": true,
+       "attachShadow": true,
+       "animate": true,
+       "checkVisibility": true,
+       "showPopover": true,
+       "computedStyleMap": true,
+       "scrollIntoViewIfNeeded": true,
+       "setHTMLUnsafe": true,
+       "moveBefore": true,
+       "ariaLabel": true,
+       "inert": true,
+       "focus": true
+     },
+     "html": {
+       "dialog": true,
+       "details": true,
+       "popover": true,
+       "loading-lazy": true,
+       "inputmode": true,
+       "enterkeyhint": true,
+       "input-date": true,
+       "input-color": true,
+       "input-datetime-local": true,
+       "picture": true,
+       "srcset": true,
+       "search-element": true
+     },
+     "resumo": "212 de 257 disponíveis"
+   },
+   "deteccao": {
+     "sistema": "Android 7.1.2",
+     "navegador": "Amazon Silk 144.12.355919",
+     "motor": "Blink",
+     "tv": "Fire TV (AFTCL001)",
+     "mobile": false,
+     "touch": false
+   },
+   "audio": {
+     "sampleRate": 48000,
+     "baseLatency": 0.042666666666666665,
+     "outputLatency": 0,
+     "state": "suspended",
+     "maxChannelCount": 2,
+     "audioWorklet": true,
+     "setSinkId": true
+   },
+   "vozes": "não suportado",
+   "gamepads": [],
+   "fontes": [
+     "Noto Color Emoji",
+     "Apple Color Emoji",
+     "Segoe UI Emoji",
+     "Amazon Ember",
+     "Bookerly"
+   ],
+   "webrtc": {
+     "video": [
+       "video/VP8",
+       "video/rtx",
+       "video/VP9",
+       "video/H264",
+       "video/AV1",
+       "video/red",
+       "video/ulpfec",
+       "video/flexfec-03"
+     ],
+     "audio": [
+       "audio/opus",
+       "audio/red",
+       "audio/G722",
+       "audio/PCMU",
+       "audio/PCMA",
+       "audio/CN",
+       "audio/telephone-event"
+     ]
+   },
+   "webgpu": "sem adaptador",
+   "userAgentDataAlta": {
+     "architecture": "armv7l",
+     "bitness": "",
+     "brands": [
+       {
+         "brand": "Silk",
+         "version": "144"
+       }
+     ],
+     "formFactors": [],
+     "fullVersionList": [],
+     "mobile": false,
+     "model": "",
+     "platform": "Linux armv7l",
+     "platformVersion": "",
+     "uaFullVersion": "144.0.7559.246",
+     "wow64": false
+   },
+   "armazenamentoEstimativa": {
+     "quotaBytes": 2740759756,
+     "usoBytes": 0,
+     "quotaGB": 2.55,
+     "persistente": false,
+     "detalhes": {}
+   },
+   "dispositivosMidia": {
+     "contagem": {
+       "audioinput": 1,
+       "audiooutput": 1
+     },
+     "rotulos": [
+       "audioinput: (sem permissão)",
+       "audiooutput: (sem permissão)"
+     ],
+     "constraintsSuportadas": [
+       "aspectRatio",
+       "autoGainControl",
+       "brightness",
+       "channelCount",
+       "colorTemperature",
+       "contrast",
+       "deviceId",
+       "displaySurface",
+       "echoCancellation",
+       "exposureCompensation",
+       "exposureMode",
+       "exposureTime",
+       "facingMode",
+       "focusDistance",
+       "focusMode",
+       "frameRate",
+       "groupId",
+       "height",
+       "iso",
+       "latency",
+       "noiseSuppression",
+       "pan",
+       "pointsOfInterest",
+       "resizeMode",
+       "restrictOwnAudio",
+       "sampleRate",
+       "sampleSize",
+       "saturation",
+       "sharpness",
+       "suppressLocalAudioPlayback",
+       "tilt",
+       "torch",
+       "voiceIsolation",
+       "whiteBalanceMode",
+       "width",
+       "zoom"
+     ],
+     "getDisplayMedia": true
+   },
+   "bateria": {
+     "charging": true,
+     "level": 1,
+     "chargingTime": 0,
+     "dischargingTime": null
+   },
+   "serviceWorker": {
+     "registrosNaOrigem": []
+   },
+   "rede": {
+     "pingProprioSiteMs": 75,
+     "status": 200,
+     "servidor": "GitHub.com",
+     "cdn": "1.1 varnish"
+   },
+   "permissoes": {
+     "ambient-light-sensor": "não suportado",
+     "speaker-selection": "não suportado",
+     "geolocation": "denied",
+     "notifications": "denied",
+     "push": "denied",
+     "camera": "denied",
+     "microphone": "denied",
+     "clipboard-read": "denied",
+     "clipboard-write": "denied",
+     "persistent-storage": "denied",
+     "midi": "denied",
+     "background-sync": "denied",
+     "accelerometer": "denied",
+     "gyroscope": "denied",
+     "magnetometer": "denied",
+     "screen-wake-lock": "denied",
+     "idle-detection": "denied",
+     "local-fonts": "denied",
+     "window-management": "denied",
+     "storage-access": "denied",
+     "display-capture": "denied",
+     "payment-handler": "denied",
+     "keyboard-lock": "denied",
+     "pointer-lock": "denied"
+   },
+   "mediaCapabilities": {
+     "HEVC 2160p60 10bit": {
+       "supported": false,
+       "smooth": false,
+       "powerEfficient": false
+     },
+     "AV1 2160p60": {
+       "supported": false,
+       "smooth": false,
+       "powerEfficient": false
+     },
+     "AV1 1080p30": {
+       "supported": false,
+       "smooth": false,
+       "powerEfficient": false
+     },
+     "H.264 1080p30": {
+       "supported": true,
+       "smooth": true,
+       "powerEfficient": true
+     },
+     "H.264 2160p30": {
+       "supported": true,
+       "smooth": true,
+       "powerEfficient": false
+     },
+     "VP9 2160p60": {
+       "supported": true,
+       "smooth": true,
+       "powerEfficient": false
+     }
+   },
+   "drm": {
+     "com.microsoft.playready.recommendation.3000": {
+       "suportado": false,
+       "motivo": "erro: NotSupportedError: Unsupported keySystem or 
+supportedConfigurations."
+     },
+     "com.apple.fps": {
+       "suportado": false,
+       "motivo": "erro: NotSupportedError: Unsupported keySystem or 
+supportedConfigurations."
+     },
+     "com.apple.fps.1_0": {
+       "suportado": false,
+       "motivo": "erro: NotSupportedError: Unsupported keySystem or 
+supportedConfigurations."
+     },
+     "org.w3.clearkey": {
+       "suportado": true,
+       "distinctiveIdentifier": "not-allowed",
+       "persistentState": "not-allowed",
+       "sessionTypes": [
+         "temporary"
+       ]
+     },
+     "com.chromecast.playready": {
+       "suportado": false,
+       "motivo": "erro: NotSupportedError: Unsupported keySystem or 
+supportedConfigurations."
+     },
+     "com.widevine.alpha": {
+       "suportado": true,
+       "distinctiveIdentifier": "required",
+       "persistentState": "required",
+       "sessionTypes": [
+         "temporary"
+       ],
+       "hwSecureAll": true
+     },
+     "com.microsoft.playready": {
+       "suportado": true,
+       "distinctiveIdentifier": "required",
+       "persistentState": "required",
+       "sessionTypes": [
+         "temporary"
+       ]
+     },
+     "com.microsoft.playready.recommendation": {
+       "suportado": true,
+       "distinctiveIdentifier": "required",
+       "persistentState": "required",
+       "sessionTypes": [
+         "temporary"
+       ]
+     }
+   },
+   "ipPublico": "erro: TypeError: Failed to fetch",
+   "leituraMs": 4083,
+   "falaTeste": "não executado (use o botão Testar fala)",
+   "microfoneTeste": "não executado (use o botão Testar microfone)",
+   "botaoMicTeste": {
+     "apiVirtualKeyboard": true,
+     "A": {
+       "tentou": false,
+       "focou": false,
+       "tecladoAbriuViewport": false,
+       "menorAlturaViewport": null,
+       "eventosInput": 0,
+       "maiorBloco": 0,
+       "texto": "",
+       "ditado": false,
+       "eventos": []
+     },
+     "B": {
+       "tentou": true,
+       "focou": true,
+       "tecladoAbriuViewport": false,
+       "menorAlturaViewport": null,
+       "eventosInput": 2,
+       "maiorBloco": 0,
+       "texto": "Som",
+       "ditado": false,
+       "eventos": [
+         "focus @3284",
+         "show() chamado @3286",
+         "input +0 @9244",
+         "input +0 @9248"
+       ]
+     },
+     "C": {
+       "tentou": true,
+       "focou": true,
+       "tecladoAbriuViewport": false,
+       "menorAlturaViewport": null,
+       "eventosInput": 4,
+       "maiorBloco": 3,
+       "texto": "Som",
+       "ditado": true,
+       "eventos": [
+         "focus @15680",
+         "OK no campo @15686",
+         "input +3 @39660",
+         "input +0 @39751",
+         "focus @48204",
+         "input +0 @53170",
+         "input +0 @53176"
+       ]
+     },
+     "resultado": {
+       "ditadoFuncionouEm": [
+         "C"
+       ],
+       "tecladoDetectadoEm": [],
+       "recomendacao": "C: o 🎤 precisa ser o próprio campo de texto, 
+estilizado como botão"
+     }
+   }
+}
