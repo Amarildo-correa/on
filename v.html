@@ -50,7 +50,8 @@
     <button id="kA">🎤 A: botão que foca o campo</button>
     <button id="kB">🎤 B: botão + API VirtualKeyboard</button>
     <input id="kC" class="as-btn" type="text" placeholder="🎤 C: campo com cara de botão" autocomplete="off">
-    <input id="kCampo" type="text" placeholder="campo da busca (A e B)" autocomplete="off" virtualkeyboardpolicy="auto">
+    <input id="kCampoA" type="text" placeholder="campo do teste A" autocomplete="off">
+    <input id="kCampoB" type="text" placeholder="campo do teste B" autocomplete="off" virtualkeyboardpolicy="manual">
     <button id="kDone">Concluir teste do 🎤</button>
   </div>
   <pre id="out"></pre>
@@ -677,7 +678,7 @@
   /* Teste do botão 🎤: o ditado do Fire TV só funciona com o teclado nativo aberto. Três jeitos de abrir o teclado a partir de um 🎤:
      A) botão que chama focus() no campo; B) idem + navigator.virtualKeyboard.show(); C) o próprio 🎤 é um campo de texto estilizado.
      Detecta o teclado pela redução do visualViewport e o ditado pelo texto que chega de uma vez. */
-  var btnKbd = document.getElementById('kbd'), kbdBox = document.getElementById('kbdBox'), kCampo = document.getElementById('kCampo'), kC = document.getElementById('kC');
+  var btnKbd = document.getElementById('kbd'), kbdBox = document.getElementById('kbdBox'), kCampoA = document.getElementById('kCampoA'), kCampoB = document.getElementById('kCampoB'), kC = document.getElementById('kC');
   var K = null, kT0 = 0, kAtual = null, vvBase = 0;
   function kMs() { return Date.now() - kT0; }
   function kNovo() { return { tentou: false, focou: false, tecladoAbriuViewport: false, menorAlturaViewport: null, eventosInput: 0, maiorBloco: 0, texto: '', ditado: false, eventos: [] }; }
@@ -704,8 +705,8 @@
     });
     el.addEventListener('focus', function () { if (!K) return; if (chave && kAtual !== chave) kInicio(chave); if (kAtual) { K[kAtual].focou = true; kLog('focus'); } });
   }
-  kInput(kCampo, null); kInput(kC, 'C');
-  function kInicio(chave) { kAtual = chave; K[chave].tentou = true; vvBase = window.visualViewport ? visualViewport.height : innerHeight; kCampo.value = ''; status('Teste ' + chave + ': o teclado abriu? Se sim, segure o microfone e fale.'); }
+  kInput(kCampoA, 'A'); kInput(kCampoB, 'B'); kInput(kC, 'C');
+  function kInicio(chave) { kAtual = chave; K[chave].tentou = true; vvBase = window.visualViewport ? visualViewport.height : innerHeight; status('Teste ' + chave + ': o teclado abriu? Se sim, segure o microfone e fale.'); }
 
   btnKbd.onclick = function () {
     kT0 = Date.now();
@@ -713,9 +714,9 @@
     kbdBox.hidden = false; document.getElementById('kA').focus(); render();
     status('Teste cada 🎤 (A, B e C) e depois aperte Concluir teste do 🎤.');
   };
-  document.getElementById('kA').onclick = function () { kInicio('A'); kCampo.setAttribute('virtualkeyboardpolicy', 'auto'); kCampo.focus(); kCampo.click(); };
+  document.getElementById('kA').onclick = function () { kInicio('A'); kCampoA.focus(); kCampoA.click(); };
   document.getElementById('kB').onclick = function () {
-    kInicio('B'); kCampo.setAttribute('virtualkeyboardpolicy', 'manual'); kCampo.focus();
+    kInicio('B'); kCampoB.focus();
     if (n.virtualKeyboard && n.virtualKeyboard.show) { try { n.virtualKeyboard.show(); kLog('show() chamado'); } catch (e) { K.B.erro = e.message; } }
     else K.B.erro = 'navigator.virtualKeyboard não existe';
   };
@@ -723,9 +724,15 @@
 
   document.getElementById('kDone').onclick = function () {
     if (!K) return;
-    var ok = ['A', 'B', 'C'].filter(function (k) { return K[k].ditado; }), abriu = ['A', 'B', 'C'].filter(function (k) { return K[k].tecladoAbriuViewport || K[k].tecladoAbriuVirtualKeyboard; });
+    var campos = { A: kCampoA, B: kCampoB, C: kC };
+    ['A', 'B', 'C'].forEach(function (k) {
+      var o = K[k]; o.texto = campos[k].value;
+      o.textoChegou = o.texto.trim().length > 0;
+      o.semEventoInput = o.textoChegou && o.eventosInput === 0; /* valor mudou sem o evento input: a página teria que ler o campo em vez de esperar o evento */
+    });
+    var ok = ['A', 'B', 'C'].filter(function (k) { return K[k].textoChegou; }), abriu = ['A', 'B', 'C'].filter(function (k) { return K[k].tecladoAbriuViewport || K[k].tecladoAbriuVirtualKeyboard; });
     K.resultado = {
-      ditadoFuncionouEm: ok, tecladoDetectadoEm: abriu,
+      textoChegouEm: ok, chegouDeUmaVezEm: ['A', 'B', 'C'].filter(function (k) { return K[k].ditado; }), tecladoDetectadoEm: abriu,
       recomendacao: ok.indexOf('A') > -1 ? 'A: um botão 🎤 comum que foca o campo já abre o teclado'
         : ok.indexOf('B') > -1 ? 'B: botão 🎤 com navigator.virtualKeyboard.show()'
         : ok.indexOf('C') > -1 ? 'C: o 🎤 precisa ser o próprio campo de texto, estilizado como botão'
