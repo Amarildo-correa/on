@@ -47,6 +47,7 @@ Todas as cores ficam em variáveis CSS no `:root` de cada página, agrupadas por
 - `--brand` `#357DED`: azul da marca (logo, seção atual, capitular, barra de progresso, status do pareamento, botões do celular).
 - `--focus` `#FFD60A`: superfície amarela do foco.
 - `--card` `#141414`, `--thumb` `#1F1F1F`, `--control` `#454545`: superfícies dos cards, miniaturas e botões.
+- `--field` `#3C4049`: fundo do campo "Buscar notícias" no cabeçalho.
 - Texto, do mais claro ao mais apagado: `--white`, `--text`, `--title`, `--meta`, `--sub`, `--seen`, `--dim`, `--faint`, `--off`.
 
 `c.html` usa os mesmos nomes e valores quando o token existe nos dois (`--bg`, `--brand`, `--focus`, `--card`, `--control`, `--sub`, `--dim`, `--white`). Só ficam fixas as cores do desenho do direcional no SVG do celular e as máscaras de transparência (`mask-image`).

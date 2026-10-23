@@ -14,7 +14,7 @@
 svg[data-ico]{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 :root{
 /* superfícies */
---letterbox:#0E0E0E;--bg:#2A2D35;--bg-clear:rgba(42,45,53,0);--card:#141414;--thumb:#1F1F1F;--control:#454545;--track:#585858;
+--letterbox:#0E0E0E;--bg:#2A2D35;--bg-clear:rgba(42,45,53,0);--card:#141414;--thumb:#1F1F1F;--control:#454545;--field:#3C4049;--track:#585858;
 /* linhas e divisores */
 --rule:#3A3A3A;--line:#555555;--field-line:#9A9A9A;
 /* texto e ícones (do mais claro ao mais apagado) */
@@ -41,7 +41,7 @@ html,body{height:100%;margin:0;background:var(--letterbox);overflow:hidden}
 .top svg{display:block;flex:none;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round}
 /* hd-bar com a mesma margem direita da hd-info: a nav termina na borda direita do 2º card */
 .hd-bar{position:absolute;top:0;left:0;right:0;height:118px;box-sizing:border-box;padding:0 calc(100% - 1584px) 0 0;border-bottom:3px solid var(--line);display:flex;align-items:center}
-.hd-search{align-self:flex-end;margin-bottom:-3px!important;width:400px;height:85px;box-sizing:border-box;display:flex;align-items:center;padding:0 28px;background:var(--control);border-bottom:4px solid var(--field-line)!important;color:var(--white);font-size:33px;font-weight:500;text-align:left;white-space:nowrap}
+.hd-search{align-self:flex-end;margin-bottom:-3px!important;width:400px;height:85px;box-sizing:border-box;display:flex;align-items:center;padding:0 28px;background:var(--field);border-bottom:4px solid var(--field-line)!important;color:var(--white);font-size:33px;font-weight:500;text-align:left;white-space:nowrap}
 .hd-search svg{width:34px;height:34px;stroke-width:2.6;margin-right:20px}
 /* centro vertical dos links igual ao do texto da busca (a busca fica encostada na base da barra) */
 .hd-nav{display:flex;align-items:center;margin-left:auto;margin-top:31px}
