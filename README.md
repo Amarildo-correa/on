@@ -39,6 +39,18 @@ Uma barra lateral à esquerda, dentro da margem de segurança. Recolhida, mostra
 
 O item "Excluir localstorage" do menu lateral apaga, após um segundo OK em até 3 s, os dados deste app: notícias salvas, matérias lidas, clima, preferências (sons, abertura, proxy) e o código do celular pareado. Também limpa o `sessionStorage`, os cookies visíveis ao JavaScript no caminho do app e caches do Cache Storage com nome do app, e recarrega a página. Não usa `localStorage.clear()` porque o `github.io` é uma origem compartilhada com outros apps. O cache HTTP do navegador não pode ser apagado por JavaScript.
 
+## Cores (tokens)
+
+Todas as cores ficam em variáveis CSS no `:root` de cada página, agrupadas por papel (superfícies, linhas, texto, marca e foco, sombras); as regras usam só `var(--…)`. Os principais:
+
+- `--bg` `#202124`: fundo do palco, do cabeçalho, do menu aberto, da matéria e da abertura; também é o `theme-color` do celular.
+- `--brand` `#357DED`: azul da marca (logo, seção atual, capitular, barra de progresso, status do pareamento, botões do celular).
+- `--focus` `#FFD60A`: superfície amarela do foco.
+- `--card` `#141414`, `--thumb` `#1F1F1F`, `--control` `#454545`: superfícies dos cards, miniaturas e botões.
+- Texto, do mais claro ao mais apagado: `--white`, `--text`, `--title`, `--meta`, `--sub`, `--seen`, `--dim`, `--faint`, `--off`.
+
+`c.html` usa os mesmos nomes e valores quando o token existe nos dois (`--bg`, `--brand`, `--focus`, `--card`, `--control`, `--sub`, `--dim`, `--white`). Só ficam fixas as cores do desenho do direcional no SVG do celular e as máscaras de transparência (`mask-image`).
+
 ## Ícones
 
 Os ícones vêm da biblioteca [Lucide](https://lucide.dev) via CDN (`lucide@1.52.0`, jsDelivr), em `index.html` e `c.html`; o desenho é feito por `shared.js`. No HTML, cada ícone é um `<svg data-ico="nome">` que recebe o desenho ao carregar; no JS, `ico('nome')` gera o SVG e `setIco(el, 'nome')` troca o ícone (clima, tela cheia, status do pareamento). Sem foto, a miniatura do card (e a capa da matéria) mostra um ícone da editoria, escolhido por palavra-chave em `CAT_ICO` (ex.: Alerta → `triangle-alert`, Esportes → `trophy`, Justiça → `scale`; padrão `newspaper`). O símbolo do logo continua desenhado no próprio HTML, por ser parte da marca: um único `<symbol id="logo-mark">`, reaproveitado com `<use>` no cabeçalho, no menu, na matéria e na abertura.
