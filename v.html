@@ -41,6 +41,9 @@
   var out = document.getElementById('out'), st = document.getElementById('st');
   var btnSend = document.getElementById('send'), btnCopy = document.getElementById('copy');
 
+  R.errosJs = [];
+  window.onerror = function (msg, src, lin) { R.errosJs.push(msg + ' (linha ' + lin + ')'); st.textContent = 'Erro de JS: ' + msg + ' (linha ' + lin + ')'; st.className = 'bad'; };
+  window.onunhandledrejection = function (e) { R.errosJs.push('promessa: ' + (e.reason && e.reason.message || e.reason)); };
   function status(msg, cls) { st.textContent = msg; st.className = cls || ''; }
   function safe(fn) { try { var v = fn(); return v === undefined ? null : v; } catch (e) { return 'erro: ' + (e && e.message || e); } }
   function has(obj, name) { try { return obj != null && name in obj; } catch (e) { return false; } }
@@ -504,19 +507,56 @@
     while (new Blob([t]).size > 3800 && t.length > 100) t = t.slice(0, -200);
     return t + '';
   }
+  /* Plano B, para navegadores em que o fetch falha (ex.: Silk): formulário enviado num iframe escondido.
+     Não depende de CORS nem de ler a resposta. enctype text/plain gera o corpo "nome=valor": o nome leva o JSON
+     até a abertura de um campo extra e o valor o fecha, então o Apps Script recebe um JSON válido, igual ao do fetch. */
+  function enviarPorFormulario(payload, pronto) {
+    var nome = 'v' + Date.now(), ifr = document.createElement('iframe'), f = document.createElement('form'), inp = document.createElement('input');
+    var txt = JSON.stringify(payload);
+    ifr.name = nome; ifr.style.display = 'none';
+    f.method = 'POST'; f.action = GAS_URL; f.target = nome; f.enctype = 'text/plain'; f.acceptCharset = 'UTF-8'; f.style.display = 'none';
+    inp.type = 'hidden'; inp.name = txt.slice(0, -1) + ',"_":"'; inp.value = '"}';
+    f.appendChild(inp);
+    var feito = false;
+    function fim(ok) { if (feito) return; feito = true; pronto(ok); setTimeout(function () { f.remove(); ifr.remove(); }, 60000); }
+    /* o iframe carrega quando o Google responde: o pedido chegou e o script rodou */
+    ifr.onload = function () { if (ifr.getAttribute('data-sent')) fim(true); };
+    setTimeout(function () { fim(false); }, 30000);
+    document.body.appendChild(ifr); document.body.appendChild(f);
+    ifr.setAttribute('data-sent', '1');
+    f.submit();
+  }
+
   btnSend.onclick = function () {
     if (!GAS_URL) { status('Envio não configurado: falta a URL do Apps Script (GAS_URL em v.html).', 'bad'); return; }
     btnSend.disabled = true;
     status('Enviando para ' + EMAIL + '…');
+    var payload = { subject: title(), resumo: resumo(), json: json };
+    var ctl = window.AbortController ? new AbortController() : null, t = setTimeout(function () { if (ctl) ctl.abort(); }, 20000);
     /* text/plain: requisição simples, sem preflight de CORS (o Apps Script não responde a OPTIONS) */
-    fetch(GAS_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ subject: title(), resumo: resumo(), json: json }) })
-      .then(function (r) { return r.json(); })
-      .then(function (j) {
+    fetch(GAS_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload), signal: ctl ? ctl.signal : undefined })
+      .then(function (r) { return r.text(); })
+      .then(function (txt) {
+        var j; try { j = JSON.parse(txt); } catch (e) { throw new Error('resposta não é JSON: ' + txt.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 120)); }
         if (!j || !j.ok) throw new Error(j && j.error || 'resposta inesperada');
+        clearTimeout(t);
         status('Enviado para ' + EMAIL + '.', 'ok');
+        btnSend.disabled = false;
       })
-      .catch(function (e) { status('Falha no envio (' + e.message + '). Use Copiar JSON e tente de novo.', 'bad'); })
-      .then(function () { btnSend.disabled = false; });
+      .catch(function (e) {
+        clearTimeout(t);
+        var motivo = (e && (e.name + ': ' + e.message)) || String(e);
+        R.envio = { metodo: 'formulario', falhaFetch: motivo };
+        render();
+        payload.subject += ' (modo compatível)';
+        payload.resumo = 'O fetch falhou neste navegador: ' + motivo + '\n\n' + resumo();
+        payload.json = json;
+        status('fetch falhou (' + motivo + '). Tentando modo compatível…');
+        enviarPorFormulario(payload, function (ok) {
+          status(ok ? 'Enviado para ' + EMAIL + ' (modo compatível).' : 'Falha no envio: o Google não respondeu em 30 s. Use Copiar JSON.', ok ? 'ok' : 'bad');
+          btnSend.disabled = false;
+        });
+      });
   };
 
   btnCopy.onclick = function () {
