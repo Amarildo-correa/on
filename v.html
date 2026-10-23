@@ -21,6 +21,10 @@
   button[disabled] { opacity: .5; cursor: default; }
   #st { font-size: 15px; color: var(--sub); }
   #st.ok { color: var(--ok); } #st.bad { color: var(--bad); }
+  .mic { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .mic input { flex: 1 1 320px; min-width: 0; border: 2px solid var(--control); border-radius: 10px; background: var(--card); color: var(--white); font: inherit; font-size: 20px; padding: 10px 14px; }
+  .mic input:focus { outline: 4px solid var(--focus); outline-offset: 2px; border-color: var(--brand); }
+  [hidden] { display: none !important; }
   pre { margin: 0; padding: 12px; background: var(--card); border-radius: 10px; font: 13px/1.45 "Roboto Mono", ui-monospace, monospace; white-space: pre-wrap; word-break: break-word; }
 </style>
 <main>
@@ -30,7 +34,12 @@
     <button id="speak" class="alt" disabled>Testar fala</button>
     <button id="heard" class="alt" hidden>Ouvi a voz</button>
     <button id="notHeard" class="alt" hidden>Não ouvi</button>
+    <button id="mic" class="alt" disabled>Testar microfone</button>
     <span id="st">Lendo informações do navegador…</span>
+  </div>
+  <div class="mic" id="micBox" hidden>
+    <input id="dictado" type="text" inputmode="text" enterkeyhint="done" autocomplete="off" placeholder="Foque aqui, segure o microfone do controle e fale">
+    <button id="micDone">Concluir teste</button>
   </div>
   <pre id="out"></pre>
 </main>
@@ -492,8 +501,9 @@
   Promise.all(jobs).then(function () {
     R.leituraMs = Math.round(performance.now());
     R.falaTeste = 'não executado (use o botão Testar fala)';
+    R.microfoneTeste = 'não executado (use o botão Testar microfone)';
     render();
-    btnSend.disabled = btnCopy.disabled = btnSpeak.disabled = false;
+    btnSend.disabled = btnCopy.disabled = btnSpeak.disabled = btnMic.disabled = false;
     btnSend.focus();
     status('Leitura concluída (' + Math.round(json.length / 1024) + ' KB).', 'ok');
   });
@@ -548,6 +558,109 @@
   btnHeard.onclick = function () { ouvido(true); };
   btnNot.onclick = function () { ouvido(false); };
 
+  /* Teste do microfone, para saber se dá para ter um campo de busca por voz:
+     1) getUserMedia (a página consegue gravar áudio?), 2) SpeechRecognition (o navegador transcreve?),
+     3) ditado do sistema (segurar o microfone do controle com um campo focado digita o texto?). */
+  var btnMic = document.getElementById('mic'), micBox = document.getElementById('micBox'), campo = document.getElementById('dictado'), btnMicDone = document.getElementById('micDone');
+  var M = null, micT0 = 0;
+  function ms() { return Date.now() - micT0; }
+
+  function testarGetUserMedia() {
+    var G = M.getUserMedia = { existe: !!(n.mediaDevices && n.mediaDevices.getUserMedia), ok: false };
+    if (!G.existe) return Promise.resolve();
+    return wait(n.mediaDevices.getUserMedia({ audio: true }), 15000).then(function (st) {
+      if (typeof st === 'string') { G.erro = st; return; }
+      G.ok = true;
+      G.faixas = st.getAudioTracks().map(function (t) { var c = t.getSettings ? t.getSettings() : {}; return { rotulo: t.label, estado: t.readyState, sampleRate: c.sampleRate, canais: c.channelCount }; });
+      /* mede o nível de som por 2 s: mostra se o microfone capta algo de verdade */
+      var AC = window.AudioContext || window.webkitAudioContext;
+      return new Promise(function (res) {
+        if (!AC) { G.nivelMax = 'sem AudioContext'; st.getTracks().forEach(function (t) { t.stop(); }); return res(); }
+        var ac = new AC(), an = ac.createAnalyser(), buf = new Uint8Array(an.fftSize), max = 0;
+        ac.createMediaStreamSource(st).connect(an);
+        var iv = setInterval(function () { an.getByteTimeDomainData(buf); for (var i = 0; i < buf.length; i++) max = Math.max(max, Math.abs(buf[i] - 128)); }, 50);
+        setTimeout(function () { clearInterval(iv); G.nivelMax0a128 = max; G.captouSom = max > 6; st.getTracks().forEach(function (t) { t.stop(); }); if (ac.close) ac.close(); res(); }, 2000);
+      });
+    }).then(function () {
+      if (!n.mediaDevices || !n.mediaDevices.enumerateDevices) return;
+      return n.mediaDevices.enumerateDevices().then(function (d) {
+        M.microfones = d.filter(function (x) { return x.kind === 'audioinput'; }).map(function (x) { return x.label || '(sem nome)'; });
+      });
+    });
+  }
+
+  function testarReconhecimento() {
+    var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    var S = M.speechRecognition = { existe: !!SR, api: window.SpeechRecognition ? 'SpeechRecognition' : window.webkitSpeechRecognition ? 'webkitSpeechRecognition' : null, eventos: [], erro: null, transcricao: '', final: false };
+    if (!SR) return Promise.resolve();
+    return new Promise(function (res) {
+      var r, fim = false;
+      try { r = new SR(); } catch (e) { S.erro = 'construtor: ' + e.message; return res(); }
+      r.lang = 'pt-BR'; r.interimResults = true; r.continuous = false; r.maxAlternatives = 1;
+      ['start', 'audiostart', 'soundstart', 'speechstart', 'speechend', 'soundend', 'audioend', 'nomatch'].forEach(function (ev) {
+        r['on' + ev] = function () { S.eventos.push(ev + ' @' + ms()); if (ev === 'start') status('Fale agora (reconhecimento do navegador, até 10 s)…'); };
+      });
+      r.onresult = function (e) {
+        var txt = '', conf = null, fin = false;
+        for (var i = 0; i < e.results.length; i++) { txt += e.results[i][0].transcript; conf = e.results[i][0].confidence; fin = fin || e.results[i].isFinal; }
+        S.transcricao = txt; S.confianca = conf; S.final = fin; S.eventos.push('result' + (fin ? '(final)' : '(parcial)') + ' @' + ms());
+        status('Ouvido: "' + txt + '"');
+      };
+      r.onerror = function (e) { S.erro = e.error + (e.message ? ': ' + e.message : ''); S.eventos.push('error @' + ms()); };
+      r.onend = function () { S.eventos.push('end @' + ms()); if (!fim) { fim = true; res(); } };
+      try { r.start(); } catch (e) { S.erro = 'start: ' + e.message; return res(); }
+      setTimeout(function () { try { r.stop(); } catch (e) {} }, 10000);
+      setTimeout(function () { if (!fim) { fim = true; S.erro = S.erro || 'nenhum evento end em 14 s'; try { r.abort(); } catch (e) {} res(); } }, 14000);
+    });
+  }
+
+  /* ditado: registra como o texto chega no campo. Muitos caracteres num único evento = texto inserido pelo sistema (ditado ou colar), não tecla a tecla */
+  var D = null;
+  campo.onfocus = function () { if (D) { D.campoFocado = true; D.eventos.push('focus @' + ms()); } };
+  campo.onblur = function () { if (D) D.eventos.push('blur @' + ms()); };
+  campo.onkeydown = function (e) { if (D) { D.teclas++; if (e.key === 'Enter') btnMicDone.click(); } };
+  campo.addEventListener('compositionstart', function () { if (D) D.composicao = true; });
+  campo.oninput = function (e) {
+    if (!D) return;
+    var antes = D.ultimoTexto || '', agora = campo.value, bloco = Math.max(0, agora.length - antes.length);
+    D.ultimoTexto = agora; D.eventosInput++; D.maiorBloco = Math.max(D.maiorBloco, bloco);
+    var tipo = e.inputType || 'sem inputType'; D.tipos[tipo] = (D.tipos[tipo] || 0) + 1;
+    if (D.eventos.length < 30) D.eventos.push('input ' + tipo + ' +' + bloco + ' @' + ms());
+  };
+
+  btnMic.onclick = function () {
+    micT0 = Date.now();
+    M = R.microfoneTeste = { etapa: 'gravando' };
+    btnMic.disabled = true; micBox.hidden = true;
+    status('Testando o microfone (o navegador pode pedir permissão)…');
+    render();
+    testarGetUserMedia().then(function () { render(); return testarReconhecimento(); }).then(function () {
+      D = M.ditado = { campoFocado: false, eventosInput: 0, teclas: 0, maiorBloco: 0, tipos: {}, composicao: false, texto: '', eventos: [] };
+      M.etapa = 'ditado';
+      render();
+      campo.value = ''; micBox.hidden = false; campo.focus();
+      status('Agora o ditado: com o campo focado, segure o microfone do controle, fale e solte. Depois aperte Concluir teste.');
+    });
+  };
+
+  btnMicDone.onclick = function () {
+    if (!M) return;
+    D.texto = campo.value;
+    var G = M.getUserMedia || {}, S = M.speechRecognition || {};
+    var ditadoOk = D.texto.length > 0 && D.maiorBloco >= 3 && D.teclas < D.texto.length;
+    D.origemProvavel = !D.texto ? 'nenhum texto chegou' : ditadoOk ? 'inserido pelo sistema de uma vez (ditado)' : 'digitado tecla a tecla';
+    M.resultado = {
+      ditadoDoSistema: ditadoOk, speechRecognition: !!(S.transcricao), gravacaoDeAudio: !!G.ok, microfoneCaptaSom: G.captouSom === true,
+      caminhoRecomendado: ditadoOk ? 'input comum: o ditado do sistema já digita o texto (sem código de voz)'
+        : S.transcricao ? 'SpeechRecognition na página (pt-BR)'
+        : G.ok && G.captouSom ? 'gravar com getUserMedia e transcrever num serviço na nuvem'
+        : 'sem voz na TV: usar o celular (c.html) com o ditado do teclado e mandar o texto pela conexão MQTT'
+    };
+    delete M.etapa; delete D.ultimoTexto;
+    micBox.hidden = true; btnMic.disabled = false; render(); btnSend.focus();
+    status('Teste do microfone concluído: ' + M.resultado.caminhoRecomendado, 'ok');
+  };
+
   function title() { var d = R.deteccao || {}; return 'Diagnóstico /v · ' + [d.tv, d.navegador, d.sistema].filter(Boolean).join(' · '); }
 
   /* Envio pelo Google Apps Script (apps-script/v-email.gs) publicado na conta Google do dono: grátis, sai pelo próprio Gmail,
@@ -569,6 +682,7 @@
       fala: f && typeof f === 'object' ? (f.eventos ? { existe: f.existeSpeechSynthesis, voz: f.voz, start: f.eventos.start, end: f.eventos.end, erro: f.eventos.error,
         boundary: f.boundary.total + ' ' + JSON.stringify(f.boundary.tipos), duracaoMs: f.duracaoMs, palpite: f.palpiteSom, ouviu: f.ouvidoPeloUsuario }
         : { existe: !!f.existeSpeechSynthesis, existeUtterance: !!f.existeUtterance, info: 'speechSynthesis não existe neste navegador: não há voz nativa' }) : f,
+      microfone: R.microfoneTeste && typeof R.microfoneTeste === 'object' ? (R.microfoneTeste.resultado || { info: 'teste não concluído', etapa: R.microfoneTeste.etapa }) : R.microfoneTeste,
       vozes: Array.isArray(R.vozes) ? R.vozes.length : R.vozes, apis: R.apis && R.apis.resumo,
       fuso: R.intl && R.intl.timeZone, ip: R.ipPublico, coletadoEm: R.coletadoEm
     };
