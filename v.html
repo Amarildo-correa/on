@@ -27,6 +27,9 @@
   <div class="bar">
     <button id="send" disabled>Enviar por e-mail</button>
     <button id="copy" class="alt" disabled>Copiar JSON</button>
+    <button id="speak" class="alt" disabled>Testar fala</button>
+    <button id="heard" class="alt" hidden>Ouvi a voz</button>
+    <button id="notHeard" class="alt" hidden>Não ouvi</button>
     <span id="st">Lendo informações do navegador…</span>
   </div>
   <pre id="out"></pre>
@@ -416,14 +419,65 @@
 
   /* ---------- tela e e-mail ---------- */
   var json = '';
+  function render() { json = JSON.stringify(R, null, 2); out.textContent = json; }
   Promise.all(jobs).then(function () {
     R.leituraMs = Math.round(performance.now());
-    json = JSON.stringify(R, null, 2);
-    out.textContent = json;
-    btnSend.disabled = btnCopy.disabled = false;
+    R.falaTeste = 'não executado (use o botão Testar fala)';
+    render();
+    btnSend.disabled = btnCopy.disabled = btnSpeak.disabled = false;
     btnSend.focus();
     status('Leitura concluída (' + Math.round(json.length / 1024) + ' KB).', 'ok');
   });
+
+  /* Teste da voz nativa (speechSynthesis). Precisa de um clique: o Chrome/Silk bloqueia speak() sem gesto.
+     O JavaScript não consegue captar o áudio da voz, então registra os eventos e pergunta se o som saiu. */
+  var btnSpeak = document.getElementById('speak'), btnHeard = document.getElementById('heard'), btnNot = document.getElementById('notHeard');
+  btnSpeak.onclick = function () {
+    var S = window.speechSynthesis, U = window.SpeechSynthesisUtterance;
+    var T = R.falaTeste = { existeSpeechSynthesis: !!S, existeUtterance: !!U };
+    if (!S || !U) { render(); status('speechSynthesis não existe neste navegador.', 'bad'); return; }
+    var texto = 'Teste de leitura em voz alta. Uma, duas, três palavras.';
+    var u = new U(texto), t0 = Date.now(), vozes = S.getVoices(), fim = false;
+    var pt = vozes.filter(function (v) { return /^pt/i.test(v.lang); });
+    if (pt.length) u.voice = pt.filter(function (v) { return v.localService; })[0] || pt[0];
+    u.lang = u.voice ? u.voice.lang : 'pt-BR';
+    T.texto = texto; T.voz = u.voice ? u.voice.name + ' [' + u.voice.lang + ']' + (u.voice.localService ? ' local' : ' remota') : 'padrão do sistema (' + u.lang + ')';
+    T.totalVozes = vozes.length;
+    T.eventos = { start: false, end: false, error: null, pause: false, resume: false };
+    T.boundary = { disparou: false, total: 0, tipos: {}, palavras: [] };
+    T.msAteStart = null; T.duracaoMs = null; T.speakingDurante = null;
+    u.onstart = function () { T.eventos.start = true; T.msAteStart = Date.now() - t0; setTimeout(function () { T.speakingDurante = S.speaking; }, 300); render(); };
+    u.onboundary = function (e) {
+      var b = T.boundary; b.disparou = true; b.total++; b.tipos[e.name || 'sem nome'] = (b.tipos[e.name || 'sem nome'] || 0) + 1;
+      if (b.palavras.length < 12) b.palavras.push(texto.substr(e.charIndex, e.charLength || (texto.slice(e.charIndex).search(/\s|$/))) + ' @' + e.charIndex);
+    };
+    function acabou(ev) {
+      if (fim) return; fim = true;
+      T.duracaoMs = Date.now() - t0;
+      if (ev && ev.type === 'error') T.eventos.error = ev.error || 'erro sem código'; else T.eventos.end = true;
+      /* a frase leva ~3 s; terminar quase na hora indica que não houve áudio */
+      T.palpiteSom = T.eventos.error ? 'falhou' : T.duracaoMs < 800 ? 'provavelmente sem som (terminou rápido demais)' : 'provavelmente com som (duração compatível)';
+      render();
+      btnHeard.hidden = btnNot.hidden = false; btnHeard.focus();
+      status('Fala terminou. Você ouviu a voz?', T.eventos.error ? 'bad' : '');
+    }
+    u.onend = acabou; u.onerror = acabou;
+    u.onpause = function () { T.eventos.pause = true; }; u.onresume = function () { T.eventos.resume = true; };
+    /* sem nenhum evento em 15 s, o motor travou ou ignorou o speak() */
+    setTimeout(function () { if (!fim) { T.eventos.timeout = true; acabou({ type: 'error', error: 'nenhum evento end/error em 15 s' }); } }, 15000);
+    btnHeard.hidden = btnNot.hidden = true;
+    S.cancel(); S.speak(u);
+    T.pendingAposSpeak = S.pending; T.speakingAposSpeak = S.speaking;
+    render();
+    status('Falando…');
+  };
+  function ouvido(sim) {
+    if (R.falaTeste && typeof R.falaTeste === 'object') R.falaTeste.ouvidoPeloUsuario = sim;
+    btnHeard.hidden = btnNot.hidden = true; render(); btnSend.focus();
+    status(sim ? 'Registrado: a voz saiu.' : 'Registrado: a voz não saiu.', sim ? 'ok' : 'bad');
+  }
+  btnHeard.onclick = function () { ouvido(true); };
+  btnNot.onclick = function () { ouvido(false); };
 
   function title() { var d = R.deteccao || {}; return 'Diagnóstico /v · ' + [d.tv, d.navegador, d.sistema].filter(Boolean).join(' · '); }
 

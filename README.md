@@ -60,6 +60,8 @@ Os ícones vêm da biblioteca [Lucide](https://lucide.dev) via CDN (`lucide@1.52
 
 ## Diagnóstico (/v)
 
-`amarildo-correa.github.io/on/v` lê tudo o que o navegador expõe (userAgent e Client Hints, tela, media queries, WebGL/WebGPU, codecs, DRM, permissões, armazenamento, recursos de JS e CSS, presença de ~250 APIs, IP público etc.), mostra o JSON e tem um botão para enviá-lo por e-mail via [FormSubmit](https://formsubmit.co) (com `diagnostico.json` anexo). Se o envio falhar, abre o app de e-mail com o JSON no corpo. Página de uso pessoal, sem link no app e com `noindex`.
+`amarildo-correa.github.io/on/v` lê tudo o que o navegador expõe (userAgent e Client Hints, tela, media queries, WebGL/WebGPU, codecs, DRM, permissões, armazenamento, recursos de JS e CSS, presença de ~250 APIs, IP público etc.), mostra o JSON e tem um botão para enviá-lo por e-mail via [FormSubmit](https://formsubmit.co) (com `diagnostico.json` anexo). Se o envio falhar, abre o app de e-mail com o JSON no corpo. No primeiro envio o FormSubmit manda um e-mail de ativação; depois de clicar no link, os envios chegam direto.
+
+O botão "Testar fala" testa a voz nativa (`speechSynthesis`): fala uma frase em pt-BR e registra em `falaTeste` os eventos `start`/`end`/`error`, quantos `boundary` dispararam (e de que tipo), a duração e a voz usada. Como o JavaScript não consegue captar o áudio da voz, a página pergunta se você ouviu e grava a resposta em `ouvidoPeloUsuario`. Página de uso pessoal, sem link no app e com `noindex`.
 
 Arquivos: `index.html` (app da TV), `c.html` (controle no celular), `v.html` (diagnóstico), `shared.js` (código comum aos dois: MQTT e ícones) e `data/novo-hamburgo.json` (faixa local).
