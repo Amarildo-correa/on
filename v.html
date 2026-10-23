@@ -37,7 +37,7 @@
 <script>
 (function () {
   var EMAIL = 'amarildonovohamburgo@gmail.com';
-  var R = {};
+  var R = { problemaEnvio: 'testando…' }; /* primeiro item do JSON: diagnóstico do caminho até o Apps Script */
   var out = document.getElementById('out'), st = document.getElementById('st');
   var btnSend = document.getElementById('send'), btnCopy = document.getElementById('copy');
 
@@ -420,6 +420,69 @@
     return o;
   });
 
+  /* Diagnóstico do envio: testa cada etapa do caminho até o Apps Script sem mandar e-mail.
+     O GET (doGet) nunca envia; o POST só é testado com {ping:true} quando o script é da versão 2 ou maior, que responde sem enviar. */
+  job('problemaEnvio', function () {
+    var P = { causaProvavel: null, comoResolver: null, erro: null, navegador: null, ultimoEnvio: null,
+      etapas: { fetchCorsGet: null, fetchCorsPost: null, fetchSemCors: null, primeiroSaltoRedirect: null, googleusercontent: null, outroSiteComCors: null } }, E = P.etapas;
+    if (!GAS_URL) { P.causaProvavel = 'GAS_URL vazio em v.html'; return P; }
+    function passo(nome, p) {
+      var t0 = Date.now();
+      return wait(p, 8000).then(function (v) {
+        E[nome] = typeof v === 'string' ? { ok: false, erro: v, ms: Date.now() - t0 } : Object.assign ? Object.assign({ ms: Date.now() - t0 }, v) : v;
+        return E[nome];
+      });
+    }
+    function corsGet() {
+      return fetch(GAS_URL + '?probe=' + Date.now(), { cache: 'no-store' }).then(function (r) {
+        return r.text().then(function (t) {
+          var j = null; try { j = JSON.parse(t); } catch (e) {}
+          return { ok: !!(j && j.ok), status: r.status, type: r.type, redirecionou: r.redirected, urlFinal: String(r.url).split('?')[0].slice(0, 80), versaoScript: j && j.versao || 1,
+            resposta: j ? null : t.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 160) };
+        });
+      });
+    }
+    return Promise.all([
+      passo('fetchCorsGet', corsGet()),
+      passo('fetchSemCors', fetch(GAS_URL + '?probe=nc' + Date.now(), { mode: 'no-cors', cache: 'no-store' }).then(function (r) { return { ok: true, type: r.type }; })),
+      passo('primeiroSaltoRedirect', fetch(GAS_URL + '?probe=m' + Date.now(), { redirect: 'manual', cache: 'no-store' }).then(function (r) { return { ok: r.type === 'opaqueredirect' || r.ok, type: r.type, status: r.status }; })),
+      passo('googleusercontent', fetch('https://script.googleusercontent.com/?probe=' + Date.now(), { mode: 'no-cors', cache: 'no-store' }).then(function (r) { return { ok: true, type: r.type }; })),
+      passo('outroSiteComCors', fetch('https://ipapi.co/json/', { cache: 'no-store' }).then(function (r) { return { ok: r.ok, status: r.status }; }))
+    ]).then(function () {
+      var v = E.fetchCorsGet.versaoScript || 1;
+      if (v < 2) { E.fetchCorsPost = { ok: null, info: 'não testado: implante a versão 2 do v-email.gs (modo ping)' }; return; }
+      return passo('fetchCorsPost', fetch(GAS_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: '{"ping":true}' })
+        .then(function (r) { return r.text(); }).then(function (t) { var j = null; try { j = JSON.parse(t); } catch (e) {} return { ok: !!(j && j.pong), resposta: j ? null : t.slice(0, 120) }; }));
+    }).then(function () {
+      var g = E.fetchCorsGet, nc = E.fetchSemCors, m = E.primeiroSaltoRedirect, gu = E.googleusercontent, x = E.outroSiteComCors, po = E.fetchCorsPost;
+      P.navegador = R.deteccao ? [R.deteccao.navegador, R.deteccao.tv].filter(Boolean).join(' · ') : null;
+      if (g.ok && (po.ok || po.ok === null)) {
+        P.causaProvavel = 'nenhuma: o fetch até o Apps Script funciona neste navegador' + (po.ok === null ? ' (POST não testado)' : '');
+        P.comoResolver = 'nada a fazer';
+      } else if (g.ok && po.ok === false) {
+        P.causaProvavel = 'GET funciona, mas o POST falha: o navegador trata o POST de forma diferente (cookies de terceiros, ou o corpo não chega)';
+        P.comoResolver = 'o envio por formulário (modo compatível) é usado automaticamente';
+      } else if (!nc.ok) {
+        P.causaProvavel = 'script.google.com está inacessível neste aparelho ou rede (bloqueador de anúncios/rastreadores, DNS como Pi-hole/AdGuard, ou rede corporativa)';
+        P.comoResolver = 'liberar script.google.com e script.googleusercontent.com no bloqueador ou DNS; nenhum método de envio funciona enquanto estiver bloqueado';
+      } else if (!gu.ok) {
+        P.causaProvavel = 'script.google.com responde, mas script.googleusercontent.com (para onde o Apps Script redireciona a resposta) está bloqueado';
+        P.comoResolver = 'liberar script.googleusercontent.com; o e-mail costuma ser enviado mesmo assim, porque o script roda antes do redirecionamento';
+      } else if (g.resposta) {
+        P.causaProvavel = 'o Google devolveu uma página em vez do JSON (login, aviso ou erro do Apps Script): ' + g.resposta;
+        P.comoResolver = 'conferir se a implantação está com "Quem pode acessar: Qualquer pessoa"';
+      } else if (x && !x.ok) {
+        P.causaProvavel = 'o navegador bloqueia qualquer fetch para outros sites (CORS), não só o Google';
+        P.comoResolver = 'o envio por formulário (modo compatível) é usado automaticamente';
+      } else {
+        P.causaProvavel = 'a rede chega ao Google, mas o navegador não deixa a página ler a resposta depois do redirecionamento para script.googleusercontent.com (CORS em redirecionamento)';
+        P.comoResolver = 'o envio por formulário (modo compatível) é usado automaticamente';
+      }
+      P.erro = g.ok ? null : (g.erro || ('HTTP ' + g.status));
+      return P;
+    });
+  }, 30000);
+
   /* ---------- tela e e-mail ---------- */
   var json = '';
   function render() { json = JSON.stringify(R, null, 2); out.textContent = json; }
@@ -493,6 +556,7 @@
     for (var k in d) drm[k] = d[k] && d[k].suportado ? (d[k].hwSecureAll ? 'sim (L1)' : 'sim') : 'não';
     var f = R.falaTeste && typeof R.falaTeste === 'object' ? R.falaTeste : R.falaTeste;
     var r = {
+      problemaEnvio: R.problemaEnvio && typeof R.problemaEnvio === 'object' ? { causaProvavel: R.problemaEnvio.causaProvavel, comoResolver: R.problemaEnvio.comoResolver, erro: R.problemaEnvio.erro, ultimoEnvio: R.problemaEnvio.ultimoEnvio } : R.problemaEnvio,
       deteccao: R.deteccao, userAgent: n.userAgent,
       versoes: R.userAgentDataAlta && R.userAgentDataAlta.fullVersionList ? pick(R.userAgentDataAlta, ['platform', 'platformVersion', 'model', 'architecture', 'fullVersionList']) : R.userAgentDataAlta,
       tela: R.tela ? (R.tela.width + 'x' + R.tela.height + ' @' + R.tela.devicePixelRatio + ' (janela ' + R.tela.janela.innerWidth + 'x' + R.tela.janela.innerHeight + ')') : null,
@@ -540,19 +604,21 @@
         var j; try { j = JSON.parse(txt); } catch (e) { throw new Error('resposta não é JSON: ' + txt.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 120)); }
         if (!j || !j.ok) throw new Error(j && j.error || 'resposta inesperada');
         clearTimeout(t);
+        if (R.problemaEnvio && typeof R.problemaEnvio === 'object') { R.problemaEnvio.ultimoEnvio = { metodo: 'fetch', ok: true }; render(); }
         status('Enviado para ' + EMAIL + '.', 'ok');
         btnSend.disabled = false;
       })
       .catch(function (e) {
         clearTimeout(t);
         var motivo = (e && (e.name + ': ' + e.message)) || String(e);
-        R.envio = { metodo: 'formulario', falhaFetch: motivo };
+        if (R.problemaEnvio && typeof R.problemaEnvio === 'object') R.problemaEnvio.ultimoEnvio = { metodo: 'formulario (modo compatível)', falhaFetch: motivo };
         render();
         payload.subject += ' (modo compatível)';
         payload.resumo = 'O fetch falhou neste navegador: ' + motivo + '\n\n' + resumo();
         payload.json = json;
         status('fetch falhou (' + motivo + '). Tentando modo compatível…');
         enviarPorFormulario(payload, function (ok) {
+          if (R.problemaEnvio && typeof R.problemaEnvio === 'object' && R.problemaEnvio.ultimoEnvio) { R.problemaEnvio.ultimoEnvio.ok = ok ? 'resposta recebida no iframe' : false; render(); }
           status(ok ? 'Enviado para ' + EMAIL + ' (modo compatível).' : 'Falha no envio: o Google não respondeu em 30 s. Use Copiar JSON.', ok ? 'ok' : 'bad');
           btnSend.disabled = false;
         });
