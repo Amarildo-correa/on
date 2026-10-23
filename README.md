@@ -60,7 +60,7 @@ Os ícones vêm da biblioteca [Lucide](https://lucide.dev) via CDN (`lucide@1.52
 
 ## Diagnóstico (/v)
 
-`amarildo-correa.github.io/on/v` lê tudo o que o navegador expõe (userAgent e Client Hints, tela, media queries, WebGL/WebGPU, codecs, DRM, permissões, armazenamento, recursos de JS e CSS, presença de ~250 APIs, IP público etc.), mostra o JSON e tem um botão para enviá-lo por e-mail via [FormSubmit](https://formsubmit.co) (com `diagnostico.json` anexo). Se o envio falhar, abre o app de e-mail com o JSON no corpo. No primeiro envio o FormSubmit manda um e-mail de ativação; depois de clicar no link, os envios chegam direto.
+`amarildo-correa.github.io/on/v` lê tudo o que o navegador expõe (userAgent e Client Hints, tela, media queries, WebGL/WebGPU, codecs, DRM, permissões, armazenamento, recursos de JS e CSS, presença de ~250 APIs, IP público etc.), mostra o JSON e tem um botão para enviá-lo por e-mail via [ntfy.sh](https://ntfy.sh) (grátis, sem conta nem ativação): o corpo do e-mail traz um resumo (o ntfy aceita até 4 KB de texto) e o JSON completo vai como anexo `diagnostico.json`, hospedado no ntfy.sh por 3 horas. O tópico (`readontv-on-v-k7q2m9x4`) é público: quem souber o nome vê as mensagens. Se o envio falhar, abre o app de e-mail com o resumo no corpo.
 
 O botão "Testar fala" testa a voz nativa (`speechSynthesis`): fala uma frase em pt-BR e registra em `falaTeste` os eventos `start`/`end`/`error`, quantos `boundary` dispararam (e de que tipo), a duração e a voz usada. Como o JavaScript não consegue captar o áudio da voz, a página pergunta se você ouviu e grava a resposta em `ouvidoPeloUsuario`. Página de uso pessoal, sem link no app e com `noindex`.
 

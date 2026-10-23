@@ -481,25 +481,44 @@
 
   function title() { var d = R.deteccao || {}; return 'Diagnóstico /v · ' + [d.tv, d.navegador, d.sistema].filter(Boolean).join(' · '); }
 
-  /* envio pelo FormSubmit (sem servidor próprio); se falhar, abre o app de e-mail */
+  /* Envio pelo ntfy.sh: grátis, sem conta nem ativação. O ntfy repassa a notificação para o e-mail.
+     O corpo do e-mail leva um resumo (o ntfy aceita até 4 KB de texto); o JSON completo vai como anexo,
+     que fica hospedado no ntfy.sh por 3 horas. Se falhar, abre o app de e-mail. */
+  var NTFY = 'https://ntfy.sh/readontv-on-v-k7q2m9x4';
+  function pick(o, keys) { var r = {}; if (!o || typeof o !== 'object') return o; keys.forEach(function (k) { if (o[k] !== undefined) r[k] = o[k]; }); return r; }
+  function resumo() {
+    var d = R.drm && typeof R.drm === 'object' ? R.drm : {}, drm = {};
+    for (var k in d) drm[k] = d[k] && d[k].suportado ? (d[k].hwSecureAll ? 'sim (L1)' : 'sim') : 'não';
+    var f = R.falaTeste && typeof R.falaTeste === 'object' ? R.falaTeste : R.falaTeste;
+    var r = {
+      deteccao: R.deteccao, userAgent: n.userAgent,
+      versoes: R.userAgentDataAlta && R.userAgentDataAlta.fullVersionList ? pick(R.userAgentDataAlta, ['platform', 'platformVersion', 'model', 'architecture', 'fullVersionList']) : R.userAgentDataAlta,
+      tela: R.tela ? (R.tela.width + 'x' + R.tela.height + ' @' + R.tela.devicePixelRatio + ' (janela ' + R.tela.janela.innerWidth + 'x' + R.tela.janela.innerHeight + ')') : null,
+      hdr: R.mediaQueries && R.mediaQueries['dynamic-range'], gamut: R.mediaQueries && R.mediaQueries['color-gamut'],
+      cpu: n.hardwareConcurrency, memoriaGB: n.deviceMemory, gpu: R.webgl && (R.webgl.unmaskedRenderer || R.webgl.renderer), drm: drm,
+      fala: f && typeof f === 'object' ? { existe: f.existeSpeechSynthesis, voz: f.voz, start: f.eventos.start, end: f.eventos.end, erro: f.eventos.error,
+        boundary: f.boundary.total + ' ' + JSON.stringify(f.boundary.tipos), duracaoMs: f.duracaoMs, palpite: f.palpiteSom, ouviu: f.ouvidoPeloUsuario } : f,
+      vozes: Array.isArray(R.vozes) ? R.vozes.length : R.vozes, apis: R.apis && R.apis.resumo,
+      fuso: R.intl && R.intl.timeZone, ip: R.ipPublico, coletadoEm: R.coletadoEm
+    };
+    var t = JSON.stringify(r, null, 1);
+    while (new Blob([t]).size > 3800 && t.length > 100) t = t.slice(0, -200);
+    return t + '\n\nJSON completo no anexo diagnostico.json (o link vale por 3 horas).';
+  }
   btnSend.onclick = function () {
     btnSend.disabled = true;
     status('Enviando para ' + EMAIL + '…');
-    var fd = new FormData();
-    fd.append('_subject', title());
-    fd.append('_template', 'box');
-    fd.append('_captcha', 'false');
-    fd.append('message', json);
-    fd.append('attachment', new Blob([json], { type: 'application/json' }), 'diagnostico.json');
-    fetch('https://formsubmit.co/ajax/' + EMAIL, { method: 'POST', headers: { Accept: 'application/json' }, body: fd })
-      .then(function (r) { return r.json(); })
+    var q = '?filename=diagnostico.json&email=' + encodeURIComponent(EMAIL) + '&title=' + encodeURIComponent(title()) + '&message=' + encodeURIComponent(resumo()) + '&tags=computer';
+    /* POST com texto puro e sem cabeçalhos próprios: requisição simples, sem preflight de CORS */
+    fetch(NTFY + q, { method: 'POST', body: json })
+      .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j && j.error || ('HTTP ' + r.status)); return j; }); })
       .then(function (j) {
-        if (j && String(j.success) === 'true') status('Enviado para ' + EMAIL + '.', 'ok');
-        else throw new Error(j && j.message || 'resposta inesperada');
+        R.envio = { servico: 'ntfy.sh', id: j.id, anexo: j.attachment ? j.attachment.url : null, expiraEm: j.attachment && j.attachment.expires ? new Date(j.attachment.expires * 1000).toISOString() : null };
+        status('Enviado para ' + EMAIL + ' (pode levar 1 ou 2 minutos para chegar).', 'ok');
       })
       .catch(function (e) {
         status('Falha no envio (' + e.message + '). Abrindo o app de e-mail…', 'bad');
-        location.href = 'mailto:' + EMAIL + '?subject=' + encodeURIComponent(title()) + '&body=' + encodeURIComponent(json.length > 1800 ? JSON.stringify(R) .slice(0, 1800) + '…' : json);
+        location.href = 'mailto:' + EMAIL + '?subject=' + encodeURIComponent(title()) + '&body=' + encodeURIComponent(resumo().slice(0, 1800));
       })
       .then(function () { btnSend.disabled = false; });
   };
