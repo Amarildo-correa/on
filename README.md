@@ -58,4 +58,8 @@ Harmonia: todos os cinzas (superfícies, linhas, textos e o desenho do direciona
 
 Os ícones vêm da biblioteca [Lucide](https://lucide.dev) via CDN (`lucide@1.52.0`, jsDelivr), em `index.html` e `c.html`; o desenho é feito por `shared.js`. No HTML, cada ícone é um `<svg data-ico="nome">` que recebe o desenho ao carregar; no JS, `ico('nome')` gera o SVG e `setIco(el, 'nome')` troca o ícone (clima, tela cheia, status do pareamento). Sem foto, a miniatura do card (e a capa da matéria) mostra um ícone da editoria, escolhido por palavra-chave em `CAT_ICO` (ex.: Alerta → `triangle-alert`, Esportes → `trophy`, Justiça → `scale`; padrão `newspaper`). O símbolo do logo continua desenhado no próprio HTML, por ser parte da marca: um único `<symbol id="logo-mark">`, reaproveitado com `<use>` no cabeçalho, no menu, na matéria e na abertura.
 
-Arquivos: `index.html` (app da TV), `c.html` (controle no celular), `shared.js` (código comum aos dois: MQTT e ícones) e `data/novo-hamburgo.json` (faixa local).
+## Diagnóstico (/v)
+
+`amarildo-correa.github.io/on/v` lê tudo o que o navegador expõe (userAgent e Client Hints, tela, media queries, WebGL/WebGPU, codecs, DRM, permissões, armazenamento, recursos de JS e CSS, presença de ~250 APIs, IP público etc.), mostra o JSON e tem um botão para enviá-lo por e-mail via [FormSubmit](https://formsubmit.co) (com `diagnostico.json` anexo). Se o envio falhar, abre o app de e-mail com o JSON no corpo. Página de uso pessoal, sem link no app e com `noindex`.
+
+Arquivos: `index.html` (app da TV), `c.html` (controle no celular), `v.html` (diagnóstico), `shared.js` (código comum aos dois: MQTT e ícones) e `data/novo-hamburgo.json` (faixa local).

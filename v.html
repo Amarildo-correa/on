@@ -1,0 +1,458 @@
+<!doctype html>
+<!--
+  /v: lê tudo o que o navegador expõe sobre si mesmo, o sistema e o aparelho, mostra em JSON
+  e envia por e-mail. Página de diagnóstico de uso pessoal: sem regras de segurança.
+  ES5 de propósito (com recursos novos só quando existem): roda nos navegadores antigos de TV.
+-->
+<html lang="pt-BR">
+<title>Read on TV · Diagnóstico</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#2A2D35">
+<style>
+  :root { --bg: #2A2D35; --card: #121418; --control: #41454E; --brand: #357DED; --focus: #FFD60A; --white: #FFFFFF; --sub: #B0B3B9; --ok: #7BE495; --bad: #FF8A80; color-scheme: dark; }
+  html, body { margin: 0; background: var(--bg); color: var(--white); font-family: Roboto, system-ui, sans-serif; }
+  main { padding: 16px; box-sizing: border-box; }
+  .bar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 12px; }
+  button { border: 0; border-radius: 10px; background: var(--brand); color: var(--white); font: inherit; font-size: 18px; font-weight: 700; padding: 12px 20px; cursor: pointer; }
+  button.alt { background: var(--control); }
+  button:focus { outline: 4px solid var(--focus); outline-offset: 2px; }
+  button[disabled] { opacity: .5; cursor: default; }
+  #st { font-size: 15px; color: var(--sub); }
+  #st.ok { color: var(--ok); } #st.bad { color: var(--bad); }
+  pre { margin: 0; padding: 12px; background: var(--card); border-radius: 10px; font: 13px/1.45 "Roboto Mono", ui-monospace, monospace; white-space: pre-wrap; word-break: break-word; }
+</style>
+<main>
+  <div class="bar">
+    <button id="send" disabled>Enviar por e-mail</button>
+    <button id="copy" class="alt" disabled>Copiar JSON</button>
+    <span id="st">Lendo informações do navegador…</span>
+  </div>
+  <pre id="out"></pre>
+</main>
+<script>
+(function () {
+  var EMAIL = 'amarildonovohamburgo@gmail.com';
+  var R = {};
+  var out = document.getElementById('out'), st = document.getElementById('st');
+  var btnSend = document.getElementById('send'), btnCopy = document.getElementById('copy');
+
+  function status(msg, cls) { st.textContent = msg; st.className = cls || ''; }
+  function safe(fn) { try { var v = fn(); return v === undefined ? null : v; } catch (e) { return 'erro: ' + (e && e.message || e); } }
+  function has(obj, name) { try { return obj != null && name in obj; } catch (e) { return false; } }
+  /* promessa com tempo limite: nenhuma API lenta trava a leitura */
+  function wait(p, ms) {
+    return new Promise(function (res) {
+      var done = false, t = setTimeout(function () { if (!done) { done = true; res('tempo esgotado'); } }, ms || 3000);
+      Promise.resolve(p).then(function (v) { if (!done) { done = true; clearTimeout(t); res(v); } },
+        function (e) { if (!done) { done = true; clearTimeout(t); res('erro: ' + (e && (e.name + ': ' + e.message) || e)); } });
+    });
+  }
+  /* copia as propriedades simples de um objeto do navegador (inclusive as do protótipo) */
+  function plain(o) {
+    if (!o) return null;
+    var r = {};
+    for (var k in o) {
+      try { var v = o[k]; if (v === null || /^(string|number|boolean)$/.test(typeof v)) r[k] = v; } catch (e) {}
+    }
+    return r;
+  }
+
+  /* ---------- síncronos ---------- */
+  var n = navigator;
+  R.coletadoEm = new Date().toISOString();
+  R.pagina = { url: location.href, referrer: document.referrer, titulo: document.title, protocolo: location.protocol,
+    contextoSeguro: window.isSecureContext, isolamentoCrossOrigin: window.crossOriginIsolated, modoDocumento: document.compatMode,
+    charset: document.characterSet, visibilidade: document.visibilityState, emIframe: safe(function () { return window.top !== window.self; }) };
+
+  R.navigator = safe(function () {
+    var o = plain(n);
+    o.languages = n.languages ? Array.prototype.slice.call(n.languages) : null;
+    o.plugins = n.plugins ? Array.prototype.map.call(n.plugins, function (p) { return p.name + ' (' + p.filename + ')'; }) : null;
+    o.mimeTypes = n.mimeTypes ? Array.prototype.map.call(n.mimeTypes, function (m) { return m.type; }) : null;
+    o.connection = n.connection ? plain(n.connection) : null;
+    o.doNotTrack = n.doNotTrack || window.doNotTrack || n.msDoNotTrack || null;
+    o.globalPrivacyControl = has(n, 'globalPrivacyControl') ? n.globalPrivacyControl : null;
+    o.userActivation = n.userActivation ? plain(n.userActivation) : null;
+    return o;
+  });
+
+  R.userAgentData = safe(function () {
+    var d = n.userAgentData; if (!d) return 'não suportado';
+    return { brands: d.brands, mobile: d.mobile, platform: d.platform };
+  });
+
+  R.tela = safe(function () {
+    var s = screen, o = plain(s);
+    o.orientation = s.orientation ? { type: s.orientation.type, angle: s.orientation.angle } : (window.orientation != null ? window.orientation : null);
+    o.devicePixelRatio = window.devicePixelRatio;
+    o.janela = { innerWidth: innerWidth, innerHeight: innerHeight, outerWidth: outerWidth, outerHeight: outerHeight,
+      clientWidth: document.documentElement.clientWidth, clientHeight: document.documentElement.clientHeight,
+      screenX: window.screenX, screenY: window.screenY,
+      visualViewport: window.visualViewport ? { width: visualViewport.width, height: visualViewport.height, scale: visualViewport.scale } : null };
+    return o;
+  });
+
+  R.mediaQueries = safe(function () {
+    var q = {
+      'prefers-color-scheme': ['dark', 'light'], 'prefers-reduced-motion': ['reduce', 'no-preference'],
+      'prefers-contrast': ['more', 'less', 'custom', 'no-preference'], 'prefers-reduced-transparency': ['reduce'],
+      'prefers-reduced-data': ['reduce'], 'forced-colors': ['active', 'none'], 'inverted-colors': ['inverted', 'none'],
+      'color-gamut': ['srgb', 'p3', 'rec2020'], 'dynamic-range': ['standard', 'high'], 'video-dynamic-range': ['standard', 'high'],
+      'pointer': ['none', 'coarse', 'fine'], 'any-pointer': ['none', 'coarse', 'fine'], 'hover': ['none', 'hover'], 'any-hover': ['none', 'hover'],
+      'display-mode': ['browser', 'fullscreen', 'standalone', 'minimal-ui', 'picture-in-picture'],
+      'orientation': ['portrait', 'landscape'], 'scripting': ['enabled', 'initial-only', 'none'], 'update': ['fast', 'slow', 'none'],
+      'overflow-block': ['scroll', 'paged', 'none'], 'scan': ['interlace', 'progressive'], 'grid': ['0', '1'], 'monochrome': ['0']
+    }, r = {};
+    if (!window.matchMedia) return 'não suportado';
+    for (var k in q) {
+      var hit = [];
+      for (var i = 0; i < q[k].length; i++) if (matchMedia('(' + k + ': ' + q[k][i] + ')').matches) hit.push(q[k][i]);
+      r[k] = hit.length ? hit.join(', ') : null;
+    }
+    for (var b = 1; b <= 16; b++) if (matchMedia('(color: ' + b + ')').matches) r.color = b;
+    return r;
+  });
+
+  R.intl = safe(function () {
+    var o = Intl.DateTimeFormat().resolvedOptions();
+    return { timeZone: o.timeZone, locale: o.locale, calendar: o.calendar, numberingSystem: o.numberingSystem, hourCycle: o.hourCycle,
+      offsetMinutos: -new Date().getTimezoneOffset(), dataLocal: new Date().toString(), numero: (1234567.891).toLocaleString(),
+      supportedValuesOf: !!Intl.supportedValuesOf, segmenter: !!Intl.Segmenter, listFormat: !!Intl.ListFormat, relativeTime: !!Intl.RelativeTimeFormat, displayNames: !!Intl.DisplayNames };
+  });
+
+  R.armazenamento = {
+    localStorage: safe(function () { localStorage.setItem('__v', '1'); localStorage.removeItem('__v'); return true; }),
+    sessionStorage: safe(function () { sessionStorage.setItem('__v', '1'); sessionStorage.removeItem('__v'); return true; }),
+    indexedDB: !!window.indexedDB, cacheStorage: has(window, 'caches'), cookieEnabled: n.cookieEnabled,
+    cookiesVisiveis: safe(function () { return document.cookie.split(';').filter(Boolean).length; })
+  };
+
+  R.performance = safe(function () {
+    var p = window.performance, o = {};
+    if (!p) return 'não suportado';
+    if (p.memory) o.memory = { jsHeapSizeLimit: p.memory.jsHeapSizeLimit, totalJSHeapSize: p.memory.totalJSHeapSize, usedJSHeapSize: p.memory.usedJSHeapSize };
+    var nav = p.getEntriesByType && p.getEntriesByType('navigation')[0];
+    if (nav) o.navegacao = { tipo: nav.type, protocolo: nav.nextHopProtocol, duracaoMs: Math.round(nav.duration), domInteractiveMs: Math.round(nav.domInteractive), transferSize: nav.transferSize };
+    o.timeOrigin = p.timeOrigin;
+    o.recursos = p.getEntriesByType ? p.getEntriesByType('resource').length : null;
+    return o;
+  });
+
+  /* WebGL: placa de vídeo, driver e limites */
+  function gl(kind) {
+    return safe(function () {
+      var c = document.createElement('canvas'), g = c.getContext(kind) || (kind === 'webgl' && c.getContext('experimental-webgl'));
+      if (!g) return 'não suportado';
+      var dbg = g.getExtension('WEBGL_debug_renderer_info'), P = function (k) { return g.getParameter(k); };
+      return {
+        vendor: P(g.VENDOR), renderer: P(g.RENDERER), version: P(g.VERSION), shadingLanguage: P(g.SHADING_LANGUAGE_VERSION),
+        unmaskedVendor: dbg ? P(dbg.UNMASKED_VENDOR_WEBGL) : null, unmaskedRenderer: dbg ? P(dbg.UNMASKED_RENDERER_WEBGL) : null,
+        maxTextureSize: P(g.MAX_TEXTURE_SIZE), maxRenderbufferSize: P(g.MAX_RENDERBUFFER_SIZE), maxViewportDims: Array.prototype.slice.call(P(g.MAX_VIEWPORT_DIMS)),
+        maxVertexAttribs: P(g.MAX_VERTEX_ATTRIBS), maxTextureImageUnits: P(g.MAX_TEXTURE_IMAGE_UNITS), antialias: (g.getContextAttributes() || {}).antialias,
+        extensoes: g.getSupportedExtensions()
+      };
+    });
+  }
+  R.webgl = gl('webgl');
+  R.webgl2 = gl('webgl2');
+
+  R.canvas = safe(function () {
+    var c = document.createElement('canvas');
+    return { canvas2d: !!c.getContext('2d'), toDataURLwebp: c.toDataURL('image/webp').indexOf('image/webp') > -1,
+      offscreenCanvas: has(window, 'OffscreenCanvas'), createImageBitmap: has(window, 'createImageBitmap') };
+  });
+
+  /* formatos de mídia que o navegador sabe tocar */
+  var VIDEO = ['video/mp4; codecs="avc1.42E01E"', 'video/mp4; codecs="avc1.640028"', 'video/mp4; codecs="hev1.1.6.L93.B0"', 'video/mp4; codecs="hvc1.1.6.L93.B0"',
+    'video/mp4; codecs="hvc1.2.4.L153.B0"', 'video/mp4; codecs="dvh1.05.06"', 'video/mp4; codecs="av01.0.05M.08"', 'video/mp4; codecs="av01.0.12M.10.0.110.09.16.09.0"',
+    'video/mp4; codecs="vp09.00.10.08"', 'video/mp4; codecs="vp09.02.10.10.01.09.16.09.01"', 'video/webm; codecs="vp8"', 'video/webm; codecs="vp9"',
+    'video/webm; codecs="av1"', 'video/ogg; codecs="theora"', 'video/mp2t; codecs="avc1.42E01E,mp4a.40.2"', 'application/vnd.apple.mpegurl', 'application/x-mpegURL', 'application/dash+xml'];
+  var AUDIO = ['audio/mp4; codecs="mp4a.40.2"', 'audio/mp4; codecs="mp4a.40.5"', 'audio/mp4; codecs="ac-3"', 'audio/mp4; codecs="ec-3"', 'audio/mp4; codecs="ac-4"',
+    'audio/mp4; codecs="opus"', 'audio/mp4; codecs="flac"', 'audio/mp4; codecs="dtsc"', 'audio/mpeg', 'audio/aac', 'audio/flac', 'audio/wav; codecs="1"',
+    'audio/webm; codecs="opus"', 'audio/webm; codecs="vorbis"', 'audio/ogg; codecs="opus"', 'audio/ogg; codecs="vorbis"'];
+  R.midia = safe(function () {
+    var v = document.createElement('video'), a = document.createElement('audio'), MS = window.MediaSource || window.WebKitMediaSource, MMS = window.ManagedMediaSource;
+    function table(list, el) {
+      var o = {};
+      for (var i = 0; i < list.length; i++) o[list[i]] = { canPlayType: el.canPlayType(list[i]) || 'não',
+        mediaSource: MS && MS.isTypeSupported ? MS.isTypeSupported(list[i]) : null, managedMediaSource: MMS ? MMS.isTypeSupported(list[i]) : null };
+      return o;
+    }
+    return { mediaSource: !!MS, managedMediaSource: !!MMS, pictureInPicture: document.pictureInPictureEnabled || false, remotePlayback: has(v, 'remote'),
+      webkitPresentationMode: has(v, 'webkitSupportsPresentationMode'), video: table(VIDEO, v), audio: table(AUDIO, a) };
+  });
+
+  R.fullscreen = { fullscreenEnabled: document.fullscreenEnabled || document.webkitFullscreenEnabled || false,
+    requestFullscreen: !!(document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen) };
+
+  /* CSS que o motor entende */
+  R.css = safe(function () {
+    if (!window.CSS || !CSS.supports) return 'CSS.supports não suportado';
+    var list = ['display: grid', 'display: flex', 'gap: 1px', 'display: contents', 'aspect-ratio: 1', 'position: sticky', 'backdrop-filter: blur(1px)', '-webkit-backdrop-filter: blur(1px)',
+      'container-type: inline-size', 'selector(:has(a))', 'selector(:is(a))', 'selector(:where(a))', 'selector(:focus-visible)', 'color: oklch(50% 0.1 200)', 'color: color-mix(in srgb, red, blue)',
+      'color: color(display-p3 1 0 0)', 'inset: 0', 'scroll-snap-type: x mandatory', 'overscroll-behavior: contain', 'content-visibility: auto', 'mask-image: none', '-webkit-mask-image: none',
+      'clip-path: circle(50%)', 'font-variation-settings: "wght" 400', 'text-wrap: balance', 'anchor-name: --a', 'view-transition-name: a', 'animation-timeline: scroll()',
+      'translate: 1px', 'accent-color: red', 'height: 1dvh', 'width: 1cqw', 'field-sizing: content', 'interpolate-size: allow-keywords', 'scrollbar-gutter: stable', 'zoom: 1'];
+    var o = {};
+    for (var i = 0; i < list.length; i++) o[list[i]] = list[i].indexOf('selector(') === 0 ? CSS.supports(list[i]) : CSS.supports('(' + list[i] + ')');
+    o.nesting = safe(function () { var s = document.createElement('style'); s.textContent = 'a{&b{color:red}}'; document.head.appendChild(s); var ok = !!(s.sheet && s.sheet.cssRules[0] && s.sheet.cssRules[0].cssRules); s.remove(); return ok; });
+    o.paintWorklet = has(CSS, 'paintWorklet'); o.registerProperty = has(CSS, 'registerProperty'); o.highlights = has(CSS, 'highlights');
+    return o;
+  });
+
+  /* JavaScript: recursos da linguagem */
+  R.javascript = safe(function () {
+    function syn(src) { try { new Function(src); return true; } catch (e) { return false; } }
+    return {
+      arrowFunctions: syn('()=>1'), classes: syn('class A{}'), letConst: syn('let a=1;const b=2'), templateLiterals: syn('`a`'), destructuring: syn('var {a}={}'),
+      spread: syn('[...[]]'), asyncAwait: syn('async function f(){await 1}'), generators: syn('function*g(){}'), asyncIterators: syn('async function f(){for await(var x of []);}'),
+      optionalChaining: syn('a?.b'), nullish: syn('a??b'), bigint: typeof BigInt === 'function', classFields: syn('class A{a=1;#b=2}'), staticBlocks: syn('class A{static{}}'),
+      logicalAssignment: syn('a||=1'), numericSeparators: syn('1_000'), topLevelAwaitModule: null, regexLookbehind: syn('/(?<=a)b/'), regexNamedGroups: syn('/(?<n>a)/'), regexV: syn('/[\\p{L}--a]/v'),
+      Promise: typeof Promise, PromiseAllSettled: !!(window.Promise && Promise.allSettled), PromiseAny: !!(window.Promise && Promise.any), PromiseWithResolvers: !!(window.Promise && Promise.withResolvers),
+      Proxy: typeof Proxy, Reflect: typeof Reflect, Symbol: typeof Symbol, WeakRef: typeof WeakRef, FinalizationRegistry: typeof FinalizationRegistry,
+      ArrayAt: !!Array.prototype.at, ArrayFlat: !!Array.prototype.flat, ArrayFindLast: !!Array.prototype.findLast, ArrayToSorted: !!Array.prototype.toSorted, ArrayFromAsync: !!Array.fromAsync,
+      ObjectHasOwn: !!Object.hasOwn, ObjectGroupBy: !!Object.groupBy, StringReplaceAll: !!String.prototype.replaceAll, StructuredClone: typeof structuredClone,
+      SetMethods: !!(window.Set && Set.prototype.union), IteratorHelpers: typeof Iterator !== 'undefined' && !!Iterator.prototype && !!Iterator.prototype.map,
+      Temporal: typeof Temporal !== 'undefined', SharedArrayBuffer: typeof SharedArrayBuffer, Atomics: typeof Atomics, WebAssembly: typeof WebAssembly,
+      wasmSimd: safe(function () { return WebAssembly.validate(new Uint8Array([0,97,115,109,1,0,0,0,1,5,1,96,0,1,123,3,2,1,0,10,10,1,8,0,65,0,253,15,253,98,11])); }),
+      wasmThreads: safe(function () { return typeof WebAssembly.Memory === 'function' && !!new WebAssembly.Memory({ initial: 1, maximum: 1, shared: true }).buffer; }),
+      esModules: 'noModule' in document.createElement('script'), importMaps: !!(HTMLScriptElement.supports && HTMLScriptElement.supports('importmap')),
+      eval: safe(function () { return eval('1+1') === 2; })
+    };
+  });
+
+  /* presença de APIs (globais, navigator, document, elementos) */
+  var API = {
+    window: ['fetch', 'XMLHttpRequest', 'WebSocket', 'WebTransport', 'EventSource', 'Worker', 'SharedWorker', 'ServiceWorker', 'BroadcastChannel', 'MessageChannel',
+      'AbortController', 'ReadableStream', 'WritableStream', 'TransformStream', 'CompressionStream', 'DecompressionStream', 'TextEncoder', 'TextDecoder', 'URL', 'URLSearchParams', 'URLPattern',
+      'Blob', 'File', 'FileReader', 'FormData', 'Headers', 'Request', 'Response', 'crypto', 'Crypto', 'SubtleCrypto', 'IntersectionObserver', 'ResizeObserver', 'MutationObserver',
+      'PerformanceObserver', 'ReportingObserver', 'requestIdleCallback', 'requestAnimationFrame', 'queueMicrotask', 'scheduler', 'customElements', 'ShadowRoot', 'HTMLTemplateElement',
+      'AudioContext', 'webkitAudioContext', 'OfflineAudioContext', 'AudioWorklet', 'MediaRecorder', 'MediaStream', 'MediaStreamTrack', 'ImageCapture', 'RTCPeerConnection', 'webkitRTCPeerConnection',
+      'RTCDataChannel', 'MediaKeys', 'MediaKeySession', 'VideoDecoder', 'VideoEncoder', 'AudioDecoder', 'AudioEncoder', 'ImageDecoder', 'VideoFrame', 'EncodedVideoChunk',
+      'speechSynthesis', 'SpeechSynthesisUtterance', 'SpeechRecognition', 'webkitSpeechRecognition', 'Notification', 'PushManager', 'PaymentRequest', 'PublicKeyCredential', 'PasswordCredential',
+      'IdentityCredential', 'FederatedCredential', 'Gamepad', 'GamepadHapticActuator', 'DeviceOrientationEvent', 'DeviceMotionEvent', 'AbsoluteOrientationSensor', 'Accelerometer', 'Gyroscope',
+      'Magnetometer', 'AmbientLightSensor', 'GravitySensor', 'LinearAccelerationSensor', 'TouchEvent', 'PointerEvent', 'Touch', 'DragEvent', 'ClipboardItem', 'EyeDropper',
+      'showOpenFilePicker', 'showSaveFilePicker', 'showDirectoryPicker', 'FileSystemHandle', 'FileSystemFileHandle', 'documentPictureInPicture', 'launchQueue', 'getScreenDetails',
+      'queryLocalFonts', 'BarcodeDetector', 'FaceDetector', 'TextDetector', 'Translator', 'LanguageDetector', 'Summarizer', 'Writer', 'Rewriter', 'Proofreader', 'LanguageModel', 'ai',
+      'XRSystem', 'XRSession', 'PresentationRequest', 'RemotePlayback', 'MediaSession', 'MediaMetadata', 'CookieStore', 'cookieStore', 'StorageManager', 'LockManager', 'Navigation', 'navigation',
+      'CloseWatcher', 'ViewTransition', 'Highlight', 'Sanitizer', 'TrustedTypes', 'trustedTypes', 'SharedStorage', 'sharedStorage', 'Fence', 'FencedFrameConfig', 'PressureObserver',
+      'ComputePressureObserver', 'IdleDetector', 'NavigatorUAData', 'NetworkInformation', 'BatteryManager', 'WakeLock', 'WakeLockSentinel', 'VirtualKeyboard', 'EditContext', 'Profiler',
+      'webkit', 'chrome', 'opera', 'safari', 'netscape', 'external', 'onorientationchange', 'tizen', 'webOS', 'webOSSystem', 'PalmSystem', 'AmazonWebAppPlatform', 'Android', 'amazon'],
+    navigator: ['serviceWorker', 'storage', 'permissions', 'mediaDevices', 'mediaCapabilities', 'mediaSession', 'requestMediaKeySystemAccess', 'geolocation', 'clipboard', 'share', 'canShare',
+      'credentials', 'locks', 'wakeLock', 'getBattery', 'getGamepads', 'vibrate', 'bluetooth', 'usb', 'hid', 'serial', 'nfc', 'xr', 'gpu', 'ml', 'presentation', 'keyboard', 'virtualKeyboard',
+      'contacts', 'ink', 'scheduling', 'userActivation', 'windowControlsOverlay', 'login', 'setAppBadge', 'clearAppBadge', 'getInstalledRelatedApps', 'registerProtocolHandler', 'sendBeacon',
+      'pdfViewerEnabled', 'webdriver', 'deviceMemory', 'hardwareConcurrency', 'maxTouchPoints', 'connection', 'onLine', 'cookieEnabled', 'javaEnabled', 'globalPrivacyControl', 'managed',
+      'devicePosture', 'protectedAudience', 'joinAdInterestGroup', 'runAdAuction', 'brave', 'standalone'],
+    document: ['fonts', 'startViewTransition', 'requestStorageAccess', 'hasStorageAccess', 'browsingTopics', 'interestCohort', 'featurePolicy', 'permissionsPolicy', 'exitPictureInPicture',
+      'pictureInPictureEnabled', 'exitPointerLock', 'adoptedStyleSheets', 'timeline', 'prerendering', 'activeViewTransition', 'caretPositionFromPoint', 'caretRangeFromPoint'],
+    elemento: ['requestFullscreen', 'webkitRequestFullscreen', 'requestPointerLock', 'attachShadow', 'animate', 'checkVisibility', 'showPopover', 'computedStyleMap', 'scrollIntoViewIfNeeded',
+      'setHTMLUnsafe', 'moveBefore', 'ariaLabel', 'inert', 'focus'],
+    html: ['dialog', 'details', 'popover', 'loading-lazy', 'inputmode', 'enterkeyhint', 'input-date', 'input-color', 'input-datetime-local', 'picture', 'srcset', 'search-element']
+  };
+  R.apis = safe(function () {
+    var o = {}, k, i, el = document.createElement('div');
+    o.window = {}; for (i = 0; i < API.window.length; i++) o.window[API.window[i]] = has(window, API.window[i]);
+    o.navigator = {}; for (i = 0; i < API.navigator.length; i++) o.navigator[API.navigator[i]] = has(n, API.navigator[i]);
+    o.document = {}; for (i = 0; i < API.document.length; i++) o.document[API.document[i]] = has(document, API.document[i]);
+    o.elemento = {}; for (i = 0; i < API.elemento.length; i++) o.elemento[API.elemento[i]] = has(el, API.elemento[i]);
+    function inputType(t) { var x = document.createElement('input'); x.setAttribute('type', t); return x.type === t; }
+    o.html = { dialog: typeof HTMLDialogElement === 'function', details: 'open' in document.createElement('details'), popover: has(el, 'popover'),
+      'loading-lazy': 'loading' in HTMLImageElement.prototype, inputmode: 'inputMode' in el, enterkeyhint: 'enterKeyHint' in el,
+      'input-date': inputType('date'), 'input-color': inputType('color'), 'input-datetime-local': inputType('datetime-local'),
+      picture: typeof HTMLPictureElement === 'function', srcset: 'srcset' in document.createElement('img'), 'search-element': String(document.createElement('search')) !== '[object HTMLUnknownElement]' };
+    var tot = 0, sim = 0; for (k in o) for (var j in o[k]) { tot++; if (o[k][j] === true) sim++; }
+    o.resumo = sim + ' de ' + tot + ' disponíveis';
+    return o;
+  });
+
+  /* palpite legível do sistema e do navegador, a partir do userAgent */
+  R.deteccao = safe(function () {
+    var ua = n.userAgent, m, os = null, br = null, tv = null;
+    if ((m = ua.match(/Windows NT ([\d.]+)/))) os = 'Windows NT ' + m[1];
+    else if ((m = ua.match(/Android ([\d.]+)/))) os = 'Android ' + m[1];
+    else if ((m = ua.match(/(?:iPhone|CPU) OS ([\d_]+)/))) os = 'iOS ' + m[1].replace(/_/g, '.');
+    else if ((m = ua.match(/Mac OS X ([\d_.]+)/))) os = 'macOS ' + m[1].replace(/_/g, '.');
+    else if (/CrOS/.test(ua)) os = 'ChromeOS';
+    else if (/Linux/.test(ua)) os = 'Linux';
+    if ((m = ua.match(/Silk\/([\d.]+)/))) br = 'Amazon Silk ' + m[1];
+    else if ((m = ua.match(/Edg\w*\/([\d.]+)/))) br = 'Edge ' + m[1];
+    else if ((m = ua.match(/OPR\/([\d.]+)/))) br = 'Opera ' + m[1];
+    else if ((m = ua.match(/SamsungBrowser\/([\d.]+)/))) br = 'Samsung Internet ' + m[1];
+    else if ((m = ua.match(/Firefox\/([\d.]+)/))) br = 'Firefox ' + m[1];
+    else if ((m = ua.match(/Chrome\/([\d.]+)/))) br = 'Chrome/Chromium ' + m[1];
+    else if ((m = ua.match(/Version\/([\d.]+).*Safari/))) br = 'Safari ' + m[1];
+    if ((m = ua.match(/AFT\w+/))) tv = 'Fire TV (' + m[0] + ')';
+    else if (/Tizen/.test(ua)) tv = 'Samsung Tizen';
+    else if (/Web0S|webOS/.test(ua)) tv = 'LG webOS';
+    else if (/SMART-TV|SmartTV|HbbTV|BRAVIA|GoogleTV|Android TV|AndroidTV|CrKey|Roku|AppleTV/i.test(ua)) tv = 'Smart TV / TV box';
+    var engine = /Gecko\/\d/.test(ua) && /Firefox/.test(ua) ? 'Gecko' : /Chrome|Chromium|Silk/.test(ua) ? 'Blink' : /AppleWebKit/.test(ua) ? 'WebKit' : null;
+    return { sistema: os, navegador: br, motor: engine, tv: tv, mobile: /Mobi|Android/.test(ua) && !tv, touch: (n.maxTouchPoints || 0) > 0 || 'ontouchstart' in window };
+  });
+
+  /* ---------- assíncronos ---------- */
+  var jobs = [];
+  function job(key, fn, ms) { jobs.push(wait(Promise.resolve().then(fn), ms).then(function (v) { R[key] = v; })); }
+
+  job('userAgentDataAlta', function () {
+    if (!n.userAgentData || !n.userAgentData.getHighEntropyValues) return 'não suportado';
+    return n.userAgentData.getHighEntropyValues(['architecture', 'bitness', 'brands', 'formFactors', 'fullVersionList', 'mobile', 'model', 'platform', 'platformVersion', 'uaFullVersion', 'wow64']);
+  });
+  job('armazenamentoEstimativa', function () {
+    if (!n.storage || !n.storage.estimate) return 'não suportado';
+    return Promise.all([n.storage.estimate(), n.storage.persisted ? n.storage.persisted() : null]).then(function (r) {
+      return { quotaBytes: r[0].quota, usoBytes: r[0].usage, quotaGB: r[0].quota ? +(r[0].quota / 1073741824).toFixed(2) : null, persistente: r[1], detalhes: r[0].usageDetails || null };
+    });
+  });
+  job('permissoes', function () {
+    if (!n.permissions || !n.permissions.query) return 'não suportado';
+    var names = ['geolocation', 'notifications', 'push', 'camera', 'microphone', 'clipboard-read', 'clipboard-write', 'persistent-storage', 'midi', 'background-sync', 'accelerometer',
+      'gyroscope', 'magnetometer', 'ambient-light-sensor', 'screen-wake-lock', 'idle-detection', 'local-fonts', 'window-management', 'storage-access', 'display-capture', 'payment-handler', 'speaker-selection', 'keyboard-lock', 'pointer-lock'], o = {};
+    return Promise.all(names.map(function (nm) {
+      return wait(n.permissions.query(nm === 'push' ? { name: nm, userVisibleOnly: true } : { name: nm }), 1500).then(function (s) { o[nm] = s && s.state ? s.state : 'não suportado'; });
+    })).then(function () { return o; });
+  });
+  job('dispositivosMidia', function () {
+    if (!n.mediaDevices || !n.mediaDevices.enumerateDevices) return 'não suportado';
+    return n.mediaDevices.enumerateDevices().then(function (d) {
+      var c = {}; d.forEach(function (x) { c[x.kind] = (c[x.kind] || 0) + 1; });
+      return { contagem: c, rotulos: d.map(function (x) { return x.kind + ': ' + (x.label || '(sem permissão)'); }),
+        constraintsSuportadas: n.mediaDevices.getSupportedConstraints ? Object.keys(n.mediaDevices.getSupportedConstraints()) : null, getDisplayMedia: !!n.mediaDevices.getDisplayMedia };
+    });
+  });
+  job('drm', function () {
+    if (!n.requestMediaKeySystemAccess) return 'EME não suportado';
+    var ks = ['com.widevine.alpha', 'com.microsoft.playready', 'com.microsoft.playready.recommendation', 'com.microsoft.playready.recommendation.3000', 'com.apple.fps', 'com.apple.fps.1_0', 'org.w3.clearkey', 'com.chromecast.playready'], o = {};
+    var cfg = [{ initDataTypes: ['cenc'], videoCapabilities: [{ contentType: 'video/mp4; codecs="avc1.42E01E"' }], audioCapabilities: [{ contentType: 'audio/mp4; codecs="mp4a.40.2"' }] }];
+    return Promise.all(ks.map(function (k) {
+      return wait(n.requestMediaKeySystemAccess(k, cfg).then(function (a) {
+        var c = a.getConfiguration(); return { suportado: true, distinctiveIdentifier: c.distinctiveIdentifier, persistentState: c.persistentState, sessionTypes: c.sessionTypes };
+      }), 3000).then(function (v) { o[k] = typeof v === 'string' ? { suportado: false, motivo: v } : v; });
+    })).then(function () {
+      /* nível de segurança do Widevine (L1 = hardware) */
+      return wait(n.requestMediaKeySystemAccess('com.widevine.alpha', [{ initDataTypes: ['cenc'], videoCapabilities: [{ contentType: 'video/mp4; codecs="avc1.42E01E"', robustness: 'HW_SECURE_ALL' }] }]), 3000)
+        .then(function (v) { if (o['com.widevine.alpha']) o['com.widevine.alpha'].hwSecureAll = typeof v !== 'string'; return o; });
+    });
+  }, 8000);
+  job('mediaCapabilities', function () {
+    if (!n.mediaCapabilities || !n.mediaCapabilities.decodingInfo) return 'não suportado';
+    var tests = [['H.264 1080p30', 'video/mp4; codecs="avc1.640028"', 1920, 1080, 30, 8e6], ['H.264 2160p30', 'video/mp4; codecs="avc1.640033"', 3840, 2160, 30, 25e6],
+      ['HEVC 2160p60 10bit', 'video/mp4; codecs="hvc1.2.4.L153.B0"', 3840, 2160, 60, 35e6], ['VP9 2160p60', 'video/webm; codecs="vp09.00.51.08"', 3840, 2160, 60, 30e6],
+      ['AV1 2160p60', 'video/mp4; codecs="av01.0.13M.10"', 3840, 2160, 60, 30e6], ['AV1 1080p30', 'video/mp4; codecs="av01.0.08M.08"', 1920, 1080, 30, 6e6]], o = {};
+    return Promise.all(tests.map(function (t) {
+      return wait(n.mediaCapabilities.decodingInfo({ type: 'media-source', video: { contentType: t[1], width: t[2], height: t[3], framerate: t[4], bitrate: t[5] } }), 2000)
+        .then(function (r) { o[t[0]] = typeof r === 'string' ? r : { supported: r.supported, smooth: r.smooth, powerEfficient: r.powerEfficient }; });
+    })).then(function () { return o; });
+  });
+  job('webgpu', function () {
+    if (!n.gpu) return 'não suportado';
+    return n.gpu.requestAdapter().then(function (a) {
+      if (!a) return 'sem adaptador';
+      var info = a.info || null, lim = {};
+      if (a.limits) for (var k in a.limits) if (typeof a.limits[k] === 'number') lim[k] = a.limits[k];
+      return { info: info ? { vendor: info.vendor, architecture: info.architecture, device: info.device, description: info.description } : null,
+        features: a.features ? Array.from(a.features) : null, limits: lim, isFallbackAdapter: a.isFallbackAdapter, preferredCanvasFormat: n.gpu.getPreferredCanvasFormat ? n.gpu.getPreferredCanvasFormat() : null };
+    });
+  });
+  job('bateria', function () {
+    if (!n.getBattery) return 'não suportado';
+    return n.getBattery().then(function (b) { return { charging: b.charging, level: b.level, chargingTime: b.chargingTime, dischargingTime: b.dischargingTime }; });
+  });
+  job('audio', function () {
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return 'não suportado';
+    var c = new AC(), o = { sampleRate: c.sampleRate, baseLatency: c.baseLatency, outputLatency: c.outputLatency, state: c.state, maxChannelCount: c.destination.maxChannelCount,
+      audioWorklet: !!c.audioWorklet, setSinkId: has(c, 'setSinkId') };
+    if (c.close) c.close();
+    return o;
+  });
+  job('vozes', function () {
+    if (!window.speechSynthesis) return 'não suportado';
+    return new Promise(function (res) {
+      function get() { return speechSynthesis.getVoices().map(function (v) { return v.name + ' [' + v.lang + ']' + (v.localService ? ' local' : ''); }); }
+      var v = get(); if (v.length) return res(v);
+      speechSynthesis.onvoiceschanged = function () { res(get()); };
+      setTimeout(function () { res(get()); }, 1500);
+    });
+  });
+  job('gamepads', function () {
+    if (!n.getGamepads) return 'não suportado';
+    return Array.prototype.filter.call(n.getGamepads(), Boolean).map(function (g) { return { id: g.id, mapping: g.mapping, botoes: g.buttons.length, eixos: g.axes.length }; });
+  });
+  job('serviceWorker', function () {
+    if (!n.serviceWorker || !n.serviceWorker.getRegistrations) return 'não suportado';
+    return n.serviceWorker.getRegistrations().then(function (r) { return { registrosNaOrigem: r.map(function (x) { return x.scope; }) }; });
+  });
+  job('fontes', function () {
+    var list = ['Roboto', 'Arial', 'Helvetica', 'Times New Roman', 'Courier New', 'Verdana', 'Georgia', 'Segoe UI', 'San Francisco', 'SF Pro Text', 'Noto Sans', 'Noto Color Emoji',
+      'Apple Color Emoji', 'Segoe UI Emoji', 'Ubuntu', 'DejaVu Sans', 'Liberation Sans', 'Droid Sans', 'Amazon Ember', 'Bookerly', 'Samsung Sans', 'LG Smart UI', 'Tahoma', 'Calibri', 'Cambria', 'Menlo', 'Consolas'];
+    var c = document.createElement('canvas').getContext('2d'), base = ['monospace', 'serif', 'sans-serif'], w = {}, txt = 'mmmmmmmmmmlli10OQ@#';
+    if (!c) return 'canvas indisponível';
+    base.forEach(function (b) { c.font = '72px ' + b; w[b] = c.measureText(txt).width; });
+    return list.filter(function (f) { return base.some(function (b) { c.font = '72px "' + f + '",' + b; return c.measureText(txt).width !== w[b]; }); });
+  });
+  job('rede', function () {
+    var t0 = Date.now();
+    return fetch(location.href.split('#')[0] + (location.search ? '&' : '?') + '_t=' + t0, { cache: 'no-store' }).then(function (r) {
+      return { pingProprioSiteMs: Date.now() - t0, status: r.status, servidor: r.headers.get('server'), cdn: r.headers.get('via') || r.headers.get('x-served-by') };
+    });
+  });
+  job('ipPublico', function () {
+    return fetch('https://ipapi.co/json/').then(function (r) { return r.json(); }).then(function (j) {
+      return { ip: j.ip, cidade: j.city, regiao: j.region, pais: j.country_name, provedor: j.org, asn: j.asn, fuso: j.timezone };
+    });
+  }, 5000);
+  job('webrtc', function () {
+    var PC = window.RTCPeerConnection || window.webkitRTCPeerConnection;
+    if (!PC) return 'não suportado';
+    var o = { video: null, audio: null };
+    if (window.RTCRtpReceiver && RTCRtpReceiver.getCapabilities) {
+      o.video = (RTCRtpReceiver.getCapabilities('video') || { codecs: [] }).codecs.map(function (c) { return c.mimeType; }).filter(function (v, i, a) { return a.indexOf(v) === i; });
+      o.audio = (RTCRtpReceiver.getCapabilities('audio') || { codecs: [] }).codecs.map(function (c) { return c.mimeType; }).filter(function (v, i, a) { return a.indexOf(v) === i; });
+    }
+    return o;
+  });
+
+  /* ---------- tela e e-mail ---------- */
+  var json = '';
+  Promise.all(jobs).then(function () {
+    R.leituraMs = Math.round(performance.now());
+    json = JSON.stringify(R, null, 2);
+    out.textContent = json;
+    btnSend.disabled = btnCopy.disabled = false;
+    btnSend.focus();
+    status('Leitura concluída (' + Math.round(json.length / 1024) + ' KB).', 'ok');
+  });
+
+  function title() { var d = R.deteccao || {}; return 'Diagnóstico /v · ' + [d.tv, d.navegador, d.sistema].filter(Boolean).join(' · '); }
+
+  /* envio pelo FormSubmit (sem servidor próprio); se falhar, abre o app de e-mail */
+  btnSend.onclick = function () {
+    btnSend.disabled = true;
+    status('Enviando para ' + EMAIL + '…');
+    var fd = new FormData();
+    fd.append('_subject', title());
+    fd.append('_template', 'box');
+    fd.append('_captcha', 'false');
+    fd.append('message', json);
+    fd.append('attachment', new Blob([json], { type: 'application/json' }), 'diagnostico.json');
+    fetch('https://formsubmit.co/ajax/' + EMAIL, { method: 'POST', headers: { Accept: 'application/json' }, body: fd })
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (j && String(j.success) === 'true') status('Enviado para ' + EMAIL + '.', 'ok');
+        else throw new Error(j && j.message || 'resposta inesperada');
+      })
+      .catch(function (e) {
+        status('Falha no envio (' + e.message + '). Abrindo o app de e-mail…', 'bad');
+        location.href = 'mailto:' + EMAIL + '?subject=' + encodeURIComponent(title()) + '&body=' + encodeURIComponent(json.length > 1800 ? JSON.stringify(R) .slice(0, 1800) + '…' : json);
+      })
+      .then(function () { btnSend.disabled = false; });
+  };
+
+  btnCopy.onclick = function () {
+    function fallback() { var t = document.createElement('textarea'); t.value = json; document.body.appendChild(t); t.select(); try { document.execCommand('copy'); status('JSON copiado.', 'ok'); } catch (e) { status('Não foi possível copiar.', 'bad'); } t.remove(); }
+    if (n.clipboard && n.clipboard.writeText) n.clipboard.writeText(json).then(function () { status('JSON copiado.', 'ok'); }, fallback); else fallback();
+  };
+})();
+</script>
