@@ -428,7 +428,7 @@
     if (!GAS_URL) { P.causaProvavel = 'GAS_URL vazio em v.html'; return P; }
     function passo(nome, p) {
       var t0 = Date.now();
-      return wait(p, 8000).then(function (v) {
+      return wait(p, 20000).then(function (v) {
         E[nome] = typeof v === 'string' ? { ok: false, erro: v, ms: Date.now() - t0 } : Object.assign ? Object.assign({ ms: Date.now() - t0 }, v) : v;
         return E[nome];
       });
@@ -471,6 +471,9 @@
       } else if (g.resposta) {
         P.causaProvavel = 'o Google devolveu uma página em vez do JSON (login, aviso ou erro do Apps Script): ' + g.resposta;
         P.comoResolver = 'conferir se a implantação está com "Quem pode acessar: Qualquer pessoa"';
+      } else if (g.erro === 'tempo esgotado') {
+        P.causaProvavel = 'o Apps Script demorou mais de 20 s para responder (aparelho ou rede lentos, ou o script estava "acordando"); não é bloqueio';
+        P.comoResolver = 'recarregar a página e conferir de novo; o envio espera mais tempo e usa o modo compatível se precisar';
       } else if (x && !x.ok) {
         P.causaProvavel = 'o navegador bloqueia qualquer fetch para outros sites (CORS), não só o Google';
         P.comoResolver = 'o envio por formulário (modo compatível) é usado automaticamente';
@@ -481,7 +484,7 @@
       P.erro = g.ok ? null : (g.erro || ('HTTP ' + g.status));
       return P;
     });
-  }, 30000);
+  }, 60000);
 
   /* ---------- tela e e-mail ---------- */
   var json = '';
@@ -551,7 +554,8 @@
      com o JSON completo no corpo e anexo. O destinatário fica fixo no script. Cole aqui a URL /exec da implantação. */
   var GAS_URL = 'https://script.google.com/macros/s/AKfycbx9YCy3CN1BTc5WNnuOgXLVIu2FOQRkrK7ZnAvfzfKCv5A-jlQ4uBBCbNWj7FOZUwY87g/exec';
   function pick(o, keys) { var r = {}; if (!o || typeof o !== 'object') return o; keys.forEach(function (k) { if (o[k] !== undefined) r[k] = o[k]; }); return r; }
-  function resumo() {
+  function resumo() { try { return resumoBruto(); } catch (e) { return 'Resumo indisponível (' + e.message + '). JSON completo abaixo.'; } }
+  function resumoBruto() {
     var d = R.drm && typeof R.drm === 'object' ? R.drm : {}, drm = {};
     for (var k in d) drm[k] = d[k] && d[k].suportado ? (d[k].hwSecureAll ? 'sim (L1)' : 'sim') : 'não';
     var f = R.falaTeste && typeof R.falaTeste === 'object' ? R.falaTeste : R.falaTeste;
@@ -562,8 +566,9 @@
       tela: R.tela ? (R.tela.width + 'x' + R.tela.height + ' @' + R.tela.devicePixelRatio + ' (janela ' + R.tela.janela.innerWidth + 'x' + R.tela.janela.innerHeight + ')') : null,
       hdr: R.mediaQueries && R.mediaQueries['dynamic-range'], gamut: R.mediaQueries && R.mediaQueries['color-gamut'],
       cpu: n.hardwareConcurrency, memoriaGB: n.deviceMemory, gpu: R.webgl && (R.webgl.unmaskedRenderer || R.webgl.renderer), drm: drm,
-      fala: f && typeof f === 'object' ? { existe: f.existeSpeechSynthesis, voz: f.voz, start: f.eventos.start, end: f.eventos.end, erro: f.eventos.error,
-        boundary: f.boundary.total + ' ' + JSON.stringify(f.boundary.tipos), duracaoMs: f.duracaoMs, palpite: f.palpiteSom, ouviu: f.ouvidoPeloUsuario } : f,
+      fala: f && typeof f === 'object' ? (f.eventos ? { existe: f.existeSpeechSynthesis, voz: f.voz, start: f.eventos.start, end: f.eventos.end, erro: f.eventos.error,
+        boundary: f.boundary.total + ' ' + JSON.stringify(f.boundary.tipos), duracaoMs: f.duracaoMs, palpite: f.palpiteSom, ouviu: f.ouvidoPeloUsuario }
+        : { existe: !!f.existeSpeechSynthesis, existeUtterance: !!f.existeUtterance, info: 'speechSynthesis não existe neste navegador: não há voz nativa' }) : f,
       vozes: Array.isArray(R.vozes) ? R.vozes.length : R.vozes, apis: R.apis && R.apis.resumo,
       fuso: R.intl && R.intl.timeZone, ip: R.ipPublico, coletadoEm: R.coletadoEm
     };
