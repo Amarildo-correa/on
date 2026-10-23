@@ -1,0 +1,58 @@
+<!doctype html>
+<!--
+  /t: busca por voz no Fire TV. O botão de microfone é um desenho; por cima dele há um campo de texto
+  transparente do mesmo tamanho, que é quem recebe o OK do controle. Assim o Silk abre o teclado nativo,
+  o microfone do controle dita o texto no campo e a página mostra esse texto no título.
+  (display:none ou visibility:hidden impediriam o foco e o teclado; por isso opacity:0.)
+-->
+<html lang="pt-BR">
+<title>Read on TV · Voz</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#2A2D35">
+<style>
+  :root { --bg: #2A2D35; --control: #41454E; --brand: #357DED; --focus: #FFD60A; --white: #FFFFFF; --sub: #B0B3B9; color-scheme: dark; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--white); font-family: Roboto, system-ui, sans-serif; }
+  main { min-height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 40px; padding: 24px; box-sizing: border-box; text-align: center; }
+  h1 { margin: 0; font-size: 44px; line-height: 1.2; font-weight: 700; max-width: 900px; word-break: break-word; }
+  h1.vazio { color: var(--sub); font-weight: 500; }
+
+  .mic-wrap { position: relative; width: 120px; height: 120px; }
+  .mic-desenho { position: absolute; inset: 0; display: grid; place-items: center; border-radius: 50%; background: var(--control); transition: background .15s, transform .15s; }
+  .mic-desenho svg { width: 52px; height: 52px; fill: none; stroke: var(--white); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  /* campo invisível, por cima do desenho: recebe o OK e o texto ditado */
+  .mic-wrap input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; padding: 0; border: 0; border-radius: 50%;
+    opacity: 0; color: transparent; caret-color: transparent; background: transparent; font-size: 16px; cursor: pointer; }
+  /* o foco é do campo invisível, então quem acende é o desenho */
+  .mic-wrap:focus-within .mic-desenho { background: var(--brand); outline: 5px solid var(--focus); outline-offset: 5px; transform: scale(1.06); }
+</style>
+<main>
+  <h1 id="titulo" class="vazio">Aperte OK no microfone, segure o microfone do controle e fale</h1>
+  <div class="mic-wrap">
+    <span class="mic-desenho" aria-hidden="true"><svg viewBox="0 0 24 24" data-ico="mic"></svg></span>
+    <input id="mic" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" aria-label="Buscar por voz">
+  </div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/lucide@1.52.0/dist/umd/lucide.min.js"></script>
+<script src="shared.js"></script>
+<script>
+(function () {
+  var mic = document.getElementById('mic'), titulo = document.getElementById('titulo'), t;
+  ROTV.drawIcons();
+  mic.focus();
+
+  function usar() {
+    clearTimeout(t);
+    var texto = mic.value.trim();
+    if (!texto) return;
+    titulo.textContent = texto;
+    titulo.className = '';
+    mic.value = '';        /* o campo fica pronto para a próxima fala */
+  }
+  /* o ditado pode chegar em pedaços: espera 800 ms sem mudanças antes de usar o texto */
+  mic.addEventListener('input', function () { clearTimeout(t); t = setTimeout(usar, 800); });
+  mic.addEventListener('change', usar);
+  mic.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); usar(); } });
+})();
+</script>

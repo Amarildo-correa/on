@@ -70,4 +70,8 @@ O primeiro item do JSON, `problemaEnvio`, testa ao abrir cada etapa do caminho a
 
 O botão "Testar fala" testa a voz nativa (`speechSynthesis`): fala uma frase em pt-BR e registra em `falaTeste` os eventos `start`/`end`/`error`, quantos `boundary` dispararam (e de que tipo), a duração e a voz usada. Como o JavaScript não consegue captar o áudio da voz, a página pergunta se você ouviu e grava a resposta em `ouvidoPeloUsuario`. Página de uso pessoal, sem link no app e com `noindex`.
 
-Arquivos: `index.html` (app da TV), `c.html` (controle no celular), `v.html` (diagnóstico), `shared.js` (código comum aos dois: MQTT e ícones) e `data/novo-hamburgo.json` (faixa local).
+## Voz (/t)
+
+`amarildo-correa.github.io/on/t` é a busca por voz mínima para o Fire TV: um botão de microfone desenhado (ícone `mic` do Lucide) com um campo de texto transparente do mesmo tamanho por cima. O OK do controle cai no campo, o Silk abre o teclado nativo e, segurando o microfone do controle, o ditado escreve no campo; a página mostra o texto no título e limpa o campo. O campo usa `opacity: 0` (com `display: none` ou `visibility: hidden` ele não receberia foco nem abriria o teclado) e o foco aparece no desenho via `:focus-within`.
+
+Arquivos: `index.html` (app da TV), `c.html` (controle no celular), `v.html` (diagnóstico), `t.html` (voz), `shared.js` (código comum aos dois: MQTT e ícones) e `data/novo-hamburgo.json` (faixa local).
